@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+
+    <title>Amar Hostel</title>
+    <link rel="shortcut icon" href="{{ asset('./backend/images/logo/favicon.png') }}"
+        type="image/x-icon" />
+
+    @include('layouts.admin.partial.styles')
+    @include('layouts.admin.partial.alert')
+</head>
+
+<body>
+    <div class="overflow-hidden site-wrapper {{ Session::get('session-sidebar') }}">
+        @include('layouts.admin.partial.sidebar')
+
+        <div class="content-wrapper">
+            @include('layouts.admin.partial.header')
+            <div class="content">
+                <div class="p-sm-4 p-3">
+                    @yield('content')
+                </div>
+            </div>
+            @include('layouts.admin.partial.footer')
+        </div>
+    </div>
+    <!-- End Site Wrapper -->
+
+    @include('layouts.admin.partial.scripts')
+
+</body>
+
+</html>
