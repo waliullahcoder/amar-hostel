@@ -24,9 +24,9 @@ Route::group(['middleware' => ['admin']], function () {
 
     // Rooms
     Route::get('rooms', [AdminController::class,'rooms'])->name('rooms');
-    Route::get('rooms/create', [AdminController::class,'roomCreate'])->name('rooms.create');
+    // Route::get('rooms/create', [AdminController::class,'roomCreate'])->name('rooms.create');
     Route::post('rooms/store', [AdminController::class,'roomStore'])->name('rooms.store');
-    Route::get('rooms/{room}/edit', [AdminController::class,'roomEdit'])->name('rooms.edit');
+    // Route::get('rooms/{room}/edit', [AdminController::class,'roomEdit'])->name('rooms.edit');
     Route::put('rooms/{room}', [AdminController::class,'roomUpdate'])->name('rooms.update');
     Route::delete('rooms/{room}', [AdminController::class,'roomDelete'])->name('rooms.delete');
 

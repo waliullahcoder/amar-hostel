@@ -8,7 +8,8 @@ use App\Models\Room;
 use App\Models\Service;
 use App\Models\Booking;
 use App\Models\Testimonial;
-
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 class AdminController extends Controller
 {
     // Dashboard
@@ -34,34 +35,105 @@ class AdminController extends Controller
         return view('admin.rooms.create');
     }
 
+
     public function roomStore(Request $request)
     {
-        $request->validate([
-            'name'=>'required',
-            'price'=>'required|numeric',
-            'capacity'=>'required|integer',
+        $data = $request->validate([
+            'name'             => 'required|string|max:255',
+            'price'            => 'required|numeric',
+            'capacity'         => 'required|integer',
+            'description'      => 'nullable|string',
+            'available'        => 'nullable|boolean',
+
+            // room image
+            'image'            => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+
+            // SEO
+            'meta_title'       => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string',
+            'meta_keywords'    => 'nullable|string',
+            'meta_image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        Room::create($request->all());
-        return redirect()->route('admin.rooms')->with('success', 'Room Created Successfully');
+        /* ---------- SLUG ---------- */
+        $data['slug'] = Str::slug($request->name);
+
+        /* ---------- ROOM IMAGE ---------- */
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')
+                ->store('rooms', 'public');   // storage/app/public/rooms
+        }
+
+        /* ---------- SEO IMAGE ---------- */
+        if ($request->hasFile('meta_image')) {
+            $data['meta_image'] = $request->file('meta_image')
+                ->store('rooms/seo', 'public');
+        }
+
+        Room::create($data);
+
+        return back()->with('success', 'Room Created Successfully');
     }
+
+
 
     public function roomEdit(Room $room)
     {
         return view('admin.rooms.edit', compact('room'));
     }
 
+
     public function roomUpdate(Request $request, Room $room)
     {
-        $request->validate([
-            'name'=>'required',
-            'price'=>'required|numeric',
-            'capacity'=>'required|integer',
+        $data = $request->validate([
+            'name'             => 'required|string|max:255',
+            'price'            => 'required|numeric',
+            'capacity'         => 'required|integer',
+            'description'      => 'nullable|string',
+            'available'        => 'nullable|boolean',
+
+            // Room image
+            'image'            => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+
+            // SEO
+            'meta_title'       => 'nullable|string|max:255',
+            'meta_description' => 'nullable|string',
+            'meta_keywords'    => 'nullable|string',
+            'meta_image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        $room->update($request->all());
-        return redirect()->route('admin.rooms')->with('success', 'Room Updated Successfully');
+        /* ---------- SLUG ---------- */
+        $data['slug'] = Str::slug($request->name);
+
+        /* ---------- ROOM IMAGE ---------- */
+        if ($request->hasFile('image')) {
+            // পুরানো image delete
+            if ($room->image && Storage::disk('public')->exists($room->image)) {
+                Storage::disk('public')->delete($room->image);
+            }
+
+            $data['image'] = $request->file('image')
+                ->store('rooms', 'public');
+        }
+
+        /* ---------- SEO IMAGE ---------- */
+        if ($request->hasFile('meta_image')) {
+            // পুরানো meta_image delete
+            if ($room->meta_image && Storage::disk('public')->exists($room->meta_image)) {
+                Storage::disk('public')->delete($room->meta_image);
+            }
+
+            $data['meta_image'] = $request->file('meta_image')
+                ->store('rooms/seo', 'public');
+        }
+
+        /* ---------- UPDATE ---------- */
+        $room->update($data);
+
+        return back()->with('success', 'Room Updated Successfully');
     }
+
+
 
     public function roomDelete(Room $room)
     {

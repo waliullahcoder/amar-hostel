@@ -14,6 +14,11 @@ return new class extends Migration {
             $table->integer('capacity');
             $table->string('image')->nullable();
             $table->boolean('available')->default(true);
+            $table->string('meta_title')->nullable();
+            $table->text('meta_description')->nullable();
+            $table->string('meta_keywords')->nullable();
+            $table->string('meta_image')->nullable();
+            $table->string('slug')->unique();
             $table->timestamps();
         });
     }
