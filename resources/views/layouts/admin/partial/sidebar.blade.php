@@ -1,16 +1,19 @@
 <aside class="bg-dark aside aside-fixed d-flex flex-column">
     <div class="brand p-2">
-        <a href="/admin/dashboard" class="brand-logo w-100">
-            <img src="{{ asset('./backend/images/logo/favicon.png') }}" height="46" width="100%" alt="Logo" style="object-fit: contain;">
+        <a href="{{ route('admin.dashboard') }}" class="brand-logo w-100">
+            <img src="{{ asset('backend/images/logo/favicon.png') }}" height="46" width="100%" alt="Logo" style="object-fit: contain;">
         </a>
     </div>
 
     <div class="aside-menu-wrapper pt-4">
         <div class="aside-menu overflow-auto c-scrollbar-light" style="height: calc(100vh - 119px);">
             <ul class="menu-nav">
-                <li class="menu-item root-menu has-submenu menu-item-active">
-                    <a href="#" class="menu-link">
+
+                {{-- Dashboard --}}
+                <li class="menu-item root-menu {{ request()->routeIs('admin.dashboard') ? 'menu-item-active' : '' }}">
+                    <a href="{{ route('admin.dashboard') }}" class="menu-link">
                         <span class="svg-icon menu-icon">
+                            <!-- Dashboard Icon -->
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
                                 <rect x="4" y="4" width="7" height="7" rx="1.5"></rect>
                                 <path d="M5.5,13 L9.5,13 C10.328,13 11,13.671 11,14.5 L11,18.5 C11,19.328 10.328,20 9.5,20 L5.5,20 C4.671,20 4,19.328 4,18.5 L4,14.5 C4,13.671 4.671,13 5.5,13 Z M14.5,4 L18.5,4 C19.328,4 20,4.671 20,5.5 L20,9.5 C20,10.328 19.328,11 18.5,11 L14.5,11 C13.671,11 13,10.328 13,9.5 L13,5.5 C13,4.671 13.671,4 14.5,4 Z M14.5,13 L18.5,13 C19.328,13 20,13.671 20,14.5 L20,18.5 C20,19.328 19.328,20 18.5,20 L14.5,20 C13.671,20 13,19.328 13,18.5 L14.5,13 Z" fill="#000000" opacity="0.3"></path>
@@ -18,29 +21,118 @@
                         </span>
                         <span class="menu-text">Dashboard</span>
                     </a>
+                </li>
+
+                {{-- Rooms --}}
+                <li class="menu-item root-menu has-submenu {{ request()->routeIs('admin.rooms*') ? 'menu-item-active' : '' }}">
+                    <a href="#" class="menu-link">
+                        <span class="svg-icon menu-icon">
+                            <!-- Rooms Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                <path d="M4 4h16v16H4z" fill="#000" opacity="0.3"/>
+                                <path d="M6 6h4v4H6zm8 0h4v4h-4zm0 8h4v4h-4zm-8 0h4v4H6z"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Rooms</span>
+                        <i class="menu-arrow"></i>
+                    </a>
                     <div class="menu-submenu">
                         <ul class="menu-subnav">
-                            <li class="menu-item no-sub">
-                                <a href="#" class="menu-link">
-                                    <span class="menu-text">Submenu 1</span>
-                                </a>
-                            </li>
-                            <li class="menu-item no-sub">
-                                <a href="#" class="menu-link">
-                                    <span class="menu-text">Submenu 2</span>
+                            <li class="menu-item">
+                                <a href="{{ route('admin.rooms') }}" class="menu-link">
+                                    <span class="menu-text">Manage Rooms</span>
                                 </a>
                             </li>
                         </ul>
                     </div>
                 </li>
-                <li class="menu-item root-menu">
+
+                {{-- Services --}}
+                <li class="menu-item root-menu has-submenu {{ request()->routeIs('admin.services*') ? 'menu-item-active' : '' }}">
                     <a href="#" class="menu-link">
-                        <span class="menu-text">Another Menu</span>
+                        <span class="svg-icon menu-icon">
+                            <!-- Services Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                <circle cx="12" cy="12" r="10" fill="#000" opacity="0.3"/>
+                                <path d="M12 6v6l4 2"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Services</span>
+                        <i class="menu-arrow"></i>
                     </a>
+                    <div class="menu-submenu">
+                        <ul class="menu-subnav">
+                            <li class="menu-item">
+                                <a href="{{ route('admin.services') }}" class="menu-link">
+                                    <span class="menu-text">List Services</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="{{ route('admin.services.create') }}" class="menu-link">
+                                    <span class="menu-text">Add Service</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
+
+                {{-- Bookings --}}
+                <li class="menu-item root-menu has-submenu {{ request()->routeIs('admin.bookings*') ? 'menu-item-active' : '' }}">
+                    <a href="#" class="menu-link">
+                        <span class="svg-icon menu-icon">
+                            <!-- Bookings Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                <path d="M3 6h18v12H3z" fill="#000" opacity="0.3"/>
+                                <path d="M6 6h12v12H6z"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Bookings</span>
+                        <i class="menu-arrow"></i>
+                    </a>
+                    <div class="menu-submenu">
+                        <ul class="menu-subnav">
+                            <li class="menu-item">
+                                <a href="{{ route('admin.bookings') }}" class="menu-link">
+                                    <span class="menu-text">List Bookings</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                {{-- Testimonials --}}
+                <li class="menu-item root-menu has-submenu {{ request()->routeIs('admin.testimonials*') ? 'menu-item-active' : '' }}">
+                    <a href="#" class="menu-link">
+                        <span class="svg-icon menu-icon">
+                            <!-- Testimonials Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                <path d="M2 12h20v8H2z" fill="#000" opacity="0.3"/>
+                                <path d="M4 14h16v4H4z"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Testimonials</span>
+                        <i class="menu-arrow"></i>
+                    </a>
+                    <div class="menu-submenu">
+                        <ul class="menu-subnav">
+                            <li class="menu-item">
+                                <a href="{{ route('admin.testimonials') }}" class="menu-link">
+                                    <span class="menu-text">List Testimonials</span>
+                                </a>
+                            </li>
+                            <li class="menu-item">
+                                <a href="{{ route('admin.testimonials.create') }}" class="menu-link">
+                                    <span class="menu-text">Add Testimonial</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
             </ul>
         </div>
 
+        {{-- Footer/Social --}}
         <div class="d-flex align-items-center social-wrapper" style="height: 55px; border-top: 1px solid #cbd0dd;">
             <ul class="w-100 p-2 d-flex align-items-center justify-content-center social">
                 <li>

@@ -1,101 +1,77 @@
-<footer class="footer-section">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-lg-3 col-md-4 col-6">
-                <div class="pb-3">
-                    <a href="{{ Route('home') }}">
-                        <img src="{{ asset(file_exists($settings->logo) ? $settings->logo : 'frontend/images/logo/logo.jpg') }}"
-                            height="50" alt="{{ $settings->app_name }}">
-                    </a>
+<footer class="footer-area section_gap">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-3  col-md-6 col-sm-6">
+                        <div class="single-footer-widget">
+                            <h6 class="footer_title">About Agency</h6>
+                            <p>The world has become so fast paced that people don’t want to stand by reading a page of information, they would much rather look at a presentation and understand the message. It has come to a point </p>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-6">
+                        <div class="single-footer-widget">
+                            <h6 class="footer_title">Navigation Links</h6>
+                            <div class="row">
+                                <div class="col-4">
+                                    <ul class="list_style">
+                                        <li><a href="#">Home</a></li>
+                                        <li><a href="#">Feature</a></li>
+                                        <li><a href="#">Services</a></li>
+                                        <li><a href="#">Portfolio</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-4">
+                                    <ul class="list_style">
+                                        <li><a href="#">Team</a></li>
+                                        <li><a href="#">Pricing</a></li>
+                                        <li><a href="#">Blog</a></li>
+                                        <li><a href="#">Contact</a></li>
+                                    </ul>
+                                </div>										
+                            </div>							
+                        </div>
+                    </div>							
+                    <div class="col-lg-3 col-md-6 col-sm-6">
+                        <div class="single-footer-widget">
+                            <h6 class="footer_title">Newsletter</h6>
+                            <p>For business professionals caught between high OEM price and mediocre print and graphic output, </p>		
+                            <div id="mc_embed_signup">
+                                <form target="_blank" action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&id=92a4423d01" method="get" class="subscribe_form relative">
+                                    <div class="input-group d-flex flex-row">
+                                        <input name="EMAIL" placeholder="Email Address" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Email Address '" required="" type="email">
+                                        <button class="btn sub-btn"><span class="lnr lnr-location"></span></button>		
+                                    </div>									
+                                    <div class="mt-10 info"></div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-6">
+                        <div class="single-footer-widget instafeed">
+                            <h6 class="footer_title">InstaFeed</h6>
+                            <ul class="list_style instafeed d-flex flex-wrap">
+                                <li><img src="frontend/images/Image-01.jpg" alt="" loading="lazy" decoding="async"></li>
+                                <li><img src="frontend/images/Image-02.jpg" alt="" loading="lazy" decoding="async"></li>
+                                <li><img src="frontend/images/Image-03.jpg" alt="" loading="lazy" decoding="async"></li>
+                                <li><img src="frontend/images/Image-04.jpg" alt="" loading="lazy" decoding="async"></li>
+                                <li><img src="frontend/images/Image-05.jpg" alt="" loading="lazy" decoding="async"></li>
+                                <li><img src="frontend/images/Image-06.jpg" alt="" loading="lazy" decoding="async"></li>
+                                <li><img src="frontend/images/Image-07.jpg" alt="" loading="lazy" decoding="async"></li>
+                                <li><img src="frontend/images/Image-08.jpg" alt="" loading="lazy" decoding="async"></li>
+                            </ul>
+                        </div>
+                    </div>						
                 </div>
-                <p>{{ $settings->description }}</p>
+                <div class="border_line"></div>
+                <div class="row footer-bottom d-flex justify-content-between align-items-center">
+                    <p class="col-lg-8 col-sm-12 footer-text m-0"><!-- Link back to TechnoPark can't be removed. Template is licensed under CC BY 3.0. -->
+Copyright ©<script>document.write(new Date().getFullYear());</script>2026 All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://technoparkbd.com" target="_blank">TechnoPark</a>
+<!-- Link back to TechnoPark can't be removed. Template is licensed under CC BY 3.0. --></p>
+                    <div class="col-lg-4 col-sm-12 footer-social">
+                        <a href="#"><i class="fa fa-facebook"></i></a>
+                        <a href="#"><i class="fa fa-twitter"></i></a>
+                        <a href="#"><i class="fa fa-dribbble"></i></a>
+                        <a href="#"><i class="fa fa-behance"></i></a>
+                    </div>
+                </div>
             </div>
-            <div class="col-lg-3 col-md-4 col-6">
-                <h5 class="footer-title">প্রয়োজনীয় লিংক</h5>
-                <ul class="footer-list">
-                    <li class="footer-item"><a class="footer-link" href="#">যোগাযোগ করুন</a></li>
-                    <li class="footer-item"><a class="footer-link" href="#">শপিং ব্যাগ</a></li>
-                    <li class="footer-item"><a class="footer-link" href="#">প্রশ্নোত্তর</a></li>
-                    <li class="footer-item"><a class="footer-link" href="#">কিভাবে কেনাকাটা করবেন ?</a></li>
-                    <li class="footer-item"><a class="footer-link" href="#">শর্তাবলী</a></li>
-                    <li class="footer-item"><a class="footer-link" href="#">রিফান্ড নীতিমালা</a></li>
-                    <li class="footer-item"><a class="footer-link" href="#">প্রাইভেসী পলিসি</a></li>
-                </ul>
-            </div>
-            <div class="col-lg-3 col-md-4 col-6">
-                <h5 class="footer-title">জনপ্রিয়</h5>
-                <ul class="footer-list">
-                    <li class="footer-item"><a class="footer-link" href="#">পছন্দের তালিকা</a></li>
-                    <li class="footer-item"><a class="footer-link" href="#">অ্যাকাডেমিক বই</a></li>
-                    <li class="footer-item"><a class="footer-link" href="#">ড. আব্দুল্লাহ জাহাঙ্গীর</a></li>
-                    <li class="footer-item"><a class="footer-link" href="#">আরিফ আজাদ এর বই</a></li>
-                    <li class="footer-item"><a class="footer-link" href="#">প্রি-অর্ডার</a></li>
-                    <li class="footer-item"><a class="footer-link" href="#">প্যাকেজ</a></li>
-                    <li class="footer-item"><a class="footer-link" href="#">ইলেকট্রনিক্স</a></li>
-                </ul>
-            </div>
-            <div class="col-lg-3 col-md-4 col-6">
-                <h5 class="footer-title">যোগাযোগ</h5>
-                <ul class="footer-contact">
-                    <li class="footer-contact-item">
-                        <i class="fa fa-map-marker-alt"></i>&nbsp;Head Office: <br>
-                        {!! $settings->address !!}
-                    </li>
-                    <li class="footer-contact-item">
-                        <i class="fa fa-mobile-alt"></i>&nbsp;Phone:<br><a
-                            href="tel:+88{{ $settings->primary_phone }}">{{ $settings->primary_phone }}</a>
-                    </li>
-                    <li class="footer-contact-item">
-                        <i class="fa fa-envelope"></i>&nbsp;&nbsp;<span>{{ $settings->primary_email }}</span>
-                    </li>
-                    <li class="footer-contact-item pt-2">
-                        @if ($settings->facebook_page)
-                            <a class="social-link" target="_blank" href="{{ $settings->facebook_page }}" rel="noopener">
-                                <i class="fab fa-facebook"></i>
-                            </a>
-                        @endif
-                        @if ($settings->youtube)
-                            &nbsp;&nbsp;
-                            <a class="social-link" target="_blank" href="{{ $settings->youtube }}" rel="noopener">
-                                <i class="fab fa-youtube"></i>
-                            </a>
-                        @endif
-                        @if ($settings->instagram)
-                            &nbsp;&nbsp;
-                            <a class="social-link" target="_blank" href="{{ $settings->instagram }}" rel="noopener">
-                                <i class="fab fa-instagram"></i>
-                            </a>
-                        @endif
-                        @if ($settings->twitter)
-                            &nbsp;&nbsp;
-                            <a class="social-link" target="_blank" href="{{ $settings->twitter }}" rel="noopener">
-                                <i class="fab fa-twitter"></i>
-                            </a>
-                        @endif
-                        @if ($settings->linkedin)
-                            &nbsp;&nbsp;
-                            <a class="social-link" target="_blank" href="{{ $settings->linkedin }}" rel="noopener">
-                                <i class="fab fa-linkedin"></i>
-                            </a>
-                        @endif
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</footer>
-<div class="footer-bottom py-3">
-    <div class="container">
-        <div class="copyright">Copyright © {{ date('Y') }} {{ $settings->app_name }}</div>
-    </div>
-</div>
-<!-- End Footer -->
-
-<div class="scrollTop" style="display: none;">
-    <svg width="28" height="28" stroke-width="4" aria-hidden="true">
-        <path d="M24.5 4.66663H3.5V6.27079H24.5V4.66663Z" fill="currentColor"></path>
-        <path
-            d="M14 8.19898L5.84953 16.3495L6.98385 17.4838L13.1979 11.2697L13.1979 24.5H14.8021L14.8021 11.2697L21.0162 17.4838L22.1505 16.3495L14 8.19898Z"
-            fill="currentColor"></path>
-    </svg>
-</div>
+        </footer>

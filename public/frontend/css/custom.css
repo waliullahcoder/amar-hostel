@@ -1,0 +1,46 @@
+    /* Logo */
+.header-logo {
+    height: 55px;
+    width: auto;
+}
+
+/* Menu spacing */
+.menu_nav .nav-link {
+    padding: 10px 18px;
+    font-weight: 500;
+}
+
+/* Dropdown */
+.dropdown-menu {
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.12);
+}
+
+/* Right contact */
+.header-contact {
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #333;
+}
+
+.contact-item i {
+    color: #c59d5f;
+}
+
+/* Responsive */
+@media (max-width: 991px) {
+    .header-contact {
+        display: none !important;
+    }
+
+    .menu_nav {
+        text-align: center;
+    }
+}
