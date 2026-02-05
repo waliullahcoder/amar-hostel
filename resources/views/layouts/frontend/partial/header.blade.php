@@ -59,11 +59,11 @@
             <div class="header-contact d-none d-lg-flex">
                 <div class="contact-item">
                     <i class="fa fa-phone"></i>
-                    <span>+880 1711-000000</span>
+                    <span>+880 1916-304877</span>
                 </div>
                 <div class="contact-item">
                     <i class="fa fa-envelope"></i>
-                    <span>info@hotel.com</span>
+                    <span>info@amarhostelbd.com</span>
                 </div>
             </div>
 
