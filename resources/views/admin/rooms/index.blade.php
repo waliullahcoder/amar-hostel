@@ -10,6 +10,12 @@
 </div>
 @endif
 
+@if(session('error'))
+<div class="alert alert-danger alert-dismissible fade show">
+    {{ session('error') }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+@endif
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="fw-bold mb-0">Room Management</h4>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#roomModal" onclick="resetRoomForm()">
@@ -66,6 +72,11 @@
                         <button class="btn btn-sm btn-success" onclick='viewRoom(@json($room))'>
                             View
                         </button>
+                         <form action="{{ route('admin.rooms.destroy', $room->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this room?');">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-sm btn-danger">Delete</button>
+                        </form>
                     </td>
                 </tr>
                 @empty

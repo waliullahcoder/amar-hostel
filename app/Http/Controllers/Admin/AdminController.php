@@ -55,6 +55,10 @@ class AdminController extends Controller
             'meta_image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
+        if(Room::where('name', $request->name)->exists()) {
+            return back()->with('error','Room already exists!')->withInput();
+        }
+
         /* ---------- SLUG ---------- */
         $data['slug'] = Str::slug($request->name);
 
@@ -102,6 +106,7 @@ class AdminController extends Controller
             'meta_image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
+    
         /* ---------- SLUG ---------- */
         $data['slug'] = Str::slug($request->name);
 
