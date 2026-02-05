@@ -65,6 +65,8 @@
                             data-meta_title="{{ $room->meta_title }}"
                             data-meta_keywords="{{ $room->meta_keywords }}"
                             data-meta_description="{{ $room->meta_description }}"
+                            data-image="{{ $room->image }}"
+                            data-meta_image="{{ $room->meta_image }}"
                             data-bs-toggle="modal"
                             data-bs-target="#roomModal">
                             Edit
@@ -89,7 +91,7 @@
     </div>
 </div>
 
-{{-- ================= MODAL ================= --}}
+{{-- ================= Add/EDIT MODAL ================= --}}
 <div class="modal fade" id="roomModal">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content">
@@ -137,6 +139,10 @@
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold">Room Image</label>
                                     <input type="file" name="image" class="form-control">
+                                    {{-- Existing Image Preview --}}
+                                    <div class="mt-2" id="existing_room_image">
+                                        <span class="text-muted">No Image</span>
+                                    </div>
                                 </div>
 
                                 <div class="col-12">
@@ -181,6 +187,10 @@
                                 <div class="col-12">
                                     <label class="form-label fw-bold">Meta Image</label>
                                     <input type="file" name="meta_image" class="form-control">
+                                    {{-- Existing Meta Image Preview --}}
+                                    <div class="mt-2" id="existing_meta_image">
+                                        <span class="text-muted">No Image</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -289,7 +299,54 @@
     </div>
 </div>
 
-{{-- ================= SCRIPT TO FILL MODAL ================= --}}
+
+
+
+{{-- ================= Add/Edit SCRIPT ================= --}}
+<script>
+function resetRoomForm() {
+    const form = document.getElementById('roomForm');
+    form.reset();
+    form.action = "{{ route('admin.rooms.store') }}";
+    document.getElementById('form_method').value = "POST";
+    document.getElementById('room_id').value = "";
+}
+
+document.querySelectorAll('.editRoom').forEach(btn => {
+    btn.addEventListener('click', function () {
+        // Fill form fields
+        room_id.value = this.dataset.id;
+        room_name.value = this.dataset.name;
+        room_price.value = this.dataset.price;
+        room_capacity.value = this.dataset.capacity;
+        room_description.value = this.dataset.description;
+        meta_title.value = this.dataset.meta_title ?? '';
+        meta_keywords.value = this.dataset.meta_keywords ?? '';
+        meta_description.value = this.dataset.meta_description ?? '';
+        // Show existing image
+        if(this.dataset.image) {
+            existing_room_image.innerHTML = `<img src="/storage/${this.dataset.image}" class="img-fluid rounded" width="120">`;
+        } else {
+            existing_room_image.innerHTML = '<span class="text-muted">No Image</span>';
+        }
+        if(this.dataset.meta_image) {
+            existing_meta_image.innerHTML = `<img src="/storage/${this.dataset.meta_image}" class="img-fluid rounded" width="120">`;
+        } else {
+            existing_meta_image.innerHTML = '<span class="text-muted">No Image</span>';
+        }
+
+        // Change submit button text to "Update"
+        roomForm.querySelector('button[type="submit"]').textContent = "Update";
+
+
+        // Update form action and method
+        roomForm.action = "/admin/rooms/" + this.dataset.id;
+        document.getElementById('form_method').value = "PUT";
+    });
+});
+</script>
+
+{{-- =================VIEW SCRIPT TO FILL MODAL ================= --}}
 <script>
 function viewRoom(room) {
     // Room info
@@ -312,37 +369,6 @@ function viewRoom(room) {
     var modal = new bootstrap.Modal(document.getElementById('viewRoomModal'));
     modal.show();
 }
-</script>
-
-
-
-{{-- ================= SCRIPT ================= --}}
-<script>
-function resetRoomForm() {
-    const form = document.getElementById('roomForm');
-    form.reset();
-    form.action = "{{ route('admin.rooms.store') }}";
-    document.getElementById('form_method').value = "POST";
-    document.getElementById('room_id').value = "";
-}
-
-document.querySelectorAll('.editRoom').forEach(btn => {
-    btn.addEventListener('click', function () {
-        // Fill form fields
-        room_id.value = this.dataset.id;
-        room_name.value = this.dataset.name;
-        room_price.value = this.dataset.price;
-        room_capacity.value = this.dataset.capacity;
-        room_description.value = this.dataset.description;
-        meta_title.value = this.dataset.meta_title ?? '';
-        meta_keywords.value = this.dataset.meta_keywords ?? '';
-        meta_description.value = this.dataset.meta_description ?? '';
-
-        // Update form action and method
-        roomForm.action = "/admin/rooms/" + this.dataset.id;
-        document.getElementById('form_method').value = "PUT";
-    });
-});
 </script>
 
 @endsection
