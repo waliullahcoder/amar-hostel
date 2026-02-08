@@ -17,68 +17,114 @@
 <!--================ Breadcrumb Area =================-->
 
 <!--================ Booking Area =================-->
-<section class="booking_area section_gap">
+<section class="accomodation_area section_gap">
     <div class="container">
+         {{-- GLOBAL SUCCESS --}}
+                        @if(session('success'))
+                            <div class="alert alert-success text-center">
+                                <h2 class="title_color" style="color:#01ea01">Your 
+                                    {{ session('success') }}
+                                    <br> Thank You!
+                                </h2></div>
+                            @else
+                            <!-- SECTION TITLE -->
+                        <div class="section_title text-center mb-5">
+                            <h2 class="title_color">Available Rooms</h2>
+                            <p>Select your preferred room category and book easily</p>
+                        </div>
+                        @endif
+        
         <div class="row">
 
-            <!-- FILTER / SIDEBAR -->
+            <!-- FILTER SIDEBAR -->
             <div class="col-lg-3 mb-4">
-                <div class="card shadow-sm rounded-4">
-                    <div class="card-body p-3">
-                        <h5 class="mb-3">Filters</h5>
+                <div class="card shadow-sm border-0 rounded-4">
+                    <div class="card-body p-4">
+                        <h5 class="mb-3 fw-bold">Filter Rooms</h5>
 
                         <form action="{{ route('booking.search') }}" method="GET">
-                            <!-- Room Type -->
+
+                            <!-- CATEGORY -->
                             <div class="mb-3">
-                                <label>Room Type</label>
-                                <select name="room_type" class="form-select">
-                                    <option value="">All Rooms</option>
-                                    <option value="double-deluxe">Double Deluxe</option>
-                                    <option value="single-deluxe">Single Deluxe</option>
-                                    <option value="honeymoon-suite">Honeymoon Suite</option>
-                                    <option value="economy-double">Economy Double</option>
+                                <label class="fw-semibold mb-1">Room Category</label>
+                                <select name="category_id" class="form-select">
+                                    <option value="">All Categories</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}"
+                                            {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
 
-                            <!-- Guests -->
+                            <!-- GUESTS -->
                             <div class="mb-3">
-                                <label>Guests</label>
-                                <input type="number" name="guests" class="form-control" min="1" placeholder="1">
+                                <label class="fw-semibold mb-1">Guests</label>
+                                <input type="number"
+                                       name="guests"
+                                       class="form-control"
+                                       min="1"
+                                       value="{{ request('guests') }}"
+                                       placeholder="Number of guests">
                             </div>
-
-                            <!-- Submit -->
-                            <button type="submit" class="btn btn-primary w-100 rounded-pill">
-                                Search
+                            <div class="mb-3">
+                            <button type="submit"
+                                    class="btn theme_btn button_hover w-100 rounded-pill">
+                                Search Rooms
                             </button>
+                            </div>
                         </form>
                     </div>
                 </div>
             </div>
 
-            <!-- ROOMS LIST -->
+            <!-- ROOMS -->
             <div class="col-lg-9">
-                <div class="row g-4">
+                <div class="row mb_30">
 
                     @forelse($rooms as $room)
-                    <div class="col-md-6">
-                        <div class="card shadow-sm rounded-4 h-100 hover-shadow">
-                            <img src="{{ asset($room->thumbnail) }}" class="card-img-top rounded-top-4" alt="{{ $room->name }}">
-                            <div class="card-body p-3 p-lg-4">
-                                <h5 class="card-title fw-bold">{{ $room->name }}</h5>
-                                <p class="text-muted mb-2">{{ $room->description }}</p>
-                                <p class="fw-semibold mb-2">Price: ৳{{ $room->price }} / night</p>
+                    <div class="col-lg-4 col-sm-6 mb-4">
+                        <div class="accomodation_item text-center shadow-sm rounded-4 overflow-hidden">
+
+                            <div class="hotel_img position-relative">
+                                <img src="{{ $room->image
+                                        ? asset('storage/'.$room->image)
+                                        : asset('frontend/images/room1.jpg') }}"
+                                     alt="{{ $room->name }}"
+                                     class="img-fluid w-100">
 
                                 <a href="{{ route('booking.bookRoom', $room->id) }}"
-                                   class="btn btn-success w-100 rounded-pill">
-                                   Book Now
+                                   class="btn theme_btn button_hover position-absolute bottom-0 start-50 translate-middle-x mb-3">
+                                    Book Now
                                 </a>
                             </div>
+
+                            <div class="p-3">
+                                <a href="#">
+                                    <h4 class="sec_h4 mb-1">{{ $room->name }}</h4>
+                                </a>
+
+                                <p class="text-muted mb-2 small">
+                                    {{ Str::limit($room->description, 70) }}
+                                </p>
+
+                                <h5 class="fw-bold">
+                                    ৳ {{ number_format($room->price) }}
+                                    <small class="text-muted">/night</small>
+                                </h5>
+
+                                <span class="badge bg-light text-dark mt-2">
+                                    Capacity: {{ $room->capacity }}
+                                </span>
+                            </div>
+
                         </div>
                     </div>
                     @empty
                     <div class="col-12">
                         <div class="alert alert-warning text-center">
-                            No rooms available.
+                            No rooms found for your search.
                         </div>
                     </div>
                     @endforelse
@@ -92,14 +138,3 @@
 <!--================ Booking Area =================-->
 
 @endsection
-
-@push('styles')
-<style>
-/* Hover effect for room cards */
-.hover-shadow:hover {
-    transform: translateY(-5px);
-    transition: all 0.3s ease;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.15) !important;
-}
-</style>
-@endpush

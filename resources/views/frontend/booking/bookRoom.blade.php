@@ -1,6 +1,8 @@
 @extends('layouts.frontend.app')
 
 @section('content')
+
+<!--================ Breadcrumb =================-->
 <section class="breadcrumb_area">
     <div class="container">
         <div class="page-cover text-center">
@@ -13,48 +15,129 @@
     </div>
 </section>
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-6">
-            <div class="card shadow-sm rounded-4 p-4">
+<!--================ Booking =================-->
+<section class="booking_area section_gap">
+    <div class="container">
 
-                @if($errors->any())
-                    <div class="alert alert-danger">
-                        <ul class="mb-0">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+
+                <div class="booking_card shadow-lg">
+
+                    <!-- ROOM INFO -->
+                    <div class="booking_header text-center">
+                        <h3>{{ $room->name }}</h3>
+                        <p>Capacity: {{ $room->capacity }} Guests</p>
+                        <h4>৳ {{ number_format($room->price) }} <span>/ per guest</span></h4>
                     </div>
-                @endif
 
-                <h4 class="mb-3 fw-bold">{{ $room->name }}</h4>
-                <p class="text-muted">Available capacity: {{ $room->capacity }}</p>
-                <p class="fw-semibold mb-4">Price per guest: ৳{{ $room->price }}</p>
+                    {{-- Errors --}}
+                    @if($errors->any())
+                        <div class="alert alert-danger m-4">
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                    <h2 style="color:#f86565;text-align:center;">{{ $error }}</h2>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
-                <form action="{{ route('booking.confirmBooking', $room->id) }}" method="POST">
+                    <!-- FORM -->
+                    <form action="{{ route('booking.confirmBooking', $room->id) }}" method="POST" class="p-4 p-lg-5">
                     @csrf
 
-                    <div class="mb-3">
-                        <label>Check-in Date</label>
-                        <input type="date" name="check_in" class="form-control" required>
-                    </div>
+                    <div class="row g-4">
 
-                    <div class="mb-3">
-                        <label>Check-out Date</label>
-                        <input type="date" name="check_out" class="form-control" required>
-                    </div>
+                        <!-- CHECK IN -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Check In</label>
+                            <input type="date" name="check_in" class="form-control booking_field"
+                            value="{{ now()->format('Y-m-d') }}"
+                             required>
+                        </div>
 
-                    <div class="mb-3">
-                        <label>Number of Guests</label>
-                        <input type="number" name="guests" class="form-control" min="1" max="{{ $room->capacity }}" required>
-                    </div>
+                        <!-- CHECK OUT -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Check Out</label>
+                            <input type="date" name="check_out" class="form-control booking_field" 
+                            value="{{ now()->format('Y-m-d') }}"
+                            required>
+                        </div>
 
-                    <button type="submit" class="btn btn-success w-100 rounded-pill">Confirm Booking</button>
+                        <!-- DURATION -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Duration</label>
+                            <select name="duration" class="form-select booking_field" required>
+                                <option value="day">Day</option>
+                                <option value="night">Night</option>
+                                <option value="week">Week</option>
+                                <option value="month">Month</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+
+                        <!-- GUESTS -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Guests</label>
+                            <input type="number"
+                                id="guests"
+                                name="guests"
+                                min="1"
+                                max="{{ $room->capacity }}"
+                                class="form-control booking_field"
+                                placeholder="Enter number of guests"
+                                required>
+                        </div>
+
+                        <!-- TOTAL PRICE -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Total Price</label>
+                            <input type="text"
+                                id="total_price"
+                                name="total_price"
+                                class="form-control booking_field total_price"
+                                readonly>
+                        </div>
+
+                        <!-- BUTTON -->
+                        <div class="col-md-6" style="margin-top:30px;">
+                            <button type="submit" class="btn theme_btn button_hover">
+                                Confirm Booking
+                            </button>
+                        </div>
+
+                    </div>
                 </form>
+
+
+                </div>
 
             </div>
         </div>
+
     </div>
-</div>
+   <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const guestInput = document.getElementById('guests');
+        const totalPriceInput = document.getElementById('total_price');
+
+        const pricePerGuest = {{ $room->price }};
+
+        guestInput.addEventListener('input', function () {
+            let guests = parseInt(this.value);
+
+            if (!isNaN(guests) && guests > 0) {
+                let total = guests * pricePerGuest;
+                totalPriceInput.value = '৳ ' + total.toLocaleString();
+            } else {
+                totalPriceInput.value = '';
+            }
+        });
+
+    });
+</script>
+
+</section>
+
 @endsection

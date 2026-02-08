@@ -1867,7 +1867,9 @@ button:focus {
 .mb-30 {
   margin-bottom: 30px;
 }
-
+.mb-3{
+  margin: 15px;
+}
 .sample-text-area {
   padding: 100px 0px;
   background: #f9f9ff;

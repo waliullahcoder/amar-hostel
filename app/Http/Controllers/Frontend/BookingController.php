@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Room;
 use App\Models\Booking;
+use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -14,20 +15,23 @@ class BookingController extends Controller
     // Show rooms for booking
     public function index(Request $request)
     {
-        $query = Room::query();
+        $rooms = Room::where('available', 1);
 
-        if ($request->room_type) {
-            $query->where('name', 'like', '%' . $request->room_type . '%');
+        if ($request->category_id) {
+            $rooms->where('category_id', $request->category_id);
         }
 
         if ($request->guests) {
-            $query->where('capacity', '>=', $request->guests);
+            $rooms->where('capacity', '>=', $request->guests);
         }
 
-        $rooms = $query->get();
-
-        return view('frontend.booking.hostelBooking', compact('rooms'));
+        return view('frontend.booking.hostelBooking', [
+            'rooms' => $rooms->get(),
+            'categories' => Category::all()
+        ]);
     }
+
+
 
     // Show booking form
     public function bookRoom($id)
