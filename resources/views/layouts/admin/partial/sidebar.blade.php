@@ -22,6 +22,29 @@
                         <span class="menu-text">Dashboard</span>
                     </a>
                 </li>
+                {{-- Categories --}}
+                <li class="menu-item root-menu has-submenu {{ request()->routeIs('admin.categories*') ? 'menu-item-active' : '' }}">
+                    <a href="#" class="menu-link">
+                        <span class="svg-icon menu-icon">
+                            <!-- Rooms Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+                                <path d="M4 4h16v16H4z" fill="#000" opacity="0.3"/>
+                                <path d="M6 6h4v4H6zm8 0h4v4h-4zm0 8h4v4h-4zm-8 0h4v4H6z"/>
+                            </svg>
+                        </span>
+                        <span class="menu-text">Categories</span>
+                        <i class="menu-arrow"></i>
+                    </a>
+                    <div class="menu-submenu">
+                        <ul class="menu-subnav">
+                            <li class="menu-item">
+                                <a href="{{ route('admin.categories.index') }}" class="menu-link">
+                                    <span class="menu-text">Manage Categories</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
 
                 {{-- Rooms --}}
                 <li class="menu-item root-menu has-submenu {{ request()->routeIs('admin.rooms*') ? 'menu-item-active' : '' }}">

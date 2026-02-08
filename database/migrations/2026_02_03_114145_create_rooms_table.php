@@ -9,6 +9,7 @@ return new class extends Migration {
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2);
             $table->integer('capacity');
@@ -18,6 +19,7 @@ return new class extends Migration {
             $table->text('meta_description')->nullable();
             $table->string('meta_keywords')->nullable();
             $table->string('meta_image')->nullable();
+            $table->integer('status')->default(1);
             $table->string('slug')->unique();
             $table->timestamps();
         });

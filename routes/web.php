@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Frontend\ViewController;
 use App\Http\Controllers\Frontend\UserController;
+use App\Http\Controllers\Frontend\BookingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
@@ -23,7 +24,9 @@ Route::get('/storage-link', function () {
 })->name('admin.storage.link');
 
 Route::get('/', [ViewController::class, 'index'])->name('home');
-
+Route::get('/about', [ViewController::class, 'aboutPage'])->name('aboutPage');
+Route::get('/gallery', [ViewController::class, 'galleryPage'])->name('galleryPage');
+// Route::get('/booking', [ViewController::class, 'bookingPage'])->name('bookingPage');
 //Login Register
 Route::get('/contact', [ViewController::class, 'contactPage'])->name('contactPage');
 Route::get('/signin', [ViewController::class, 'signinPage'])->name('auth.signinPage');
@@ -44,4 +47,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/user/profile/update', [UserController::class, 'updateProfile'])
     ->name('user.profile.update');
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
+});
+
+// Booking section
+Route::prefix('booking')->name('booking.')->group(function () {
+    Route::get('/', [BookingController::class, 'index'])->name('index'); // room listing
+    Route::get('/search', [BookingController::class, 'index'])->name('search'); // search route
+    Route::get('/room/{id}', [BookingController::class, 'bookRoom'])->name('bookRoom'); // booking form
+    Route::post('/confirm/{id}', [BookingController::class, 'confirmBooking'])->name('confirmBooking'); // confirm booking
 });

@@ -1,6 +1,17 @@
 @extends('layouts.frontend.app')
 
 @section('content')
+  <section class="breadcrumb_area">
+            <div class="container">
+                <div class="page-cover text-center">
+                    <h2 class="page-cover-tittle">About Us</h2>
+                    <ol class="breadcrumb">
+                        <li><a href="index.html">Home</a></li>
+                        <li class="active">About Us</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
   <section class="about_history_area section_gap">
             <div class="container">
                 <div class="row">

@@ -40,6 +40,19 @@ class ViewController extends Controller
     {
         return view('frontend.contact.contact');
     }
+    public function aboutPage()
+    {
+        return view('frontend.about.about');
+    }
+    public function galleryPage()
+    {
+        return view('frontend.gallery.gallery');
+    }
+
+    // public function bookingPage()
+    // {
+    //     return view('frontend.booking.booking');
+    // }
 
     public function signinPage()
     {

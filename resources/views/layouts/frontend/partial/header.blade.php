@@ -19,8 +19,15 @@
                  id="navbarSupportedContent">
                 <ul class="navbar-nav menu_nav">
 
-                    <li class="nav-item active"><a class="nav-link" href="#">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">About</a></li>
+                    <li class="nav-item {{ Request::routeIs('home') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('home') }}">Home</a>
+                    </li>
+
+                    <li class="nav-item {{ Request::routeIs('aboutPage') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('aboutPage') }}">About</a>
+                    </li>
+
+                    
 
                     <!-- Rooms -->
                    <li class="nav-item submenu dropdown"> <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> Rooms <span class="ms-1">▼</span> </a> 
@@ -48,9 +55,15 @@
                             </ul>
                         </li>
 
-                    <li class="nav-item"><a class="nav-link" href="#">Gallery</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Booking</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('contactPage') }}">Contact</a></li>
+                    <li class="nav-item {{ Request::routeIs('galleryPage') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('galleryPage') }}">Gallery</a>
+                    </li>
+                     <li class="nav-item {{ Request::routeIs('booking.index') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('booking.index') }}">Booking</a>
+                    </li>
+                    <li class="nav-item {{ Request::routeIs('contactPage') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('contactPage') }}">Contact</a>
+                    </li>
 
                 </ul>
             </div>

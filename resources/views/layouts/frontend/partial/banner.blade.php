@@ -23,7 +23,7 @@
                                         <div class="book_tabel_item">
                                             <div class="form-group">
                                                 <div class="input-group date" id="datetimepicker11">
-                                                    <input type="text" class="form-control" placeholder="Arrival Date">
+                                                    <input type="text" class="form-control" placeholder="CheckIn Date">
                                                     <span class="input-group-addon">
                                                         <i class="fa fa-calendar" aria-hidden="true"></i>
                                                     </span>
@@ -31,7 +31,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <div class="input-group date" id="datetimepicker1">
-                                                    <input type="text" class="form-control" placeholder="Departure Date">
+                                                    <input type="text" class="form-control" placeholder="CheckOut Date">
                                                     <span class="input-group-addon">
                                                         <i class="fa fa-calendar" aria-hidden="true"></i>
                                                     </span>
@@ -43,21 +43,18 @@
                                         <div class="book_tabel_item">
                                             <div class="input-group">
                                                 <select class="wide">
-                                                    <option data-display="Adults">Adults</option>
-                                                   <option value="1">1</option>
-                                                    <option value="2">2</option>
-                                                    <option value="3">3</option>
-                                                    <option value="4">4</option>
-                                                    <option value="5">5</option>
-                                                    <option value="6">6</option>
-                                                    <option value="7">7</option>
-                                                    <option value="8">8</option>
-                                                    <option value="9">9+</option>
+                                                    <option data-display="Duration">Duration</option>
+                                                   <option value="day">Day</option>
+                                                    <option value="night">Night</option>
+                                                    <option value="week">Week</option>
+                                                    <option value="month">Month</option>
+                                                    <option value="year">Year</option>
+                                                    <option value="custom">Custom</option>
                                                 </select>
                                             </div>
                                              <div class="input-group">
                                                 <select class="wide">
-                                                    <option data-display="Child">Child</option>
+                                                    <option data-display="Guests/Seats">Guests/Seats</option>
                                                     <option value="1">1</option>
                                                     <option value="2">2</option>
                                                     <option value="3">3</option>
@@ -73,20 +70,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <div class="book_tabel_item">
-                                            <div class="input-group">
-                                                <select class="wide">
-                                                    <option data-display="Rooms">Rooms</option>
-                                                    <option value="1">1</option>
-                                                    <option value="2">2</option>
-                                                    <option value="3">3</option>
-                                                    <option value="4">4</option>
-                                                    <option value="5">5</option>
-                                                    <option value="6">6</option>
-                                                    <option value="7">7</option>
-                                                    <option value="8">8</option>
-                                                    <option value="9">9+</option>
-                                                </select>
-                                            </div>
+                                            
                                             <div class="input-group">
                                                 <select class="wide">
                                                      <option data-display="Room Type">Room Type</option>

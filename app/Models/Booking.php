@@ -12,8 +12,7 @@ class Booking extends Model
     protected $fillable = [
         'room_id', 
         'user_id', 
-        'customer_email', 
-        'customer_phone', 
+        'duration',
         'check_in', 
         'check_out', 
         'guests', 
@@ -21,8 +20,15 @@ class Booking extends Model
         'status'
     ];
 
+    // Relation to Room
     public function room()
     {
         return $this->belongsTo(Room::class);
+    }
+
+    // Relation to User
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

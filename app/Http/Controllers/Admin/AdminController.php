@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Room;
 use App\Models\Service;
+use App\Models\Category;
 use App\Models\Booking;
 use App\Models\Testimonial;
 use Illuminate\Support\Str;
@@ -27,7 +28,8 @@ class AdminController extends Controller
     public function rooms()
     {
         $rooms = Room::all();
-        return view('admin.rooms.index', compact('rooms'));
+        $categories = Category::all();
+        return view('admin.rooms.index', compact('rooms','categories'));
     }
 
     public function roomCreate()
@@ -40,6 +42,7 @@ class AdminController extends Controller
     {
         $data = $request->validate([
             'name'             => 'required|string|max:255',
+            'category_id'      => 'required',
             'price'            => 'required|numeric',
             'capacity'         => 'required|integer',
             'description'      => 'nullable|string',
@@ -91,6 +94,7 @@ class AdminController extends Controller
     {
         $data = $request->validate([
             'name'             => 'required|string|max:255',
+            'category_id'      => 'required',
             'price'            => 'required|numeric',
             'capacity'         => 'required|integer',
             'description'      => 'nullable|string',

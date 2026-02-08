@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\{
     AuthController,
     AdminController,
+    CategoryController,
 };
 
 Route::middleware('guest')->group(function () {
@@ -22,11 +23,15 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
+     // Categpries
+    Route::get('categories', [CategoryController::class,'index'])->name('categories.index');
+    Route::post('categories/store', [CategoryController::class,'categoryStore'])->name('categories.store');
+    Route::put('categories/{category}', [CategoryController::class,'categoryUpdate'])->name('categories.update');
+    Route::delete('categories/{category}', [CategoryController::class,'categoryDelete'])->name('categories.destroy');
+
     // Rooms
     Route::get('rooms', [AdminController::class,'rooms'])->name('rooms');
-    // Route::get('rooms/create', [AdminController::class,'roomCreate'])->name('rooms.create');
     Route::post('rooms/store', [AdminController::class,'roomStore'])->name('rooms.store');
-    // Route::get('rooms/{room}/edit', [AdminController::class,'roomEdit'])->name('rooms.edit');
     Route::put('rooms/{room}', [AdminController::class,'roomUpdate'])->name('rooms.update');
     Route::delete('rooms/{room}', [AdminController::class,'roomDelete'])->name('rooms.destroy');
 

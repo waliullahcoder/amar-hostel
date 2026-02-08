@@ -31,6 +31,7 @@
                     <th>#</th>
                     <th>Image</th>
                     <th>Name</th>
+                    <th>Type</th>
                     <th>Price</th>
                     <th>Capacity</th>
                     <th>Status</th>
@@ -49,6 +50,7 @@
                         @endif
                     </td>
                     <td>{{ $room->name }}</td>
+                    <td>{{ $room->category->name?? 'N/A' }}</td>
                     <td>৳ {{ number_format($room->price) }}</td>
                     <td>{{ $room->capacity }}</td>
                     <td>
@@ -65,6 +67,7 @@
                             data-meta_title="{{ $room->meta_title }}"
                             data-meta_keywords="{{ $room->meta_keywords }}"
                             data-meta_description="{{ $room->meta_description }}"
+                            data-category_id="{{ $room->category_id }}"
                             data-image="{{ $room->image }}"
                             data-meta_image="{{ $room->meta_image }}"
                             data-bs-toggle="modal"
@@ -131,12 +134,22 @@
                         {{-- GENERAL --}}
                         <div class="tab-pane fade show active" id="general">
                             <div class="row g-3">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="form-label fw-bold">Room Name</label>
                                     <input type="text" name="name" id="room_name" class="form-control" required>
                                 </div>
+                              <div class="col-md-4">
+                                    <label class="form-label fw-bold">Room Type</label>
+                                    <select name="category_id" id="room_category_id" class="form-select" required>
+                                        <option value="">Select Type</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
-                                <div class="col-md-6">
+
+                                <div class="col-md-4">
                                     <label class="form-label fw-bold">Room Image</label>
                                     <input type="file" name="image" class="form-control">
                                     {{-- Existing Image Preview --}}
@@ -209,7 +222,6 @@
 </div>
 
 
-{{-- ================= VIEW MODAL ================= --}}
 {{-- ================= VIEW ROOM INFO MODAL ================= --}}
 <div class="modal fade" id="viewRoomModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -323,6 +335,7 @@ document.querySelectorAll('.editRoom').forEach(btn => {
         meta_title.value = this.dataset.meta_title ?? '';
         meta_keywords.value = this.dataset.meta_keywords ?? '';
         meta_description.value = this.dataset.meta_description ?? '';
+        room_category_id.value = this.dataset.category_id;
         // Show existing image
         if(this.dataset.image) {
             existing_room_image.innerHTML = `<img src="/storage/${this.dataset.image}" class="img-fluid rounded" width="120">`;

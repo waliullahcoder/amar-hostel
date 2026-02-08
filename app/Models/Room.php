@@ -11,6 +11,9 @@ class Room extends Model
 
     protected $fillable = [
     'name',
+    'category_id',
+    'duration',
+    'status',
     'slug',
     'description',
     'price',
@@ -22,4 +25,10 @@ class Room extends Model
     'meta_keywords',
     'meta_image',
   ];
+
+   // Correct relation: singular 'category'
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
 }
