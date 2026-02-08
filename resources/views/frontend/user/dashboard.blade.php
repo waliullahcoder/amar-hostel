@@ -1,0 +1,98 @@
+@extends('layouts.frontend.app')
+
+@section('content')
+
+<!--================ Breadcrumb Area =================-->
+<section class="breadcrumb_area py-4 bg-light">
+    <div class="container">
+        <div class="page-cover text-center">
+            <h2 class="page-cover-tittle">User Dashboard</h2>
+            <ol class="breadcrumb justify-content-center">
+                <li class="breadcrumb-item"><a href="{{ url('/') }}">Home</a></li>
+                <li class="breadcrumb-item active">User Dashboard</li>
+            </ol>
+        </div>
+    </div>
+</section>
+<!--================ Breadcrumb Area =================-->
+
+<!--================ Dashboard Content =================-->
+<div class="container">
+    <div class="row section_gap">
+
+        <!-- SIDEBAR -->
+        @include('frontend.user.userSideBar')
+
+        <!-- MAIN CONTENT -->
+        <div class="col-lg-9">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body">
+
+                    <!-- Welcome Message -->
+                    <div class="mb-4 text-center text-lg-start">
+                        <h4 class="fw-bold">👋 Welcome, {{ auth()->user()->name }}</h4>
+                        <p class="text-muted mb-0">
+                            This is your user dashboard. From here you can manage orders, wishlist, profile and settings.
+                        </p>
+                    </div>
+
+                    <!-- Dashboard Stats -->
+                   <div class="row g-4 mt-4">
+                    <!-- Bookings -->
+                    <div class="col-md-4">
+                        <a href="" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm rounded-4 text-center h-100" 
+                                style="padding: 30px 20px; margin: 20px;">
+                                <div class="card-body">
+                                    <h5 class="mb-3 fw-semibold text-primary">Bookings</h5>
+                                    <h3 class="fw-bold">{{ $orders_count ?? 0 }}</h3>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Rooms -->
+                    <div class="col-md-4">
+                        <a href="" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm rounded-4 text-center h-100" 
+                                style="padding: 30px 20px; margin: 20px;">
+                                <div class="card-body">
+                                    <h5 class="mb-3 fw-semibold text-success">Rooms</h5>
+                                    <h3 class="fw-bold">0</h3>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Wallet -->
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm rounded-4 text-center h-100" 
+                            style="padding: 30px 20px; margin: 20px;">
+                            <div class="card-body">
+                                <h5 class="mb-3 fw-semibold text-warning">Wallet</h5>
+                                <h3 class="fw-bold">৳{{ auth()->user()->wallet ?? 0 }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!--================ Dashboard Content =================-->
+
+@endsection
+
+@push('styles')
+<style>
+.hover-shadow:hover {
+    transform: translateY(-4px);
+    transition: all 0.3s ease;
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15) !important;
+}
+</style>
+@endpush

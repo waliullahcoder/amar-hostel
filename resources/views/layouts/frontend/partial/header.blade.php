@@ -65,6 +65,11 @@
                     <i class="fa fa-envelope"></i>
                     <span>info@amarhostelbd.com</span>
                 </div>
+                 <!-- LOGIN BUTTON -->
+                <a href="{{ auth()->check() ? route('frontend.user.dashboard') : route('auth.signinPage') }}" class="header-login-btn">
+                    <i class="fa fa-user"></i> {{ auth()->check() ? auth()->user()->email : 'Login' }}
+                </a>
+
             </div>
 
         </nav>

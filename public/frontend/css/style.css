@@ -93,7 +93,9 @@ button:focus {
     max-width: 1170px;
   }
 }
-
+.text-danger{
+  color: red !important;
+}
 .section_gap {
   padding: 45px 0;
 }
@@ -374,7 +376,7 @@ button:focus {
 }
 
 .navbar .menu_nav .nav-item + li {
-  margin-left: 30px;
+  margin-left: 15px;
 }
 
 .navbar_fixed {

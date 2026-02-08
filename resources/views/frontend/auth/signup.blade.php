@@ -27,6 +27,20 @@
                     
                     <div class="card-body" style="padding:40px 35px;">
 
+                        {{-- GLOBAL ERROR --}}
+                        @if(session('error'))
+                            <div class="alert alert-danger text-center">
+                                {{ session('error') }}
+                            </div>
+                        @endif
+
+                        {{-- GLOBAL SUCCESS --}}
+                        @if(session('success'))
+                            <div class="alert alert-success text-center">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
                         <!-- Signup Form -->
                         <form method="POST" action="{{ route('user.signupPost') }}">
                             @csrf
@@ -37,8 +51,11 @@
                                 <input type="text"
                                        name="name"
                                        value="{{ old('name') }}"
-                                       class="form-control rounded-pill py-2 px-3"
+                                       class="form-control rounded-pill py-2 px-3 @error('name') is-invalid @enderror"
                                        required>
+                                @error('name')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
 
                             <!-- Email -->
@@ -47,8 +64,11 @@
                                 <input type="email"
                                        name="email"
                                        value="{{ old('email') }}"
-                                       class="form-control rounded-pill py-2 px-3"
+                                       class="form-control rounded-pill py-2 px-3 @error('email') is-invalid @enderror"
                                        required>
+                                @error('email')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
 
                             <!-- Password -->
@@ -56,8 +76,11 @@
                                 <label class="form-label">Password</label>
                                 <input type="password"
                                        name="password"
-                                       class="form-control rounded-pill py-2 px-3"
+                                       class="form-control rounded-pill py-2 px-3 @error('password') is-invalid @enderror"
                                        required>
+                                @error('password')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
 
                             <!-- Confirm Password -->
@@ -106,3 +129,5 @@
 <!--================ Signup Area =================-->
 
 @endsection
+
+

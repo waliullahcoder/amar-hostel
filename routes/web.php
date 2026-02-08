@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Frontend\ViewController;
+use App\Http\Controllers\Frontend\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
@@ -34,3 +35,13 @@ Route::get('/login', function () {
 
 Route::post('/signin', [UserController::class, 'signinPost'])->name('user.signinPost');
 Route::post('/signup', [UserController::class, 'signupPost'])->name('user.signupPost');
+/* ---------- USER DASHBOARD (Protected) ---------- */
+Route::middleware(['auth'])->group(function () {
+    Route::get('/user/dashboard', [UserController::class, 'dashboard'])
+        ->name('frontend.user.dashboard');
+    Route::get('/user/profile/edit', [UserController::class, 'updateEditProfile'])
+    ->name('user.profile.edit');
+    Route::post('/user/profile/update', [UserController::class, 'updateProfile'])
+    ->name('user.profile.update');
+    Route::post('/logout', [UserController::class, 'logout'])->name('logout');
+});

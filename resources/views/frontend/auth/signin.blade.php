@@ -26,19 +26,32 @@
                      style="border:1px solid #eee; border-radius:16px;">
                     
                     <div class="card-body" style="padding:40px 35px;">
+                        
+                        {{-- GLOBAL ERROR --}}
+                        @if(session('error'))
+                            <div class="alert alert-danger text-center">{{ session('error') }}</div>
+                        @endif
+
+                        {{-- GLOBAL SUCCESS --}}
+                        @if(session('success'))
+                            <div class="alert alert-success text-center">{{ session('success') }}</div>
+                        @endif
 
                         <!-- Login Form -->
-                        <form action="{{ route('admin.login') }}" method="POST">
+                        <form action="{{ route('user.signinPost') }}" method="POST">
                             @csrf
 
                             <!-- Username -->
                             <div class="form-group mb-3">
                                 <input type="text"
-                                       name="user_name"
-                                       class="form-control rounded-pill py-2 px-3"
-                                       placeholder="User Name"
-                                       value="{{ old('user_name') }}"
+                                       name="email"
+                                       value="{{ old('email') }}"
+                                       class="form-control rounded-pill py-2 px-3 @error('email') is-invalid @enderror"
+                                       placeholder="Email Address"
                                        required>
+                                @error('email')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
 
                             <!-- Password -->
@@ -46,10 +59,12 @@
                                 <input type="password"
                                        name="password"
                                        id="password"
-                                       class="form-control rounded-pill py-2 px-3 pe-5"
+                                       class="form-control rounded-pill py-2 px-3 pe-5 @error('password') is-invalid @enderror"
                                        placeholder="Password"
                                        required>
-
+                                @error('password')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
 
                             <!-- Remember / Forgot -->
@@ -65,9 +80,7 @@
                                     </label>
                                 </div>
 
-                                <a href="#" class="small text-muted">
-                                    Forgot Password?
-                                </a>
+                                <a href="#" class="small text-muted">Forgot Password?</a>
                             </div>
 
                             <!-- Submit -->
