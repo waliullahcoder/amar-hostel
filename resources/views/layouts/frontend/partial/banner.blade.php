@@ -39,7 +39,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-2">
+                                    <div class="col-md-4">
                                         <div class="book_tabel_item">
                                             <div class="input-group">
                                                 <select class="wide">
@@ -71,7 +71,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-2">
+                                    <div class="col-md-4">
                                         <div class="book_tabel_item">
                                             <div class="input-group">
                                                 <select class="wide">
@@ -87,11 +87,6 @@
                                                     <option value="9">9+</option>
                                                 </select>
                                             </div>
-                                           
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="book_tabel_item">
                                             <div class="input-group">
                                                 <select class="wide">
                                                      <option data-display="Room Type">Room Type</option>

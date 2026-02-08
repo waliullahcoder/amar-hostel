@@ -24,12 +24,13 @@ Route::get('/storage-link', function () {
 Route::get('/', [ViewController::class, 'index'])->name('home');
 
 //Login Register
+Route::get('/contact', [ViewController::class, 'contactPage'])->name('contactPage');
 Route::get('/signin', [ViewController::class, 'signinPage'])->name('auth.signinPage');
+Route::get('/signup', [ViewController::class, 'signupPage'])->name('auth.signupPage');
+
 Route::get('/login', function () {
     return redirect()->route('auth.signinPage');
 })->name('login');
-
-Route::get('/signup', [ViewController::class, 'signupPage'])->name('auth.signupPage');
 
 Route::post('/signin', [UserController::class, 'signinPost'])->name('user.signinPost');
 Route::post('/signup', [UserController::class, 'signupPost'])->name('user.signupPost');

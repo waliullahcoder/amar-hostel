@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Frontend;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Services\FrontEndService;
+use Illuminate\Support\Facades\Auth;
 class ViewController extends Controller
 {
     protected $frontEndService;
@@ -33,6 +34,28 @@ class ViewController extends Controller
     {
         $services = $this->frontEndService->allServices();
         return view('frontend.services', compact('services'));
+    }
+
+    public function contactPage()
+    {
+        return view('frontend.contact.contact');
+    }
+
+    public function signinPage()
+    {
+        if (Auth::check()) {
+            return redirect()->route('home');
+        }
+        return view('frontend.auth.signin');
+    }
+    
+
+    public function signupPage()
+    {
+        if (Auth::check()) {
+                return redirect()->route('home');
+            }
+        return view('frontend.auth.signup');
     }
     
 }

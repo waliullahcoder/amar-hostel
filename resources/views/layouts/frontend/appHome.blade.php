@@ -18,10 +18,30 @@
         <!--================Header Area =================-->
       @include('layouts.frontend.partial.header')
         <!--================Header Area =================-->
-    
+        
+        <!--================Banner Area =================-->
+      @include('layouts.frontend.partial.banner')
+        <!--================Banner Area =================-->
+        
         <!--================ Accomodation Area  =================-->
         @yield('content')
         <!--================ Accomodation Area  =================-->
+        
+        <!--================ Facilities Area  =================-->
+       @include('layouts.frontend.partial.services')
+        <!--================ Facilities Area  =================-->
+        
+        <!--================ About History Area  =================-->
+        @include('layouts.frontend.partial.about')
+        <!--================ About History Area  =================-->
+        
+        <!--================ Testimonial Area  =================-->
+       @include('layouts.frontend.partial.testimonial')
+        <!--================ Testimonial Area  =================-->
+        
+        <!--================ Gallery  =================-->
+        @include('layouts.frontend.partial.gallery')
+        <!--================ Recent Area  =================-->
         
         <!--================ start footer Area  =================-->	
         @include('layouts.frontend.partial.footer')

@@ -50,7 +50,7 @@
 
                     <li class="nav-item"><a class="nav-link" href="#">Gallery</a></li>
                     <li class="nav-item"><a class="nav-link" href="#">Booking</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ route('contactPage') }}">Contact</a></li>
 
                 </ul>
             </div>

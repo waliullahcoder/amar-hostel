@@ -1,85 +1,108 @@
 @extends('layouts.frontend.app')
 
 @section('content')
-<div class="auth-page py-5">
+
+<!--================ Breadcrumb Area =================-->
+<section class="breadcrumb_area">
+    <div class="container">
+        <div class="page-cover text-center">
+            <h2 class="page-cover-tittle">Sign Up</h2>
+            <ol class="breadcrumb">
+                <li><a href="{{ url('/') }}">Home</a></li>
+                <li class="active">Create Account</li>
+            </ol>
+        </div>
+    </div>
+</section>
+<!--================ Breadcrumb Area =================-->
+
+<!--================ Signup Area =================-->
+<section class="contact_area section_gap">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-6">
 
-                <div class="card shadow-sm">
-                    <div class="card-body p-4">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow"
+                     style="border:1px solid #eee; border-radius:16px;">
+                    
+                    <div class="card-body" style="padding:40px 35px;">
 
-                        <h4 class="text-center mb-3">Create an account</h4>
-                        <p class="text-center text-muted mb-4">
-                            Sign up to start shopping with us
-                        </p>
-
-                        <form method="POST" action="{{route('user.signupPost')}}">
+                        <!-- Signup Form -->
+                        <form method="POST" action="{{ route('user.signupPost') }}">
                             @csrf
 
-                            <!-- NAME -->
-                            <div class="mb-3">
+                            <!-- Name -->
+                            <div class="form-group mb-3">
                                 <label class="form-label">Full Name</label>
                                 <input type="text"
                                        name="name"
                                        value="{{ old('name') }}"
-                                       class="form-control"
+                                       class="form-control rounded-pill py-2 px-3"
                                        required>
                             </div>
 
-                            <!-- EMAIL -->
-                            <div class="mb-3">
-                                <label class="form-label">Email address</label>
+                            <!-- Email -->
+                            <div class="form-group mb-3">
+                                <label class="form-label">Email Address</label>
                                 <input type="email"
                                        name="email"
                                        value="{{ old('email') }}"
-                                       class="form-control"
+                                       class="form-control rounded-pill py-2 px-3"
                                        required>
                             </div>
 
-                            <!-- PASSWORD -->
-                            <div class="mb-3">
+                            <!-- Password -->
+                            <div class="form-group mb-3">
                                 <label class="form-label">Password</label>
                                 <input type="password"
                                        name="password"
-                                       class="form-control"
+                                       class="form-control rounded-pill py-2 px-3"
                                        required>
                             </div>
 
-                            <!-- CONFIRM PASSWORD -->
-                            <div class="mb-3">
+                            <!-- Confirm Password -->
+                            <div class="form-group mb-3">
                                 <label class="form-label">Confirm Password</label>
                                 <input type="password"
                                        name="password_confirmation"
-                                       class="form-control"
+                                       class="form-control rounded-pill py-2 px-3"
                                        required>
                             </div>
 
-                            <!-- TERMS -->
-                            <div class="mb-3">
-                                <input type="checkbox" required>
-                                <label>
+                            <!-- Terms -->
+                            <div class="form-check mb-4">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       id="terms"
+                                       required>
+                                <label class="form-check-label" for="terms">
                                     I agree to the
                                     <a href="#">Terms & Conditions</a>
                                 </label>
                             </div>
 
-                            <!-- BUTTON -->
-                            <button type="submit" class="btn btn-danger w-100">
+                            <!-- Submit -->
+                            <button type="submit"
+                                    class="btn theme_btn button_hover w-100 py-2 rounded-pill">
                                 Create Account
                             </button>
                         </form>
 
-                        <p class="text-center mt-3 mb-0">
+                        <!-- Login Link -->
+                        <p class="text-center mt-4 mb-0">
                             Already have an account?
-                            <a href="{{route('auth.signinPage') }}">Login</a>
+                            <a href="{{ route('auth.signinPage') }}">
+                                Login
+                            </a>
                         </p>
 
                     </div>
                 </div>
-
             </div>
+
         </div>
     </div>
-</div>
+</section>
+<!--================ Signup Area =================-->
+
 @endsection

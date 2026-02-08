@@ -95,7 +95,7 @@ button:focus {
 }
 
 .section_gap {
-  padding: 120px 0;
+  padding: 45px 0;
 }
 
 .d_flex {
@@ -572,7 +572,7 @@ button:focus {
 /*=========== breadcrumb_area css =============*/
 .breadcrumb_area {
   position: relative;
-  padding: 172px 0px 84px;
+  padding: 100px 0px 10px;
   background: #04091e;
   z-index: 1;
   overflow: hidden;

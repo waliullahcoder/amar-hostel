@@ -1,68 +1,99 @@
 @extends('layouts.frontend.app')
 
 @section('content')
-<div class="auth-page py-5">
+
+<!--================ Breadcrumb Area =================-->
+<section class="breadcrumb_area">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-5">
+        <div class="page-cover text-center">
+            <h2 class="page-cover-tittle">Sign In</h2>
+            <ol class="breadcrumb">
+                <li><a href="{{ url('/') }}">Home</a></li>
+                <li class="active">Admin Login</li>
+            </ol>
+        </div>
+    </div>
+</section>
+<!--================ Breadcrumb Area =================-->
 
-                <div class="card shadow-sm">
-                    <div class="card-body p-4">
+<!--================ Login Area =================-->
+<section class="contact_area section_gap">
+    <div class="container">
+        <div class="row justify-content-center align-items-center">
 
-                        <h4 class="text-center mb-3">Login to your account</h4>
-                        <p class="text-center text-muted mb-4">
-                            Welcome back! Please login to continue
-                        </p>
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow"
+                     style="border:1px solid #eee; border-radius:16px;">
+                    
+                    <div class="card-body" style="padding:40px 35px;">
 
-                        <form method="POST" action="">
+                        <!-- Login Form -->
+                        <form action="{{ route('admin.login') }}" method="POST">
                             @csrf
 
-                            <!-- EMAIL -->
-                            <div class="mb-3">
-                                <label class="form-label">Email address</label>
-                                <input type="email"
-                                       name="email"
-                                       value="{{ old('email') }}"
-                                       class="form-control"
+                            <!-- Username -->
+                            <div class="form-group mb-3">
+                                <input type="text"
+                                       name="user_name"
+                                       class="form-control rounded-pill py-2 px-3"
+                                       placeholder="User Name"
+                                       value="{{ old('user_name') }}"
                                        required>
                             </div>
 
-                            <!-- PASSWORD -->
-                            <div class="mb-3">
-                                <label class="form-label">Password</label>
+                            <!-- Password -->
+                            <div class="form-group mb-3 position-relative">
                                 <input type="password"
                                        name="password"
-                                       class="form-control"
+                                       id="password"
+                                       class="form-control rounded-pill py-2 px-3 pe-5"
+                                       placeholder="Password"
                                        required>
+
                             </div>
 
-                            <!-- REMEMBER -->
-                            <div class="d-flex justify-content-between mb-3">
-                                <div>
-                                    <input type="checkbox" name="remember" id="remember">
-                                    <label for="remember">Remember me</label>
+                            <!-- Remember / Forgot -->
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           name="remember"
+                                           id="remember"
+                                           {{ old('remember') ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="remember">
+                                        Remember Me
+                                    </label>
                                 </div>
-                                <a href="" class="small">
-                                    Forgot password?
+
+                                <a href="#" class="small text-muted">
+                                    Forgot Password?
                                 </a>
                             </div>
 
-                            <!-- BUTTON -->
-                            <button type="submit" class="btn btn-danger w-100">
-                                Login
-                            </button>
-                        </form>
+                            <!-- Submit -->
+                            <div class="text-center">
+                                <button type="submit"
+                                        class="btn theme_btn button_hover w-100 py-2 rounded-pill">
+                                    Sign In
+                                </button>
+                            </div>
 
-                        <p class="text-center mt-3 mb-0">
-                            Don't have an account?
-                            <a href="{{ route('auth.signupPage') }}">Sign up</a>
-                        </p>
+                            <!-- Signup link -->
+                            <p class="text-center mt-3 mb-0">
+                                Don’t have an account?
+                                <a href="{{ route('auth.signupPage') }}">Sign Up</a>
+                            </p>
+
+                        </form>
+                        <!-- Login Form End -->
 
                     </div>
                 </div>
-
             </div>
+
         </div>
     </div>
-</div>
+</section>
+<!--================ Login Area =================-->
+
 @endsection
