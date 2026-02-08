@@ -6,7 +6,7 @@
 						<h6>Away from monotonous life</h6>
 						<h2>Relax Your Mind</h2>
 						<p>If you are looking at blank cassettes on the web, you may be very confused at the<br> difference in price. You may see some for as low as $.17 each.</p>
-						<a href="#" class="btn theme_btn button_hover">Get Started</a>
+						<a href="{{ route('booking.index') }}" class="btn theme_btn button_hover">BOOKING AVAILABLE</a>
 					</div>
 				</div>
             </div>
@@ -17,6 +17,7 @@
                             <h2>Book<br> Your Room</h2>
                         </div>
                         <div class="col-md-9">
+                              <form action="{{ route('booking.search') }}" method="GET">
                             <div class="boking_table">
                                 <div class="row">
                                     <div class="col-md-4">
@@ -53,7 +54,7 @@
                                                 </select>
                                             </div>
                                              <div class="input-group">
-                                                <select class="wide">
+                                                <select class="wide" name="guests">
                                                     <option data-display="Guests/Seats">Guests/Seats</option>
                                                     <option value="1">1</option>
                                                     <option value="2">2</option>
@@ -72,20 +73,24 @@
                                         <div class="book_tabel_item">
                                             
                                             <div class="input-group">
-                                                <select class="wide">
-                                                     <option data-display="Room Type">Room Type</option>
-                                            <option>Single Room</option>
-                                            <option>Double Deluxe</option>
-                                            <option>Family Suite</option>
-                                            <option>Honeymoon Suite</option>
-                                                </select>
+                                                 <select name="category_id" class="wide">
+                                                <option value="">Seat Type</option>
+                                                @foreach($categories as $category)
+                                                    <option value="{{ $category->id }}"
+                                                        {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                                        {{ $category->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                             </div>
-                                            <a class="book_now_btn button_hover" href="#">Book Now</a>
+                                            <button type="submit" class="book_now_btn button_hover">Search Now</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        
+                        </form>
+                    </div>
                     </div>
                 </div>
             </div>
