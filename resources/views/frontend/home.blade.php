@@ -13,7 +13,10 @@
                         <div class="accomodation_item text-center">
                             <div class="hotel_img">
                                 <img src="{{$room->image ? asset('storage/'.$room->image) : asset('frontend/images/room1.jpg')}}" alt="" fetchpriority="high" decoding="sync">
-                                <a href="#" class="btn theme_btn button_hover">Book Now</a>
+                                <a href="{{ route('booking.bookRoom', $room->id) }}"
+                                   class="btn theme_btn button_hover position-absolute bottom-0 start-50 translate-middle-x mb-3">
+                                    Book Now
+                                </a>
                             </div>
                             <a href="#"><h4 class="sec_h4">{{$room->name}}</h4></a>
                             <h5>৳ {{$room->price}}<small>/night</small></h5>

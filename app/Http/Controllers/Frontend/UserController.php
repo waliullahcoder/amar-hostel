@@ -6,14 +6,17 @@ use App\Models\Slider;
 use App\Models\HomeSection;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\User;
+use App\Models\Booking;
+use App\Models\Room;
 use App\Http\Controllers\Controller;
 use App\Services\FrontEndService;
-use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Storage;
-use App\HelperClass;
+use Illuminate\Support\Facades\Session;
 class UserController extends Controller
 {
     protected $frontEndService;
@@ -37,6 +40,37 @@ class UserController extends Controller
                 Auth::logout();
                 return redirect()->back()->with('success', 'You are not allowed here');
             }
+            //Booking pending after login booking confirmed
+           
+        /* 🔥 LOGIN SUCCESS — CHECK PENDING BOOKING */
+        if (Session::has('pending_booking')) {
+
+            $data = Session::get('pending_booking');
+            $room = Room::findOrFail($data['room_id']);
+
+            DB::transaction(function () use ($data, $room) {
+
+                Booking::create([
+                    'user_id'     => Auth::id(),
+                    'room_id'     => $room->id,
+                    'check_in'    => $data['check_in'],
+                    'check_out'   => $data['check_out'],
+                    'guests'      => $data['guests'],
+                    'total_price' => $room->price * $data['guests'],
+                    'status'      => 'pending',
+                ]);
+
+                // capacity কমানো
+                $room->decrement('capacity', $data['guests']);
+            });
+
+            Session::forget('pending_booking');
+
+            return redirect()
+                ->route('booking.index')
+                ->with('success', 'Booking confirmed successfully after login 🎉');
+        }
+
 
             return redirect()->route('frontend.user.dashboard')->with('success', 'Logged in successfully');
         }

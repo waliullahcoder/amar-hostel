@@ -6,7 +6,7 @@
 <section class="breadcrumb_area">
     <div class="container">
         <div class="page-cover text-center">
-            <h2 class="page-cover-tittle">Hostel Room Booking</h2>
+            <h2 class="page-cover-tittle">Hostel Seats Booking</h2>
             <ol class="breadcrumb">
                 <li><a href="{{ url('/') }}">Home</a></li>
                 <li class="active">Booking</li>
@@ -29,7 +29,7 @@
                             @else
                             <!-- SECTION TITLE -->
                         <div class="section_title text-center mb-5">
-                            <h2 class="title_color">Available Rooms</h2>
+                            <h2 class="title_color">Available Seats</h2>
                             <p>Select your preferred room category and book easily</p>
                         </div>
                         @endif
@@ -40,7 +40,7 @@
             <div class="col-lg-3 mb-4">
                 <div class="card shadow-sm border-0 rounded-4">
                     <div class="card-body p-4">
-                        <h5 class="mb-3 fw-bold">Filter Rooms</h5>
+                        <h5 class="mb-3 fw-bold">Filter Seats</h5>
 
                         <form action="{{ route('booking.search') }}" method="GET">
 

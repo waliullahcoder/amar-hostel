@@ -9,7 +9,6 @@ use App\Models\Booking;
 use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
 class BookingController extends Controller
 {
     // Show rooms for booking
@@ -51,25 +50,47 @@ class BookingController extends Controller
             'guests'    => 'required|integer|min:1|max:' . $room->capacity,
         ]);
 
-        DB::transaction(function () use ($request, $room) {
+         // 🔴 IF NOT LOGGED IN
+    if (!Auth::check()) {
 
-            // Create booking
-            $booking = Booking::create([
-                'user_id'     => Auth::id(),
+        // booking data session এ রেখে দাও
+        session()->put('pending_booking', [
                 'room_id'     => $room->id,
                 'check_in'    => $request->check_in,
                 'check_out'   => $request->check_out,
-                'guests'      => $request->guests,
-                'total_price' => $room->price * $request->guests, // price calculation
-                'status'      => 'confirmed',
-            ]);
+                'guests'      => $request->guests
+        ]);
 
-            // Decrease room capacity
-            $room->decrement('capacity', $request->guests);
-        });
+        return redirect()
+            ->route('login')
+            ->with('warning', 'Please login first to confirm your booking.');
+    }
+
+    // ✅ USER LOGGED IN → BOOKING CONFIRM
+    $this->processBooking(Auth::id(), $room, $request);
 
         return redirect()
             ->route('booking.index')
             ->with('success', 'Booking confirmed successfully! 🎉');
     }
+
+    private function processBooking($userId, $room, $request)
+    {
+        DB::transaction(function () use ($userId, $room, $request) {
+
+            Booking::create([
+                'user_id'     => $userId,
+                'room_id'     => $room->id,
+                'check_in'    => $request->check_in,
+                'check_out'   => $request->check_out,
+                'guests'      => $request->guests,
+                'total_price' => $room->price * $request->guests,
+                'status'      => 'pending',
+            ]);
+
+            // capacity decrease
+            $room->decrement('capacity', $request->guests);
+        });
+    }
+
 }
