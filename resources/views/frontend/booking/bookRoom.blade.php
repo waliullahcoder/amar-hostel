@@ -117,26 +117,44 @@
 
     </div>
    <script>
-    document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
 
-        const guestInput = document.getElementById('guests');
-        const totalPriceInput = document.getElementById('total_price');
+    const guestInput = document.getElementById('guests');
+    const checkinInput = document.querySelector('input[name="check_in"]');
+    const checkoutInput = document.querySelector('input[name="check_out"]');
+    const totalPriceInput = document.getElementById('total_price');
 
-        const pricePerGuest = {{ $room->price }};
+    const pricePerGuest = {{ $room->price }};
 
-        guestInput.addEventListener('input', function () {
-            let guests = parseInt(this.value);
+    function calculateTotal() {
+        let guests = parseInt(guestInput.value);
+        let checkin = new Date(checkinInput.value);
+        let checkout = new Date(checkoutInput.value);
 
-            if (!isNaN(guests) && guests > 0) {
-                let total = guests * pricePerGuest;
-                totalPriceInput.value = '৳ ' + total.toLocaleString();
-            } else {
-                totalPriceInput.value = '';
-            }
-        });
+        if (isNaN(guests) || guests <= 0) guests = 0;
 
-    });
+        // Calculate difference in days
+        let timeDiff = checkout - checkin;
+        let diffDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)); // difference in days
+
+        if (diffDays <= 0) diffDays = 1; // minimum 1 day
+
+        let total = guests * pricePerGuest * diffDays;
+
+        totalPriceInput.value = total > 0 ? '৳ ' + total.toLocaleString() : '';
+    }
+
+    // Listen to guests, check-in and check-out changes
+    guestInput.addEventListener('input', calculateTotal);
+    checkinInput.addEventListener('change', calculateTotal);
+    checkoutInput.addEventListener('change', calculateTotal);
+
+    // Initial calculation
+    calculateTotal();
+
+});
 </script>
+
 
 </section>
 
