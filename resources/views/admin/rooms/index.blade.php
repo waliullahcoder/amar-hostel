@@ -30,6 +30,9 @@
                 <tr>
                     <th>#</th>
                     <th>Image</th>
+                    <th>Image2</th>
+                    <th>Image3</th>
+                    <th>Image4</th>
                     <th>Name</th>
                     <th>Type</th>
                     <th>Price</th>
@@ -45,6 +48,28 @@
                     <td>
                         @if($room->image)
                             <img src="{{ asset('storage/'.$room->image) }}" width="60" class="rounded">
+                        @else
+                            <span class="text-muted">No Image</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($room->image2)
+                            <img src="{{ asset('storage/'.$room->image2) }}" width="60" class="rounded">
+                        @else
+                            <span class="text-muted">No Image</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($room->image3)
+                            <img src="{{ asset('storage/'.$room->image3) }}" width="60" class="rounded">
+                        @else
+                            <span class="text-muted">No Image</span>
+                        @endif
+                    </td>
+
+                    <td>
+                        @if($room->image4)
+                            <img src="{{ asset('storage/'.$room->image4) }}" width="60" class="rounded">
                         @else
                             <span class="text-muted">No Image</span>
                         @endif
@@ -69,6 +94,9 @@
                             data-meta_description="{{ $room->meta_description }}"
                             data-category_id="{{ $room->category_id }}"
                             data-image="{{ $room->image }}"
+                            data-image="{{ $room->image2 }}"
+                            data-image="{{ $room->image3 }}"
+                            data-image="{{ $room->image4 }}"
                             data-meta_image="{{ $room->meta_image }}"
                             data-bs-toggle="modal"
                             data-bs-target="#roomModal">
@@ -149,11 +177,36 @@
                                 </div>
 
 
-                                <div class="col-md-4">
+                               
+                                 <div class="col-md-4">
                                     <label class="form-label fw-bold">Room Image</label>
                                     <input type="file" name="image" class="form-control">
                                     {{-- Existing Image Preview --}}
                                     <div class="mt-2" id="existing_room_image">
+                                        <span class="text-muted">No Image</span>
+                                    </div>
+                                </div>
+                                 <div class="col-md-4">
+                                    <label class="form-label fw-bold">Room Image2</label>
+                                    <input type="file" name="image2" class="form-control">
+                                    {{-- Existing Image Preview --}}
+                                    <div class="mt-2" id="existing_room_image2">
+                                        <span class="text-muted">No Image</span>
+                                    </div>
+                                </div>
+                                 <div class="col-md-4">
+                                    <label class="form-label fw-bold">Room Image3</label>
+                                    <input type="file" name="image3" class="form-control">
+                                    {{-- Existing Image Preview --}}
+                                    <div class="mt-2" id="existing_room_image3">
+                                        <span class="text-muted">No Image</span>
+                                    </div>
+                                </div>
+                                 <div class="col-md-4">
+                                    <label class="form-label fw-bold">Room Image4</label>
+                                    <input type="file" name="image4" class="form-control">
+                                    {{-- Existing Image Preview --}}
+                                    <div class="mt-2" id="existing_room_image4">
                                         <span class="text-muted">No Image</span>
                                     </div>
                                 </div>
@@ -239,6 +292,15 @@
                     {{-- Room Image --}}
                     <div class="col-12 text-center mb-3">
                         <img id="view_room_image" src="" alt="Room Image" class="img-fluid rounded" style="max-height:250px;">
+                    </div>
+                    <div class="col-12 text-center mb-3">
+                        <img id="view_room_image2" src="" alt="Room Image2" class="img-fluid rounded" style="max-height:250px;">
+                    </div>
+                    <div class="col-12 text-center mb-3">
+                        <img id="view_room_image3" src="" alt="Room Image3" class="img-fluid rounded" style="max-height:250px;">
+                    </div>
+                    <div class="col-12 text-center mb-3">
+                        <img id="view_room_image4" src="" alt="Room Image4" class="img-fluid rounded" style="max-height:250px;">
                     </div>
 
                     {{-- Room Name --}}
@@ -342,6 +404,21 @@ document.querySelectorAll('.editRoom').forEach(btn => {
         } else {
             existing_room_image.innerHTML = '<span class="text-muted">No Image</span>';
         }
+        if(this.dataset.image2) {
+            existing_room_image2.innerHTML = `<img src="/storage/${this.dataset.image2}" class="img-fluid rounded" width="120">`;
+        } else {
+            existing_room_image2.innerHTML = '<span class="text-muted">No Image</span>';
+        }
+        if(this.dataset.image3) {
+            existing_room_image3.innerHTML = `<img src="/storage/${this.dataset.image3}" class="img-fluid rounded" width="120">`;
+        } else {
+            existing_room_image3.innerHTML = '<span class="text-muted">No Image</span>';
+        }
+        if(this.dataset.image4) {
+            existing_room_image4.innerHTML = `<img src="/storage/${this.dataset.image4}" class="img-fluid rounded" width="120">`;
+        } else {
+            existing_room_image4.innerHTML = '<span class="text-muted">No Image</span>';
+        }
         if(this.dataset.meta_image) {
             existing_meta_image.innerHTML = `<img src="/storage/${this.dataset.meta_image}" class="img-fluid rounded" width="120">`;
         } else {
@@ -371,6 +448,9 @@ function viewRoom(room) {
     
     // Images
     document.getElementById('view_room_image').src = room.image ? '/storage/' + room.image : '/no-image.png';
+     document.getElementById('view_room_image2').src = room.image2 ? '/storage/' + room.image2 : '/no-image.png';
+      document.getElementById('view_room_image3').src = room.image3 ? '/storage/' + room.image3 : '/no-image.png';
+       document.getElementById('view_room_image4').src = room.image ? '/storage/' + room.image4 : '/no-image.png';
     document.getElementById('view_meta_image').src = room.meta_image ? '/storage/' + room.meta_image : '/no-image.png';
 
     // SEO

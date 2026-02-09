@@ -14,6 +14,9 @@ return new class extends Migration {
             $table->decimal('price', 10, 2);
             $table->integer('capacity');
             $table->string('image')->nullable();
+            $table->string('image2')->nullable();
+            $table->string('image3')->nullable();
+            $table->string('image4')->nullable();
             $table->boolean('available')->default(true);
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();

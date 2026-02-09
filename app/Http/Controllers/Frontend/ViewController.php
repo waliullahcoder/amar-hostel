@@ -70,5 +70,12 @@ class ViewController extends Controller
             }
         return view('frontend.auth.signup');
     }
+
+
+    public function singleDetails($id)
+    {
+        $room = $this->frontEndService->getRoom($id);
+        return view('frontend.rooms.singleDetails', compact('room'));
+    }
     
 }

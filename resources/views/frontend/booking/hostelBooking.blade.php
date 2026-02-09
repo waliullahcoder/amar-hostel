@@ -88,11 +88,11 @@
                         <div class="accomodation_item text-center shadow-sm rounded-4 overflow-hidden">
 
                             <div class="hotel_img position-relative">
-                                <img src="{{ $room->image
+                                <a href="{{ route('singleDetails', $room->id) }}"><img src="{{ $room->image
                                         ? asset('storage/'.$room->image)
                                         : asset('frontend/images/room1.jpg') }}"
                                      alt="{{ $room->name }}"
-                                     class="img-fluid w-100">
+                                     class="img-fluid w-100"></a>
 
                                 <a href="{{ route('booking.bookRoom', $room->id) }}"
                                    class="btn theme_btn button_hover position-absolute bottom-0 start-50 translate-middle-x mb-3">
@@ -101,7 +101,7 @@
                             </div>
 
                             <div class="p-3">
-                                <a href="#">
+                                <a href="{{ route('singleDetails', $room->id) }}">
                                     <h4 class="sec_h4 mb-1">{{ $room->name }}</h4>
                                 </a>
 

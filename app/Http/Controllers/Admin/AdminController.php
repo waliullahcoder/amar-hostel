@@ -50,6 +50,9 @@ class AdminController extends Controller
 
             // room image
             'image'            => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'image2'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'image3'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'image4'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
             // SEO
             'meta_title'       => 'nullable|string|max:255',
@@ -69,6 +72,18 @@ class AdminController extends Controller
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')
                 ->store('rooms', 'public');   // storage/app/public/rooms
+        }
+        if ($request->hasFile('image2')) {
+            $data['image2'] = $request->file('image2')
+                ->store('rooms', 'public');
+        }
+        if ($request->hasFile('image3')) {
+            $data['image3'] = $request->file('image3')
+                ->store('rooms', 'public');
+        }
+        if ($request->hasFile('image4')) {
+            $data['image4'] = $request->file('image4')
+                ->store('rooms', 'public');
         }
 
         /* ---------- SEO IMAGE ---------- */
@@ -102,6 +117,9 @@ class AdminController extends Controller
 
             // Room image
             'image'            => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'image2'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'image3'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'image4'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
             // SEO
             'meta_title'       => 'nullable|string|max:255',
@@ -116,14 +134,34 @@ class AdminController extends Controller
 
         /* ---------- ROOM IMAGE ---------- */
         if ($request->hasFile('image')) {
-            // পুরানো image delete
             if ($room->image && Storage::disk('public')->exists($room->image)) {
                 Storage::disk('public')->delete($room->image);
             }
-
             $data['image'] = $request->file('image')
                 ->store('rooms', 'public');
         }
+        if ($request->hasFile('image2')) {
+            if ($room->image2 && Storage::disk('public')->exists($room->image2)) {
+                Storage::disk('public')->delete($room->image2);
+            }
+            $data['image2'] = $request->file('image2')
+                ->store('rooms', 'public');
+        }
+        if ($request->hasFile('image3')) {
+            if ($room->image3 && Storage::disk('public')->exists($room->image3)) {
+                Storage::disk('public')->delete($room->image3);
+            }
+            $data['image3'] = $request->file('image3')
+                ->store('rooms', 'public');
+        }
+        if ($request->hasFile('image4')) {
+            if ($room->image4 && Storage::disk('public')->exists($room->image4)) {
+                Storage::disk('public')->delete($room->image4);
+            }
+            $data['image4'] = $request->file('image4')
+                ->store('rooms', 'public');
+        }
+
 
         /* ---------- SEO IMAGE ---------- */
         if ($request->hasFile('meta_image')) {
