@@ -3531,19 +3531,16 @@ input.dt-button {
     color: var(--bs-white);
 }
 
+
 .tree {
     width: 100%;
-    background-color: var(--bs-white);
-    padding: 1rem;
 }
 
 .tree ul {
     margin: 0px;
-    padding: 0px !important;
+    padding: 0px;
     text-decoration: none;
     width: 100%;
-    background-color: var(--bs-white) !important;
-    overflow: hidden;
 }
 
 #makeTree>li>ul>li {
@@ -3555,8 +3552,12 @@ input.dt-button {
     padding: 0px;
     list-style-type: none;
     text-align: left;
-    font-family: 'Inter', sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 13px;
+    font-weight: normal;
+}
+
+.tree li.close {
     font-weight: normal;
 }
 

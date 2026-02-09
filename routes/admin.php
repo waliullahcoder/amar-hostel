@@ -5,6 +5,28 @@ use App\Http\Controllers\Admin\{
     AuthController,
     AdminController,
     CategoryController,
+    CoaSetupController,
+    DebitVoucherEntryController,
+    CreditVoucherEntryController,
+    JournalVoucherEntryController,
+    VoucherApproveController,
+    VoucherRejectController,
+    AutomationApproveController,
+    AutomationRejectController,
+    InvestorController,
+    InvestController,
+    InvestRenewController,
+    ProfitDistributionController,
+    PaymentController,
+    InvestSattlementController,
+    ReportController,
+    AdminSettingController,
+    AdminMenuController,
+    AdminMenuActionController,
+    RoleController,
+    PermissionController,
+    SettingController,
+
 };
 
 Route::middleware('guest')->group(function () {
@@ -56,6 +78,89 @@ Route::group(['middleware' => ['admin']], function () {
     Route::put('testimonials/{testimonial}', [AdminController::class,'testimonialUpdate'])->name('testimonials.update');
     Route::delete('testimonials/{testimonial}', [AdminController::class,'testimonialDelete'])->name('testimonials.delete');
 
-       
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    //===================Accounting and Investors======================
+    
+    // Accounting
+    Route::resource('/coa-setup', CoaSetupController::class);
+
+    // Accounts Transaction
+    Route::resource('/debit-voucher-entry', DebitVoucherEntryController::class);
+    Route::get('/debit-voucher-entry/{id}/print', [DebitVoucherEntryController::class, 'print'])->name('debit-voucher-entry.print');
+    Route::resource('/credit-voucher-entry', CreditVoucherEntryController::class);
+    Route::get('/credit-voucher-entry/{id}/print', [creditVoucherEntryController::class, 'print'])->name('credit-voucher-entry.print');
+    Route::resource('/journal-voucher-entry', JournalVoucherEntryController::class);
+    Route::get('/journal-voucher-entry/{id}/print', [journalVoucherEntryController::class, 'print'])->name('journal-voucher-entry.print');
+    Route::resource('/voucher-approve', VoucherApproveController::class);
+    Route::resource('/voucher-reject', VoucherRejectController::class);
+    Route::resource('/automation-approve', AutomationApproveController::class);
+    Route::resource('/automation-reject', AutomationRejectController::class);
+
+    // Investor
+    Route::resource('/investor', InvestorController::class);
+
+    // Invest
+    Route::resource('/invest', InvestController::class);
+
+    // Invest Renew
+    Route::resource('/invest-renew', InvestRenewController::class);
+
+    // Profit Distribute
+    Route::resource('/profit-distribute', ProfitDistributionController::class);
+    Route::get('/profit-distribute/{id}/print', [ProfitDistributionController::class, 'print'])->name('profit-distribute.print');
+
+    // Investor Payment
+    Route::resource('/payment', PaymentController::class);
+
+    // Invest Sattlement
+    Route::resource('/invest-sattlement', InvestSattlementController::class);
+    Route::get('/coa-list', [ReportController::class, 'coaList'])->name('coa-list.index');
+    Route::get('/voucher-list', [ReportController::class, 'voucherList'])->name('voucher-list.index');
+    Route::get('/cash-book', [ReportController::class, 'cashBook'])->name('cash-book.index');
+    Route::get('/bank-book', [ReportController::class, 'bankBook'])->name('bank-book.index');
+    Route::get('/transaction-ledger', [ReportController::class, 'transactionLedger'])->name('transaction-ledger.index');
+    Route::get('/cash-flow-statement', [ReportController::class, 'cashFlowStatement'])->name('cash-flow-statement.index');
+    Route::get('/general-ledger', [ReportController::class, 'generalLedger'])->name('general-ledger.index');
+    Route::get('/income-statement', [ReportController::class, 'incomeStatement'])->name('income-statement.index');
+    Route::get('/trial-balance', [ReportController::class, 'trialBalance'])->name('trial-balance.index');
+    Route::get('/balance-sheet', [ReportController::class, 'balanceSheet'])->name('balance-sheet.index');
+    Route::get('/head-details', [ReportController::class, 'headDetails'])->name('head-details.index');
+
+    //===================Accounting and Investors end======================
+
+
+
+      // Admin Setting
+    Route::resource('/admin-settings', AdminSettingController::class);
+
+    // Admin Menu
+    Route::resource('/admin-menu', AdminMenuController::class);
+
+    // Admin Menu Actions
+    Route::get('/admin-menu-action/{id}', [AdminMenuActionController::class, 'index'])->name('admin-menu-action.index');
+    Route::get('/admin-menu-action/{id}/create', [AdminMenuActionController::class, 'create'])->name('admin-menu-action.create');
+    Route::post('/admin-menu-action/{id}/store', [AdminMenuActionController::class, 'store'])->name('admin-menu-action.store');
+    Route::get('/admin-menu-action/{id}/edit', [AdminMenuActionController::class, 'edit'])->name('admin-menu-action.edit');
+    Route::put('/admin-menu-action/{id}', [AdminMenuActionController::class, 'update'])->name('admin-menu-action.update');
+    Route::delete('/admin-menu-action/{id}', [AdminMenuActionController::class, 'destroy'])->name('admin-menu-action.destroy');
+
+    // Role
+    Route::resource('/role', RoleController::class);
+
+    // Permission
+    Route::get('/permission/{id}/edit', [RoleController::class, 'rolePermissionEdit'])->name('role-permission.edit');
+    Route::put('/permission/{id}', [RoleController::class, 'rolePermissionUpdate'])->name('role-permission.update');
+
+      // Settings
+    Route::resource('/settings', SettingController::class);
 });
 
