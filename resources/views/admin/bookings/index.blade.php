@@ -18,6 +18,7 @@
                     <th>#</th>
                     <th>Room</th>
                     <th>User</th>
+                    <th>Guests</th>
                     <th>Check In</th>
                     <th>Check Out</th>
                     <th>Total</th>
@@ -31,18 +32,30 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $booking->room->name ?? '-' }}</td>
                     <td>{{ $booking->user->name ?? '-' }}</td>
+                    <td>{{ $booking->guests }}</td>
                     <td>{{ $booking->check_in }}</td>
                     <td>{{ $booking->check_out }}</td>
                     <td>৳ {{ number_format($booking->total_price) }}</td>
                     <td>
-                        <span class="badge bg-info">{{ ucfirst($booking->status) }}</span>
+                       <span class="badge 
+                        @if($booking->status == 'pending') bg-warning
+                        @elseif($booking->status == 'confirmed') bg-primary
+                        @elseif($booking->status == 'checked_in') bg-success
+                        @elseif($booking->status == 'checked_out') bg-secondary
+                        @elseif($booking->status == 'cancelled') bg-danger
+                        @else bg-info
+                        @endif
+                    ">
+                        {{ ucfirst(str_replace('_',' ', $booking->status)) }}
+                    </span>
+
                     </td>
                     <td>
                         <button class="btn btn-sm btn-primary"
-                            onclick='editStatus(@json($booking))'
+                            onclick='openStatusModal(@json($booking))'
                             data-bs-toggle="modal"
                             data-bs-target="#statusModal">
-                            Edit Status
+                            Resrvation
                         </button>
 
                         <button class="btn btn-sm btn-success"
@@ -53,7 +66,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="text-center text-muted">No booking found</td>
+                    <td colspan="9" class="text-center text-muted">No booking found</td>
                 </tr>
                 @endforelse
             </tbody>
@@ -71,13 +84,11 @@
                 @method('PUT')
 
                 <div class="modal-header">
-                    <h5 class="modal-title">Update Booking Status</h5>
+                    <h5 class="modal-title">Change Reservation</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
-                    <input type="hidden" id="booking_id">
-
                     <div class="mb-3">
                         <label class="form-label fw-bold">Status</label>
                         <select name="status" id="booking_status" class="form-select" required>
@@ -112,34 +123,13 @@
 
             <div class="modal-body">
                 <table class="table table-bordered">
-                    <tr>
-                        <th>Room</th>
-                        <td id="v_room"></td>
-                    </tr>
-                    <tr>
-                        <th>User</th>
-                        <td id="v_user"></td>
-                    </tr>
-                    <tr>
-                        <th>Guests</th>
-                        <td id="v_guests"></td>
-                    </tr>
-                    <tr>
-                        <th>Check In</th>
-                        <td id="v_checkin"></td>
-                    </tr>
-                    <tr>
-                        <th>Check Out</th>
-                        <td id="v_checkout"></td>
-                    </tr>
-                    <tr>
-                        <th>Total Price</th>
-                        <td id="v_price"></td>
-                    </tr>
-                    <tr>
-                        <th>Status</th>
-                        <td id="v_status"></td>
-                    </tr>
+                    <tr><th>Room</th><td id="v_room"></td></tr>
+                    <tr><th>User</th><td id="v_user"></td></tr>
+                    <tr><th>Guests</th><td id="v_guests"></td></tr>
+                    <tr><th>Check In</th><td id="v_checkin"></td></tr>
+                    <tr><th>Check Out</th><td id="v_checkout"></td></tr>
+                    <tr><th>Total Price</th><td id="v_price"></td></tr>
+                    <tr><th>Status</th><td id="v_status"></td></tr>
                 </table>
             </div>
 
@@ -153,7 +143,7 @@
 
 {{-- ================= SCRIPTS ================= --}}
 <script>
-function editStatus(booking){
+function openStatusModal(booking){
     document.getElementById('booking_status').value = booking.status;
     document.getElementById('statusForm').action = '/admin/bookings/' + booking.id;
 }

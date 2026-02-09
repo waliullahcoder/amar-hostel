@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\{
     RoleController,
     PermissionController,
     SettingController,
+    AdminBookingController
 
 };
 
@@ -78,7 +79,9 @@ Route::group(['middleware' => ['admin']], function () {
     Route::put('testimonials/{testimonial}', [AdminController::class,'testimonialUpdate'])->name('testimonials.update');
     Route::delete('testimonials/{testimonial}', [AdminController::class,'testimonialDelete'])->name('testimonials.delete');
 
-    
+    //Bookings
+    Route::get('bookings', [AdminBookingController::class,'index'])->name('bookings.index');
+    Route::put('bookings/{booking}', [AdminBookingController::class, 'update'])->name('bookings.update');
     
     
     
