@@ -26,6 +26,7 @@ Route::get('/storage-link', function () {
 Route::get('/', [ViewController::class, 'index'])->name('home');
 Route::get('/about', [ViewController::class, 'aboutPage'])->name('aboutPage');
 Route::get('/gallery', [ViewController::class, 'galleryPage'])->name('galleryPage');
+Route::get('/rooms', [ViewController::class, 'roomsPage'])->name('roomsPage');
 Route::get('/room/details/{id}', [ViewController::class, 'singleDetails'])->name('singleDetails');
 //Login Register
 Route::get('/contact', [ViewController::class, 'contactPage'])->name('contactPage');

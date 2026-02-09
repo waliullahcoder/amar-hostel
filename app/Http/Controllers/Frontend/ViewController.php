@@ -23,6 +23,11 @@ class ViewController extends Controller
 
         return view('frontend.home', compact('rooms','services','testimonials'));
     }
+    public function roomsPage()
+    {
+        $rooms = $this->frontEndService->allRooms();
+        return view('frontend.rooms.rooms', compact('rooms'));
+    }
 
     public function roomDetails($id)
     {

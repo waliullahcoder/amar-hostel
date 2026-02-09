@@ -30,15 +30,9 @@
                     
 
                     <!-- Rooms -->
-                   <li class="nav-item submenu dropdown"> <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> Rooms <span class="ms-1">▼</span> </a> 
-                    <ul class="dropdown-menu"> 
-                        <li class="nav-item"><a class="nav-link" href="#">Double Deluxe Room</a></li> 
-                        <li class="nav-item"><a class="nav-link" href="#">Single Deluxe Room</a></li> 
-                        <li class="nav-item"><a class="nav-link" href="#">Honeymoon Suite</a></li> 
-                        <li class="nav-item"><a class="nav-link" href="#">Economy Double</a></li> 
-                    </ul> 
+                  <li class="nav-item {{ Request::routeIs('roomsPage') ? 'active' : '' }}">
+                        <a class="nav-link" href="{{ route('roomsPage') }}">Rooms</a>
                     </li>
-
                     <!-- Services -->
                     <li class="nav-item submenu dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown"
