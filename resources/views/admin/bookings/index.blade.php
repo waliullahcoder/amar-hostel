@@ -19,6 +19,7 @@
                     <th>Room</th>
                     <th>User</th>
                     <th>Guests</th>
+                    <th>Available</th>
                     <th>Check In</th>
                     <th>Check Out</th>
                     <th>Total</th>
@@ -33,6 +34,7 @@
                     <td>{{ $booking->room->name ?? '-' }}</td>
                     <td>{{ $booking->user->name ?? '-' }}</td>
                     <td>{{ $booking->guests }}</td>
+                    <td>{{ $booking->room->capacity ?? '-' }}</td>
                     <td>{{ $booking->check_in }}</td>
                     <td>{{ $booking->check_out }}</td>
                     <td>৳ {{ number_format($booking->total_price) }}</td>
