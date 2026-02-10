@@ -33,7 +33,7 @@
                     <th>Price</th>
                     <th>Capacity</th>
                     <th>Status</th>
-                    <th width="150">Action</th>
+                    <th width="160">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -41,14 +41,13 @@
                 <tr class="text-center">
                     <td>{{ $loop->iteration }}</td>
 
-                    {{-- Images --}}
                     <td>
                         <div class="d-flex gap-1 justify-content-center">
                             @foreach(['image','image2','image3','image4'] as $img)
                                 @if($room->$img)
                                 <img src="{{ asset('storage/'.$room->$img) }}"
                                      class="rounded border"
-                                     style="width:45px;height:45px;object-fit:cover">
+                                     style="width:42px;height:42px;object-fit:cover">
                                 @endif
                             @endforeach
                         </div>
@@ -58,30 +57,43 @@
                     <td>{{ $room->category->name ?? 'N/A' }}</td>
                     <td>৳ {{ number_format($room->price) }}</td>
                     <td>{{ $room->capacity }}</td>
-                    <td>
-                        <span class="badge bg-success">Active</span>
-                    </td>
+                    <td><span class="badge bg-success">Active</span></td>
 
-                    {{-- Action --}}
                     <td>
+                        {{-- EDIT --}}
                         <button class="btn btn-sm btn-outline-primary editRoom"
                             data-bs-toggle="modal"
                             data-bs-target="#roomModal"
-                            data-room='@json($room)'>
-                            <i class="bi bi-pencil"></i>
+
+                            data-id="{{ $room->id }}"
+                            data-name="{{ $room->name }}"
+                            data-price="{{ $room->price }}"
+                            data-capacity="{{ $room->capacity }}"
+                            data-description="{{ $room->description }}"
+                            data-category="{{ $room->category_id }}"
+                            data-image="{{ $room->image }}"
+                            data-image2="{{ $room->image2 }}"
+                            data-image3="{{ $room->image3 }}"
+                            data-image4="{{ $room->image4 }}"
+                            data-meta_title="{{ $room->meta_title }}"
+                            data-meta_keywords="{{ $room->meta_keywords }}"
+                            data-meta_description="{{ $room->meta_description }}">
+                            Edit
                         </button>
 
+                        {{-- VIEW --}}
                         <button class="btn btn-sm btn-outline-success"
                             onclick='viewRoom(@json($room))'>
-                            <i class="bi bi-eye"></i>
+                            View
                         </button>
 
+                        {{-- DELETE --}}
                         <form action="{{ route('admin.rooms.destroy',$room->id) }}"
                               method="POST" class="d-inline"
                               onsubmit="return confirm('Delete this room?')">
                             @csrf @method('DELETE')
                             <button class="btn btn-sm btn-outline-danger">
-                                <i class="bi bi-trash"></i>
+                                X
                             </button>
                         </form>
                     </td>
@@ -109,7 +121,7 @@
                     <h5 class="modal-title">
                         <i class="bi bi-house"></i> Room Information
                     </h5>
-                    <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
 
                 <div class="modal-body">
@@ -117,18 +129,18 @@
                     {{-- Tabs --}}
                     <ul class="nav nav-pills mb-3 gap-2">
                         <li class="nav-item">
-                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#general">
-                                <i class="bi bi-info-circle"></i> General
+                            <button type="button" class="nav-link active" data-bs-toggle="tab" data-bs-target="#general">
+                                General
                             </button>
                         </li>
                         <li class="nav-item">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#price">
-                                <i class="bi bi-cash"></i> Pricing
+                            <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#price">
+                                Pricing
                             </button>
                         </li>
                         <li class="nav-item">
-                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#seo">
-                                <i class="bi bi-google"></i> SEO
+                            <button type="button" class="nav-link" data-bs-toggle="tab" data-bs-target="#seo">
+                                SEO
                             </button>
                         </li>
                     </ul>
@@ -140,22 +152,23 @@
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label class="fw-bold">Room Name</label>
-                                    <input type="text" name="name" id="room_name" class="form-control" required>
+                                    <input type="text" name="name" id="room_name" class="form-control">
                                 </div>
 
                                 <div class="col-md-4">
                                     <label class="fw-bold">Room Type</label>
                                     <select name="category_id" id="room_category_id" class="form-select">
                                         @foreach($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
 
                                 @foreach(['image','image2','image3','image4'] as $img)
                                 <div class="col-md-4">
-                                    <label class="fw-bold text-capitalize">{{ $img }}</label>
+                                    <label class="fw-bold">{{ strtoupper($img) }}</label>
                                     <input type="file" name="{{ $img }}" class="form-control">
+                                    <div class="mt-2" id="preview_{{ $img }}"></div>
                                 </div>
                                 @endforeach
 
@@ -202,7 +215,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button class="btn btn-success">Save</button>
                 </div>
 
@@ -220,11 +233,10 @@
                 <h5 class="modal-title">
                     <i class="bi bi-eye"></i> Room Details
                 </h5>
-                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body">
-
                 <div class="row g-2 mb-3">
                     <div class="col-3"><img id="v_img1" class="img-fluid rounded"></div>
                     <div class="col-3"><img id="v_img2" class="img-fluid rounded"></div>
@@ -236,7 +248,6 @@
                 <p><strong>Price:</strong> <span id="v_price"></span></p>
                 <p><strong>Capacity:</strong> <span id="v_capacity"></span></p>
                 <p><strong>Description:</strong> <span id="v_description"></span></p>
-
             </div>
 
             <div class="modal-footer">
@@ -253,32 +264,43 @@ function resetRoomForm(){
     roomForm.reset();
     roomForm.action = "{{ route('admin.rooms.store') }}";
     form_method.value = "POST";
+    ['image','image2','image3','image4'].forEach(i=>{
+        document.getElementById('preview_'+i).innerHTML = '';
+    });
 }
 
 document.querySelectorAll('.editRoom').forEach(btn=>{
     btn.onclick = ()=>{
-        let r = JSON.parse(btn.dataset.room);
-        roomForm.action = `/admin/rooms/${r.id}`;
+        roomForm.action = `/admin/rooms/${btn.dataset.id}`;
         form_method.value = "PUT";
-        room_name.value = r.name;
-        room_price.value = r.price;
-        room_capacity.value = r.capacity;
-        room_description.value = r.description;
-        room_category_id.value = r.category_id;
-        meta_title.value = r.meta_title ?? '';
-        meta_keywords.value = r.meta_keywords ?? '';
-        meta_description.value = r.meta_description ?? '';
+
+        room_name.value = btn.dataset.name;
+        room_price.value = btn.dataset.price;
+        room_capacity.value = btn.dataset.capacity;
+        room_description.value = btn.dataset.description;
+        room_category_id.value = btn.dataset.category;
+        meta_title.value = btn.dataset.meta_title ?? '';
+        meta_keywords.value = btn.dataset.meta_keywords ?? '';
+        meta_description.value = btn.dataset.meta_description ?? '';
+
+        ['image','image2','image3','image4'].forEach(i=>{
+            document.getElementById('preview_'+i).innerHTML =
+                btn.dataset[i] ? `<img src="/storage/${btn.dataset[i]}" class="img-fluid rounded" width="120">` : '';
+        });
     }
 });
 
 function viewRoom(r){
     ['image','image2','image3','image4'].forEach((i,idx)=>{
-        document.getElementById('v_img'+(idx+1)).src = r[i] ? '/storage/'+r[i] : '/no-image.png';
+        document.getElementById('v_img'+(idx+1)).src =
+            r[i] ? '/storage/'+r[i] : '/no-image.png';
     });
-    v_name.textContent = r.name;
-    v_price.textContent = '৳ '+Number(r.price).toLocaleString();
-    v_capacity.textContent = r.capacity;
-    v_description.textContent = r.description ?? 'N/A';
+
+    v_name.innerText = r.name;
+    v_price.innerText = '৳ '+Number(r.price).toLocaleString();
+    v_capacity.innerText = r.capacity;
+    v_description.innerText = r.description ?? 'N/A';
+
     new bootstrap.Modal(viewRoomModal).show();
 }
 </script>
@@ -288,9 +310,6 @@ function viewRoom(r){
 .modal-content{border-radius:14px}
 .table img{transition:.2s}
 .table img:hover{transform:scale(1.2)}
-.nav-pills .nav-link.active{
-    background:linear-gradient(45deg,#0d6efd,#6610f2);
-}
 </style>
 
 @endsection
