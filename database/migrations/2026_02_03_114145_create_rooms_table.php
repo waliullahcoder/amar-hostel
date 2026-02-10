@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->string('image2')->nullable();
             $table->string('image3')->nullable();
             $table->string('image4')->nullable();
-            $table->boolean('available')->default(true);
+            $table->integer('available')->default(8);
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
             $table->string('meta_keywords')->nullable();

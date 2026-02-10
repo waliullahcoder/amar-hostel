@@ -32,6 +32,7 @@
                     <th>Type</th>
                     <th>Price</th>
                     <th>Capacity</th>
+                    <th>Available</th>
                     <th>Status</th>
                     <th width="160">Action</th>
                 </tr>
@@ -57,6 +58,7 @@
                     <td>{{ $room->category->name ?? 'N/A' }}</td>
                     <td>৳ {{ number_format($room->price) }}</td>
                     <td>{{ $room->capacity }}</td>
+                    <td>{{ $room->available }}</td>
                     <td><span class="badge bg-success">Active</span></td>
 
                     <td>
@@ -69,6 +71,7 @@
                             data-name="{{ $room->name }}"
                             data-price="{{ $room->price }}"
                             data-capacity="{{ $room->capacity }}"
+                            data-available="{{ $room->available }}"
                             data-description="{{ $room->description }}"
                             data-category="{{ $room->category_id }}"
                             data-image="{{ $room->image }}"
@@ -182,13 +185,17 @@
                         {{-- PRICE --}}
                         <div class="tab-pane fade" id="price">
                             <div class="row g-3">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="fw-bold">Price</label>
                                     <input type="number" name="price" id="room_price" class="form-control">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <label class="fw-bold">Capacity</label>
                                     <input type="number" name="capacity" id="room_capacity" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="fw-bold">Available</label>
+                                    <input type="number" name="available" id="available" class="form-control">
                                 </div>
                             </div>
                         </div>
@@ -247,6 +254,7 @@
                 <p><strong>Name:</strong> <span id="v_name"></span></p>
                 <p><strong>Price:</strong> <span id="v_price"></span></p>
                 <p><strong>Capacity:</strong> <span id="v_capacity"></span></p>
+                <p><strong>Available:</strong> <span id="v_available"></span></p>
                 <p><strong>Description:</strong> <span id="v_description"></span></p>
             </div>
 
@@ -282,6 +290,7 @@ document.querySelectorAll('.editRoom').forEach(btn=>{
         meta_title.value = btn.dataset.meta_title ?? '';
         meta_keywords.value = btn.dataset.meta_keywords ?? '';
         meta_description.value = btn.dataset.meta_description ?? '';
+        available.value = btn.dataset.available ?? '';
 
         ['image','image2','image3','image4'].forEach(i=>{
             document.getElementById('preview_'+i).innerHTML =
@@ -299,6 +308,7 @@ function viewRoom(r){
     v_name.innerText = r.name;
     v_price.innerText = '৳ '+Number(r.price).toLocaleString();
     v_capacity.innerText = r.capacity;
+    v_available.innerText = r.available;
     v_description.innerText = r.description ?? 'N/A';
 
     new bootstrap.Modal(viewRoomModal).show();

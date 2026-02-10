@@ -46,7 +46,7 @@ class AdminController extends Controller
             'price'            => 'required|numeric',
             'capacity'         => 'required|integer',
             'description'      => 'nullable|string',
-            'available'        => 'nullable|boolean',
+            'available'        => 'nullable',
 
             // room image
             'image'            => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
@@ -113,7 +113,7 @@ class AdminController extends Controller
             'price'            => 'required|numeric',
             'capacity'         => 'required|integer',
             'description'      => 'nullable|string',
-            'available'        => 'nullable|boolean',
+            'available'        => 'nullable',
 
             // Room image
             'image'            => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
