@@ -61,8 +61,8 @@
 
             $(document).on('keyup', '#qty', function(e) {
                 var qty = $(this).val();
-                var invest_value = "{{ $admin_setting->invest_value }}";
-                var amount = qty * invest_value;
+                var share_value = "{{ $admin_setting->share_value }}";
+                var amount = qty * share_value;
                 $('#amount').val(amount);
             });
         });

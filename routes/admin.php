@@ -124,6 +124,9 @@ Route::group(['middleware' => ['admin']], function () {
     // Investor Payment
     Route::resource('/payment', PaymentController::class);
 
+    //Sales
+    Route::resource('/sales', SalesController::class);
+
     // Invest Sattlement
     Route::resource('/invest-sattlement', InvestSattlementController::class);
     Route::get('/coa-list', [ReportController::class, 'coaList'])->name('coa-list.index');
@@ -137,6 +140,7 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/trial-balance', [ReportController::class, 'trialBalance'])->name('trial-balance.index');
     Route::get('/balance-sheet', [ReportController::class, 'balanceSheet'])->name('balance-sheet.index');
     Route::get('/head-details', [ReportController::class, 'headDetails'])->name('head-details.index');
+    Route::get('/investor-statement', [ReportController::class, 'investorStatement'])->name('investor-statement.index');
 
     //===================Accounting and Investors end======================
 

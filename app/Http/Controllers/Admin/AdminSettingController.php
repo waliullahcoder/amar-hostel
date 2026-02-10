@@ -34,6 +34,7 @@ class AdminSettingController extends Controller
             'footer_text' => $request->footer_text,
             'primary_color' => $request->primary_color,
             'secondary_color' => $request->secondary_color,
+            'share_value' => $request->share_value,
             'facebook' => $request->facebook,
             'twitter' => $request->twitter,
             'linkedin' => $request->linkedin,

@@ -10,5 +10,16 @@ class Service extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description', 'icon'];
+    protected $fillable = [
+        'name', 
+        'description', 
+        'icon',
+        'image',
+        'room_id',
+        ];
+
+    public function room()
+    {
+        return $this->belongsTo(Room::class, 'room_id');
+    }
 }

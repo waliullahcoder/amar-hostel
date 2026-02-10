@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('coa_setup_id')->nullable();
+            $table->foreignId('profit_head')->nullable();
             $table->string('name');
             $table->string('image')->nullable();
             $table->string('email')->nullable();
