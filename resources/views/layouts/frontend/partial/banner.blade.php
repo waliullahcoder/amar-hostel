@@ -54,7 +54,7 @@
                                                 </select>
                                             </div>
                                              <div class="input-group">
-                                                <select class="wide" name="guests">
+                                                <select class="wide" name="available">
                                                     <option data-display="Guests/Seats">Guests/Seats</option>
                                                     <option value="1">1</option>
                                                     <option value="2">2</option>

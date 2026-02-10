@@ -294,7 +294,7 @@ document.querySelectorAll('.editRoom').forEach(btn=>{
 
         ['image','image2','image3','image4'].forEach(i=>{
             document.getElementById('preview_'+i).innerHTML =
-                btn.dataset[i] ? `<img src="/storage/${btn.dataset[i]}" class="img-fluid rounded" width="120">` : '';
+                btn.dataset[i] ? `<img src="/storage/${btn.dataset[i]}" class="img-fluid rounded" width="20">` : '';
         });
     }
 });
