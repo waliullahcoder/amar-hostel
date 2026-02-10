@@ -85,10 +85,19 @@
             <h5>Guest / Seat Availability</h5>
 
             @php
-                $totalSeats = $room->capacity;
-                $booked = $room->capacity - $room->available;
-                $bookedSeats = [6,1]; // demo (DB থেকে আনবে)
+            $totalSeats = $room->capacity;
+            $booked = $room->capacity - $room->available;
+
+            // total seats range
+            $seats = range(1, $totalSeats);
+
+            // shuffle seats randomly
+            shuffle($seats);
+
+            // take booked amount
+            $bookedSeats = array_slice($seats, 0, $booked);
             @endphp
+
 
             <div class="seat-grid mt-3">
                 @for($i=1;$i<=$totalSeats;$i++)

@@ -27,8 +27,8 @@
                     <!-- ROOM INFO -->
                     <div class="booking_header text-center">
                         <h3>{{ $room->name }}</h3>
-                        <p>Capacity: {{ $room->capacity }} Guests</p>
-                        <h4>৳ {{ number_format($room->price) }} <span>/ per guest</span></h4>
+                        <p>Available Seat: {{ $room->available }} Seats</p>
+                        <h4>৳ {{ number_format($room->price) }} <span>/ per Seats</span></h4>
                     </div>
 
                     {{-- Errors --}}
@@ -78,12 +78,12 @@
 
                         <!-- GUESTS -->
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Guests</label>
+                            <label class="form-label fw-semibold">Seats</label>
                             <input type="number"
                                 id="guests"
                                 name="guests"
                                 min="1"
-                                max="{{ $room->capacity }}"
+                                max="{{ $room->available }}"
                                 class="form-control booking_field"
                                 placeholder="Enter number of guests"
                                 required>

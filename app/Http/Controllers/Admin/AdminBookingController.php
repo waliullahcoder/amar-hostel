@@ -75,7 +75,7 @@ public function index(Request $request)
 
                 // Increase room capacity by guests count
                 if ($booking->room) {
-                    $booking->room->increment('capacity', $booking->guests);
+                    $booking->room->increment('available', $booking->guests);
                 }
             }
 

@@ -62,11 +62,11 @@
                             <div class="mb-3">
                                 <label class="fw-semibold mb-1">Guests</label>
                                 <input type="number"
-                                       name="guests"
+                                       name="available"
                                        class="form-control"
                                        min="1"
-                                       value="{{ request('guests') }}"
-                                       placeholder="Number of guests">
+                                       value="{{ request('available') }}"
+                                       placeholder="Number of Available Seats">
                             </div>
                             <div class="mb-3">
                             <button type="submit"
@@ -115,7 +115,7 @@
                                 </h5>
 
                                 <span class="badge bg-light text-dark mt-2">
-                                    Capacity: {{ $room->capacity }}
+                                    Available Seat: {{ $room->available }}
                                 </span>
                             </div>
 

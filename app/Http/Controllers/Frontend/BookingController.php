@@ -14,14 +14,14 @@ class BookingController extends Controller
     // Show rooms for booking
     public function index(Request $request)
     {
-        $rooms = Room::where('available', 1);
+        $rooms = Room::where('status', 1);
 
         if ($request->category_id) {
             $rooms->where('category_id', $request->category_id);
         }
 
-        if ($request->guests) {
-            $rooms->where('capacity', '>=', $request->guests);
+        if ($request->available) {
+            $rooms->where('available', '>=', $request->available);
         }
 
         return view('frontend.booking.hostelBooking', [
@@ -89,7 +89,7 @@ class BookingController extends Controller
             ]);
 
             // capacity decrease
-            $room->decrement('capacity', $request->guests);
+            $room->decrement('available', $request->guests);
         });
     }
 

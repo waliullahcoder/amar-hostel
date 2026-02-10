@@ -61,7 +61,7 @@ class UserController extends Controller
                 ]);
 
                 // capacity কমানো
-                $room->decrement('capacity', $data['guests']);
+                $room->decrement('available', $data['guests']);
             });
 
             Session::forget('pending_booking');
