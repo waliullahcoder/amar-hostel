@@ -14,12 +14,14 @@
             <thead>
                 <tr class="text-nowrap">
                     <th>SL#</th>
+                    <th>BookID</th>
                     <th>Room</th>
                     <th>User</th>
-                    <th>Guests</th>
+                    <th>Booked</th>
                     <th>Available</th>
+                    <th>Capacity</th>
                     <th>Check In</th>
-                    <th>Check Out</th>
+                    {{-- <th>Check Out</th> --}}
                     <th>Total</th>
                     <th>Status</th>
                     <th>Actions</th>
@@ -74,8 +76,9 @@
                 <table class="table table-bordered">
                     <tr><th>Room</th><td id="v_room"></td></tr>
                     <tr><th>User</th><td id="v_user"></td></tr>
-                    <tr><th>Guests</th><td id="v_guests"></td></tr>
+                    <tr><th>Booked</th><td id="v_guests"></td></tr>
                     <tr><th>Available</th><td id="v_available"></td></tr>
+                    <tr><th>Capacity</th><td id="v_capacity"></td></tr>
                     <tr><th>Check In</th><td id="v_checkin"></td></tr>
                     <tr><th>Check Out</th><td id="v_checkout"></td></tr>
                     <tr><th>Total Price</th><td id="v_price"></td></tr>
@@ -100,12 +103,14 @@ $(document).ready(function() {
         ajax: "{{ route('admin.bookings.index') }}",
         columns: [
             { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, className: "text-center" },
+            { data: 'room_id', name: 'room.id' },
             { data: 'room_name', name: 'room.name' },
             { data: 'user_name', name: 'user.name' },
             { data: 'guests', name: 'guests', className: "text-center" },
-            { data: 'available', name: 'room.capacity', className: "text-center" },
+            { data: 'available', name: 'room.available', className: "text-center" },
+            { data: 'capacity', name: 'room.capacity', className: "text-center" },
             { data: 'check_in', name: 'check_in' },
-            { data: 'check_out', name: 'check_out' },
+            // { data: 'check_out', name: 'check_out' },
             { data: 'total_price', name: 'total_price', render: $.fn.dataTable.render.number(',', '.', 0, '৳ ') },
             { data: 'status_badge', name: 'status', orderable: false, searchable: false },
             { data: 'action', name: 'action', orderable: false, searchable: false, className: "text-end" },
@@ -127,6 +132,7 @@ $(document).ready(function() {
         $('#v_user').text($(this).data('user'));
         $('#v_guests').text($(this).data('guests'));
         $('#v_available').text($(this).data('available'));
+        $('#v_capacity').text($(this).data('capacity'));
         $('#v_checkin').text($(this).data('checkin'));
         $('#v_checkout').text($(this).data('checkout'));
         $('#v_price').text('৳ '+$(this).data('total'));

@@ -19,13 +19,17 @@ class AdminBookingController extends Controller
 public function index(Request $request)
 {
     if($request->ajax()){
-        $bookings = Booking::with(['room','user'])->select('bookings.*');
+        $bookings = Booking::with(['room','user'])->select('bookings.*')
+        ->orderBy('id', 'desc');
 
         return DataTables::of($bookings)
             ->addIndexColumn()
+            ->addColumn('room_id', fn($b) => 'BOOKID'.$b->id ?? '-')
             ->addColumn('room_name', fn($b) => $b->room->name ?? '-')
             ->addColumn('user_name', fn($b) => $b->user->name ?? '-')
-            ->addColumn('available', fn($b) => $b->room->capacity ?? '-')
+            ->addColumn('booked', fn($b) => $b->guests ?? '-')
+            ->addColumn('available', fn($b) => $b->room->available ?? '-')
+            ->addColumn('capacity', fn($b) => $b->room->capacity ?? '-')
             ->addColumn('status_badge', function($b){
                 $color = match($b->status){
                     'pending'=>'warning',
@@ -37,18 +41,32 @@ public function index(Request $request)
                 };
                 return '<span class="badge bg-'.$color.'">'.ucfirst(str_replace('_',' ',$b->status)).'</span>';
             })
-            ->addColumn('action', function($b){
-                return '
-                <button class="btn btn-sm btn-primary editBookingBtn" data-id="'.$b->id.'" data-status="'.$b->status.'">Reservation</button>
-                <button class="btn btn-sm btn-success viewBookingBtn" 
-                    data-room="'.($b->room->name ?? '-').'" 
-                    data-user="'.($b->user->name ?? '-').'" 
-                    data-guests="'.$b->guests.'" 
-                    data-available="'.($b->room->capacity ?? '-').'"
-                    data-checkin="'.$b->check_in.'" 
-                    data-checkout="'.$b->check_out.'" 
-                    data-total="'.$b->total_price.'" 
-                    data-status="'.$b->status.'">View</button>';
+            ->addColumn('action', function ($b) {
+            $reservationBtn = '';
+            if (!in_array($b->status, ['cancelled', 'checked_out'])) {
+                $reservationBtn = '
+                <button class="btn btn-sm btn-primary editBookingBtn"
+                    data-id="'.$b->id.'"
+                    data-status="'.$b->status.'">
+                    Reservation
+                </button>';
+            }
+            return '
+                '.$reservationBtn.'
+                <button class="btn btn-sm btn-success viewBookingBtn"
+                    data-room="'.($b->room->name ?? '-').'"
+                    data-user="'.($b->user->name ?? '-').'"
+                    data-guests="'.$b->guests.'"
+                    data-booked="'.($b->guests ?? '-').'"
+                    data-available="'.($b->room->available ?? '-').'"
+                    data-capacity="'.($b->room->capacity ?? '-').'"
+                    data-checkin="'.$b->check_in.'"
+                    data-checkout="'.$b->check_out.'"
+                    data-total="'.$b->total_price.'"
+                    data-status="'.$b->status.'">
+                    <i class="fa fa-eye"></i>
+                </button>
+            ';
             })
             ->rawColumns(['status_badge','action'])
             ->make(true);
