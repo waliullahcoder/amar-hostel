@@ -25,6 +25,8 @@ class FrontEndService
         $services['home'] = Service::where('type', 'home')->orderBy('id', 'desc')->get();
         $services['gallery'] = Service::where('type', 'gallery')->orderBy('id', 'desc')->get();
         $services['testimonial'] = Service::where('type', 'testimonial')->orderBy('id', 'desc')->get();
+        $services['footer_col1'] = Service::where('type', 'footer_col1')->orderBy('id', 'desc')->get();
+        $services['footer_col2'] = Service::where('type', 'footer_col2')->orderBy('id', 'desc')->get();
         $services['about'] = Service::where('type', 'about')->first();
         return  $services;
     }

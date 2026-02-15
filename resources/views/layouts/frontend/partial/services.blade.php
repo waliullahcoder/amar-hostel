@@ -4,10 +4,17 @@
             <div class="container">
                 <div class="section_title text-center">
                     <h2 class="title_w">Royal Facilities</h2>
-                    <p>Who are in extremely love with eco friendly system.</p>
                 </div>
                 <div class="row mb_30">
+                    @foreach ($services['home'] as $service)    
                     <div class="col-lg-4 col-md-6">
+                        <div class="facilities_item">
+                            <h4 class="sec_h4"><i class="{{$service->icon}}"></i>{{ $service->name }}</h4>
+                            <p>{{ \Illuminate\Support\Str::limit($service->description, 99) }} <a href="{{ route('serviceDetails', $service->id) }}">Read More..</a></p>
+                        </div>
+                    </div>
+                    @endforeach
+                     {{-- <div class="col-lg-4 col-md-6">
                         <div class="facilities_item">
                             <h4 class="sec_h4"><i class="lnr lnr-dinner"></i>Restaurant</h4>
                             <p>Usage of the Internet is becoming more common due to rapid advancement of technology and power.</p>
@@ -42,7 +49,7 @@
                             <h4 class="sec_h4"><i class="lnr lnr-coffee-cup"></i>Bar</h4>
                             <p>Usage of the Internet is becoming more common due to rapid advancement of technology and power.</p>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </section>

@@ -153,6 +153,8 @@
             <option value="gallery">Gallery</option>
             <option value="testimonial">Testimonial</option>
             <option value="about">About</option>
+            <option value="footer_col1">Footer Col1</option>
+            <option value="footer_col2">Footer Col2</option>
         </select>
     </div>
 

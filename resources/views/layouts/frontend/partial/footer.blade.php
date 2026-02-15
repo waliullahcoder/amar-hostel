@@ -3,8 +3,8 @@
                 <div class="row">
                     <div class="col-lg-3  col-md-6 col-sm-6">
                         <div class="single-footer-widget">
-                            <h6 class="footer_title">About Agency</h6>
-                            <p>The world has become so fast paced that people don’t want to stand by reading a page of information, they would much rather look at a presentation and understand the message. It has come to a point </p>
+                            <h6 class="footer_title">{{ $services['about']->name }}</h6>
+                            <p>{{ $services['about']->description }}</p>
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 col-sm-6">
@@ -13,18 +13,16 @@
                             <div class="row">
                                 <div class="col-4">
                                     <ul class="list_style">
-                                        <li><a href="{{ route('home') }}">Home</a></li>
-                                        <li><a href="{{ route('aboutPage') }}">About</a></li>
-                                        <li><a href="">Services</a></li>
-                                        <li><a href="{{ route('galleryPage') }}">Gallery</a></li>
+                                        @foreach ($services['footer_col1'] as $item)
+                                        <li><a href="{{ route('serviceDetails', $item->id) }}">{{ $item->name }}</a></li>
+                                        @endforeach
                                     </ul>
                                 </div>
                                 <div class="col-4">
                                     <ul class="list_style">
-                                        <li><a href="{{ route('roomsPage') }}">Rooms</a></li>
-                                        <li><a href="{{ route('booking.index') }}">Booking</a></li>
-                                        <li><a href="#">Blog</a></li>
-                                        <li><a href="{{ route('contactPage') }}">Contact</a></li>
+                                       @foreach ($services['footer_col2'] as $item)
+                                        <li><a href="{{ route('serviceDetails', $item->id) }}">{{ $item->name }}</a></li>
+                                        @endforeach
                                     </ul>
                                 </div>										
                             </div>							
@@ -32,31 +30,21 @@
                     </div>							
                     <div class="col-lg-3 col-md-6 col-sm-6">
                         <div class="single-footer-widget">
-                            <h6 class="footer_title">Newsletter</h6>
-                            <p>For business professionals caught between high OEM price and mediocre print and graphic output, </p>		
-                            <div id="mc_embed_signup">
-                                <form target="_blank" action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&id=92a4423d01" method="get" class="subscribe_form relative">
-                                    <div class="input-group d-flex flex-row">
-                                        <input name="EMAIL" placeholder="Email Address" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Email Address '" required="" type="email">
-                                        <button class="btn sub-btn"><span class="lnr lnr-location"></span></button>		
-                                    </div>									
-                                    <div class="mt-10 info"></div>
-                                </form>
-                            </div>
+                            <h6 class="footer_title">Social Links</h6>
+                            
+                    <a href="{{ $settings->facebook_page }}" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                <a href="{{ $settings->twitter }}" target="_blank"><i class="fab fa-twitter"></i></a>
+                <a href="{{ $settings->instagram }}" target="_blank"><i class="fab fa-dribbble"></i></a>
+                <a href="{{ $settings->linkedin }}" target="_blank"><i class="fab fa-behance"></i></a>
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 col-sm-6">
                         <div class="single-footer-widget instafeed">
                             <h6 class="footer_title">InstaFeed</h6>
                             <ul class="list_style instafeed d-flex flex-wrap">
-                                <li><img src="frontend/images/Image-01.jpg" alt="" loading="lazy" decoding="async"></li>
-                                <li><img src="frontend/images/Image-02.jpg" alt="" loading="lazy" decoding="async"></li>
-                                <li><img src="frontend/images/Image-03.jpg" alt="" loading="lazy" decoding="async"></li>
-                                <li><img src="frontend/images/Image-04.jpg" alt="" loading="lazy" decoding="async"></li>
-                                <li><img src="frontend/images/Image-05.jpg" alt="" loading="lazy" decoding="async"></li>
-                                <li><img src="frontend/images/Image-06.jpg" alt="" loading="lazy" decoding="async"></li>
-                                <li><img src="frontend/images/Image-07.jpg" alt="" loading="lazy" decoding="async"></li>
-                                <li><img src="frontend/images/Image-08.jpg" alt="" loading="lazy" decoding="async"></li>
+                                 @foreach ($services['gallery'] as $item)
+                                <li><img src="{{ asset('storage/'.$item->image) }}" alt="" loading="lazy" decoding="async" style="width: 50px; height: 50px; object-fit: cover;"></li>
+                                @endforeach
                             </ul>
                         </div>
                     </div>						
@@ -66,12 +54,7 @@
                     <p class="col-lg-8 col-sm-12 footer-text m-0"><!-- Link back to TechnoPark can't be removed. Template is licensed under CC BY 3.0. -->
 Copyright ©<script>document.write(new Date().getFullYear());</script>2026 All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://technoparkbd.com" target="_blank">TechnoPark</a>
 <!-- Link back to TechnoPark can't be removed. Template is licensed under CC BY 3.0. --></p>
-                    <div class="col-lg-4 col-sm-12 footer-social">
-                        <a href="#"><i class="fa fa-facebook"></i></a>
-                        <a href="#"><i class="fa fa-twitter"></i></a>
-                        <a href="#"><i class="fa fa-dribbble"></i></a>
-                        <a href="#"><i class="fa fa-behance"></i></a>
-                    </div>
+                  
                 </div>
             </div>
         </footer>
