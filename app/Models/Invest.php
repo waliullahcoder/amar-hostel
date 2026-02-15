@@ -4,41 +4,31 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Support\Facades\Auth;
 
 class Invest extends Model
 {
-    use HasFactory, SoftDeletes;
-    protected $fillable = ['investor_id', 'invest_no', 'date', 'qty', 'amount', 'deposit_type', 'bkash', 'rocket', 'nagad', 'bank_account', 'remarks', 'calculate', 'approved', 'status', 'sattled', 'coa_setup_id', 'created_by', 'updated_by', 'deleted_by'];
-
-    protected static function booted()
-    {
-        static::addGlobalScope('calculate', function ($builder) {
-            if (!Auth::check() || !Auth::user()->hasRole('Software Admin')) {
-                $builder->where('calculate', true);
-            }
-        });
-    }
+    use SoftDeletes;
+    protected $fillable = ['investor_id', 'product_id', 'invest_no', 'date', 'qty', 'amount', 'deposit_type', 'bkash', 'rocket', 'nagad', 'bank_account', 'remarks', 'approved', 'sattled', 'coa_id', 'created_by', 'updated_by', 'deleted_by'];
+    protected $appends = ['formattedDate'];
 
     public function investor()
     {
         return $this->belongsTo(Investor::class, 'investor_id');
     }
 
-    public function invest_months()
+    public function product()
     {
-        return $this->hasMany(InvestMonth::class, 'invest_id');
+        return $this->belongsTo(Room::class, 'product_id');
     }
 
     public function coa()
     {
-        return $this->belongsTo(CoaSetup::class, 'coa_setup_id');
+        return $this->belongsTo(Coa::class, 'coa_id');
     }
 
-    public function getFormattedDateAttribute()
+    public function payments()
     {
-        return date('d-m-Y', strtotime($this->date));
+        return $this->hasMany(PaymentList::class, 'invest_id');
     }
 
     public function sattlements()
@@ -51,5 +41,8 @@ class Invest extends Model
         return $this->hasMany(AccountTransaction::class, 'voucher_no', 'invest_no')->where('voucher_type', 'Invest');
     }
 
-    protected $appends = ['formattedDate'];
+    public function getFormattedDateAttribute()
+    {
+        return date('d-m-Y', strtotime($this->date));
+    }
 }

@@ -7,6 +7,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Invest;
+use App\Models\ProfitDistribution;
+use App\Models\ProductionList;
+use App\Models\Booking;
+use App\Models\Room;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
@@ -52,7 +58,58 @@ class AuthController extends Controller
 
     public function dashboard(Request $request)
     {
-        return view('admin.auth.dashbaord');
+        if ($request->ajax() && $request->get_investors) {
+            $invests = Invest::with(['investor'])->where('product_id', $request->product_id)->groupBy('investor_id')->select('*', DB::raw('SUM(qty) as sumQty'), DB::raw('SUM(amount) as sumAmount'))->get();
+            return response()->json([
+                'status' => 'success',
+                'data'   => view('admin.auth.investorlist-modal', compact('invests'))->render()
+            ]);
+        }
+
+        $query = Room::where('status', true);
+        if (Auth::user()->hasRole('Investor')) {
+            $query->whereHas('invests', function ($query) {
+                $query->where('investor_id', Auth::user()->investor->id);
+            });
+        }
+        $rooms = $query->where('show_dashboard', true)->orderBy('serial', 'asc')->get();
+        
+        $data = [];
+        foreach ($rooms as $item) {
+            // $sales = SalesList::whereHas('sales')->where('product_id', $item->id)->select('*', DB::raw('SUM(qty - return_qty) as sumQty, SUM(net_amount - return_amount) as sumAmount'))->get();
+            // $productionQty = ProductionList::whereHas('production')->where('product_id', $item->id)->sum('qty');
+            $sales = Booking::where('room_id', $item->id)->get();
+            $salesQty = round($sales->sum('guests') * 0.9);
+            $salesAmount = round(($sales->sum('total_price')) * 0.9);
+            $totalProfit = $salesQty * $item->profit;
+            $totalShare = Invest::where('product_id', $item->id)->sum('qty');
+            $sattledQty = Invest::where('product_id', $item->id)->where('sattled', true)->sum('qty');
+
+            $distribution = ProfitDistribution::where('product_id', $item->id)->first();
+            if($distribution){
+                $productionQty  = $distribution->production_qty;
+                $salesQty       = $distribution->sales_qty;
+                $salesAmount    = $distribution->sales_amount;
+                $totalProfit    = $distribution->profit_amount;
+            }
+
+            $data[] = [
+                'product'           => $item,
+                'production_qty'    => $productionQty,
+                'sales_qty'         => $salesQty,
+                'sales_amount'      => $salesAmount,
+                'investor_profit'   => $totalProfit,
+                'share_qty'         => $totalShare,
+                'sattled_qty'       => $sattledQty,
+                'per_share_profit' => round($totalProfit > 0 && $item->required_share > 0 ? $totalProfit / $item->required_share : 0, 2)
+            ];
+        }
+
+        if (Auth::user()->hasRole('Investor')) {
+            return view('admin.auth.investor-dashbaord', compact('data'));
+        } else {
+            return view('admin.auth.dashbaord', compact('data'));
+        }
     }
 
     /**

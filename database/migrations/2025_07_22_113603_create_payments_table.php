@@ -11,23 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('invests', function (Blueprint $table) {
+        Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('investor_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
-            $table->string('invest_no')->unique();
+            $table->foreignId('coa_id')->nullable()->constrained()->nullOnDelete();
+            $table->enum('payment_type', ['Advance', 'Payment', 'Adjust'])->default('Advance');
+            $table->string('payment_no')->unique();
             $table->date('date');
-            $table->integer('qty');
             $table->decimal('amount', 16, 0);
-            $table->string('deposit_type')->nullable();
-            $table->string('bkash')->nullable();
-            $table->string('rocket')->nullable();
-            $table->string('nagad')->nullable();
-            $table->string('bank_account')->nullable();
             $table->text('remarks')->nullable();
-            $table->boolean('approved')->default(false);
-            $table->boolean('sattled')->default(false);
-            $table->foreignId('coa_id')->constrained();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('deleted_by')->nullable()->constrained('users')->nullOnDelete();
@@ -41,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('invests');
+        Schema::dropIfExists('payments');
     }
 };

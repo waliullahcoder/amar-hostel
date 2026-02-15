@@ -13,6 +13,9 @@ class Room extends Model
     'name',
     'category_id',
     'duration',
+    'show_dashboard', 
+    'serial', 
+    'required_share',
     'status',
     'slug',
     'description',
@@ -33,5 +36,9 @@ class Room extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+     public function invests()
+    {
+        return $this->hasMany(Invest::class, 'product_id');
     }
 }

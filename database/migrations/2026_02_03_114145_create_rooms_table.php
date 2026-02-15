@@ -23,6 +23,10 @@ return new class extends Migration {
             $table->string('meta_keywords')->nullable();
             $table->string('meta_image')->nullable();
             $table->integer('status')->default(1);
+            $table->decimal('profit', 16, 0)->default(0);
+             $table->decimal('required_share', 16, 0)->default(0);
+            $table->boolean('show_dashboard')->default(true);
+            $table->integer('serial')->default(1);
             $table->string('slug')->unique();
             $table->timestamps();
         });

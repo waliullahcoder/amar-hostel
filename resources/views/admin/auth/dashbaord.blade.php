@@ -1,225 +1,189 @@
 @extends('layouts.admin.app')
 
 @section('content')
-<div class="row g-3 info-cards">
-
-    <div class="col-lg-3 col-sm-6">
-        <div class="card info-card bg-room">
-            <div class="card-body">
-                <div>
-                    <p>Total Rooms</p>
-                    <h3>120</h3>
+    <div class="row g-3 info-cards">
+        @php
+            $totalInvestor = \App\Models\Investor::where('status', true)->count();
+            $totalInvest = \App\Models\Invest::where('sattled', false)->sum('amount');
+            $totalWithdraw = \App\Models\Payment::whereIn('payment_type', ['Payment', 'Advance'])->sum('amount');
+            $totalDue = \App\Models\ProfitDistributionList::whereHas('profitDistribution')->sum(
+                DB::raw('amount - paid_amount'),
+            );
+        @endphp
+        <div class="col-lg-3 col-sm-6">
+            <div class="card info-card">
+                <div class="card-body">
+                    <div class="card-content">
+                        <p class="card-text">Total Investor</p>
+                        <h3 class="card-count">{{ number_format($totalInvestor) }}</h3>
+                    </div>
+                    <div class="card-icon">
+                        <span class="icon"><span class="material-symbols-outlined"> group </span></span>
+                    </div>
                 </div>
-                <span class="material-symbols-outlined">hotel</span>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="card info-card">
+                <div class="card-body">
+                    <div class="card-content">
+                        <p class="card-text">Total Invest</p>
+                        <h3 class="card-count">{{ number_format($totalInvest) }}</h3>
+                    </div>
+                    <div class="card-icon">
+                        <span class="material-symbols-outlined"> credit_score </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="card info-card">
+                <div class="card-body">
+                    <div class="card-content">
+                        <p class="card-text">Total Withdraw</p>
+                        <h3 class="card-count">{{ number_format($totalWithdraw) }}</h3>
+                    </div>
+                    <div class="card-icon">
+                        <span class="material-symbols-outlined"> checkbook </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="card info-card">
+                <div class="card-body">
+                    <div class="card-content">
+                        <p class="card-text">Total Due</p>
+                        <h3 class="card-count">{{ number_format($totalDue) }}</h3>
+                    </div>
+                    <div class="card-icon">
+                        <span class="material-symbols-outlined"> calendar_clock </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="row g-3">
+                @foreach($data as $item)
+                    <div class="col-md-4 col-sm-6">
+                        <ul class="list-group">
+                            @php
+                                $bg = 'active';
+                                if($item['sattled_qty'] == $item['share_qty']){
+                                    $bg = 'bg-success';
+                                } elseif($item['sattled_qty'] > 0){
+                                    $bg = 'bg-dark text-white';
+                                } elseif(($item['product']->required_share ?? 0) - ($item['share_qty'] ?? 0) <= 0) {
+                                    $bg = 'bg-danger text-white';
+                                }
+                            @endphp
+                            <li class="list-group-item {{ $bg }} text-center">
+                                <i class="fas fa-book"></i>
+                                <b>{{ $item['product']->name ?? '' }}</b>
+                            </li>
+                            <li class="list-group-item d-flex bg-light" title="Book Published Qty">
+                                <span class="d-inline-block" style="min-width: 135px;">Book Published Qty</span> =&gt;
+                                &nbsp;&nbsp;&nbsp;
+                                <div class="flex-grow-1 text-end">
+                                    {{ $item['production_qty'] ?? 0 }}
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex bg-light" title="Books Sales Qty">
+                                <span class="d-inline-block" style="min-width: 135px;">Books Sales Qty</span> =&gt;
+                                &nbsp;&nbsp;&nbsp;
+                                <div class="flex-grow-1 text-end">
+                                    {{ $item['sales_qty'] ?? 0 }}
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex" title="Sales Amount">
+                                <span class="d-inline-block" style="min-width: 135px;">Sales Amount</span> =&gt;
+                                &nbsp;&nbsp;&nbsp;
+                                <div class="flex-grow-1 text-end">
+                                    {{ $item['sales_amount'] ?? 0 }}
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex bg-light" title="Investment Required">                            
+                                <span class="d-inline-block" style="min-width: 135px;">Investment Amount</span> =&gt;
+                                &nbsp;&nbsp;&nbsp;
+                                <div class="flex-grow-1 text-end">
+                                    {{ ($item['product']->required_share ?? 0) * ($admin_setting->invest_value ?? 0)  }}
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex" title="Share Qty">                            
+                                <span class="d-inline-block" style="min-width: 135px;">Share Qty</span> =&gt;
+                                &nbsp;&nbsp;&nbsp;
+                                <div class="flex-grow-1 text-end">
+                                    {{ $item['product']->required_share ?? 0 }}
+                                </div>
+                            </li>
+                            <li class="list-group-item bg-light" title="Invested Share">  
+                                <a href="{{ request()->fullUrl() }}?product_id={{ $item['product']->id }}&get_investors=true"
+                                    class="d-flex investorBtn">                          
+                                    <span class="d-inline-block" style="min-width: 135px;">Invested Share</span> =&gt;
+                                    &nbsp;&nbsp;&nbsp;
+                                    <div class="flex-grow-1 text-end">
+                                        {{ $item['share_qty'] ?? 0 }}
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="list-group-item d-flex {{ ($item['product']->required_share ?? 0) - ($item['share_qty'] ?? 0) > 0 ? 'text-success' : 'text-danger' }}" title="Available Share">                            
+                                <span class="d-inline-block" style="min-width: 135px;">Available Share</span> =&gt;
+                                &nbsp;&nbsp;&nbsp;
+                                <div class="flex-grow-1 text-end">
+                                    {{ ($item['product']->required_share ?? 0) - ($item['share_qty'] ?? 0) }}
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex bg-light" title="Investor Profit">                            
+                                <span class="d-inline-block" style="min-width: 135px;">Investor Profit</span> =&gt;
+                                &nbsp;&nbsp;&nbsp;
+                                <div class="flex-grow-1 text-end">
+                                    {{ $item['investor_profit'] ?? 0 }}
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex" title="Per Share Profit">
+                                <span class="d-inline-block" style="min-width: 135px;">Per Share Profit</span> =&gt;
+                                &nbsp;&nbsp;&nbsp;
+                                <div class="flex-grow-1 text-end">
+                                    {{ $item['per_share_profit'] ?? 0 }}
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>
 
-    <div class="col-lg-3 col-sm-6">
-        <div class="card info-card bg-available">
-            <div class="card-body">
-                <div>
-                    <p>Available Rooms</p>
-                    <h3>45</h3>
-                </div>
-                <span class="material-symbols-outlined">check_circle</span>
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content" id="response">
             </div>
         </div>
     </div>
-
-    <div class="col-lg-3 col-sm-6">
-        <div class="card info-card bg-occupied">
-            <div class="card-body">
-                <div>
-                    <p>Occupied Rooms</p>
-                    <h3>75</h3>
-                </div>
-                <span class="material-symbols-outlined">meeting_room</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-3 col-sm-6">
-        <div class="card info-card bg-checkin">
-            <div class="card-body">
-                <div>
-                    <p>Today Check-ins</p>
-                    <h3>18</h3>
-                </div>
-                <span class="material-symbols-outlined">login</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-3 col-sm-6">
-        <div class="card info-card bg-checkout">
-            <div class="card-body">
-                <div>
-                    <p>Today Check-outs</p>
-                    <h3>12</h3>
-                </div>
-                <span class="material-symbols-outlined">logout</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-3 col-sm-6">
-        <div class="card info-card bg-guest">
-            <div class="card-body">
-                <div>
-                    <p>Total Guests</p>
-                    <h3>210</h3>
-                </div>
-                <span class="material-symbols-outlined">groups</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-3 col-sm-6">
-        <div class="card info-card bg-revenue">
-            <div class="card-body">
-                <div>
-                    <p>Today Revenue</p>
-                    <h3>৳ 58,000</h3>
-                </div>
-                <span class="material-symbols-outlined">payments</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-3 col-sm-6">
-        <div class="card info-card bg-due">
-            <div class="card-body">
-                <div>
-                    <p>Pending Payments</p>
-                    <h3>৳ 12,500</h3>
-                </div>
-                <span class="material-symbols-outlined">warning</span>
-            </div>
-        </div>
-    </div>
-    
-
-</div>
-
-
-<!-- Charts Row -->
-<div class="row g-4 mt-4">
-
-    <!-- Monthly Revenue Chart -->
-    <div class="col-lg-6 col-sm-12">
-        <div class="card p-3">
-            <h5 class="mb-3">Monthly Revenue (৳)</h5>
-            <canvas id="revenueChart" height="250"></canvas>
-        </div>
-    </div>
-
-    <!-- Room Occupancy Chart -->
-    <div class="col-lg-6 col-sm-12">
-        <div class="card p-3">
-            <h5 class="mb-3">Room Occupancy Status</h5>
-            <canvas id="occupancyChart" height="250"></canvas>
-        </div>
-    </div>
-
-</div>
-
-<style>
-.info-card {
-    border: none;
-    border-radius: 16px;
-    color: #fff;
-    transition: .3s ease;
-}
-.info-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 14px 35px rgba(0,0,0,.25);
-}
-
-.info-card .card-body {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.info-card p {
-    margin: 0;
-    font-size: 14px;
-    opacity: .95;
-}
-
-.info-card h3 {
-    margin-top: 4px;
-    font-weight: 700;
-}
-
-.info-card span {
-    font-size: 48px;
-    opacity: .95;
-}
-
-/* Hotel friendly gradients */
-.bg-room      { background: linear-gradient(135deg, #667eea, #764ba2); }
-.bg-available { background: linear-gradient(135deg, #00b09b, #96c93d); }
-.bg-occupied  { background: linear-gradient(135deg, #ff512f, #dd2476); }
-.bg-checkin   { background: linear-gradient(135deg, #36d1dc, #5b86e5); }
-.bg-checkout  { background: linear-gradient(135deg, #f7971e, #ffd200); }
-.bg-guest     { background: linear-gradient(135deg, #43cea2, #185a9d); }
-.bg-revenue   { background: linear-gradient(135deg, #11998e, #38ef7d); }
-.bg-due       { background: linear-gradient(135deg, #ff416c, #ff4b2b); }
-</style>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // Monthly Revenue Chart
-    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-    const revenueChart = new Chart(revenueCtx, {
-        type: 'line',
-        data: {
-            labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-            datasets: [{
-                label: 'Revenue (৳)',
-                data: [50000, 60000, 45000, 70000, 65000, 80000, 75000, 82000, 90000, 85000, 95000, 100000],
-                borderColor: '#4bc0c0',
-                backgroundColor: 'rgba(75,192,192,0.2)',
-                tension: 0.4,
-                fill: true,
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: { beginAtZero: true }
-            }
-        }
-    });
-
-    // Room Occupancy Chart
-    const occupancyCtx = document.getElementById('occupancyChart').getContext('2d');
-    const occupancyChart = new Chart(occupancyCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Occupied', 'Available', 'Maintenance'],
-            datasets: [{
-                label: 'Rooms',
-                data: [75, 40, 5],
-                backgroundColor: ['#ff6384','#36a2eb','#ffcd56'],
-                hoverOffset: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { color: '#333', font: { size: 14 } }
-                }
-            }
-        }
-    });
-</script>
 @endsection
 
+@push('js')
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $(document).on('click', '.investorBtn', function(e) {
+                e.preventDefault();
+                var url = $(this).attr('href');
+                $('#response').html('');
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: {
+                        _method: 'GET'
+                    },
+                    success: function(response) {
+                        if (response.status == 'success') {
+                            $('#response').html(response.data);
+                            $('#detailsModal').modal('show');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+@endpush
