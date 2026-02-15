@@ -12,7 +12,7 @@
 {{-- HEADER --}}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="fw-bold mb-0">
-        <i class="bi bi-gear"></i> Service Management
+        <i class="bi bi-gear"></i> Service/Page Management
     </h4>
 
     <button class="btn btn-primary"
@@ -133,7 +133,8 @@
     <div class="col-md-6">
         <label class="fw-bold">Room</label>
         <select name="room_id" id="room_id"
-                class="form-select" required>
+                class="form-select">
+                <option value="">Select Room</option>
             @foreach($rooms as $room)
                 <option value="{{ $room->id }}">
                     {{ $room->name }}
@@ -146,9 +147,12 @@
         <label class="fw-bold">Type</label>
         <select name="type" id="type"
                 class="form-select">
-            <option value="room">Room</option>
-            <option value="menu">Menu</option>
-            <option value="home">Home</option>
+            <option value="room">Room Services</option>
+            <option value="menu">Menu Services</option>
+            <option value="home">Home Services</option>
+            <option value="gallery">Gallery</option>
+            <option value="testimonial">Testimonial</option>
+            <option value="about">About</option>
         </select>
     </div>
 

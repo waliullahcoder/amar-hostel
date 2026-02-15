@@ -23,12 +23,12 @@ class AdminServiceController extends Controller
     /* ================= STORE ================= */
     public function serviceStore(Request $request)
     {
-        
+
         $data = $request->validate([
             'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
             'icon'        => 'nullable|string|max:255',
-            'room_id'     => 'required|exists:rooms,id',
+            'room_id'     => 'nullable',
             'type'        => 'required',
             'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
@@ -50,10 +50,10 @@ class AdminServiceController extends Controller
     public function serviceUpdate(Request $request, Service $service)
     {
         $data = $request->validate([
-           'name'        => 'required|string|max:255',
+            'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
             'icon'        => 'nullable|string|max:255',
-            'room_id'     => 'required|exists:rooms,id',
+            'room_id'     => 'nullable',
             'type'        => 'required',
             'image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);

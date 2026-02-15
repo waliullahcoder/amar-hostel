@@ -8,7 +8,7 @@ return new class extends Migration {
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('room_id')->constrained()->onDelete('cascade');
+            $table->foreignId('room_id')->constrained()->onDelete('cascade')->nullable();
             $table->string('image')->nullable();
             $table->string('name');
             $table->string('type');
