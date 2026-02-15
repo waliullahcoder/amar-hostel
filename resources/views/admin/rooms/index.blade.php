@@ -26,7 +26,8 @@
         <table class="table table-hover align-middle">
             <thead class="table-dark text-center">
                 <tr>
-                    <th>#</th>
+                    {{-- <th>SL#</th> --}}
+                    <th width="100">Room ID</th>
                     <th>Images</th>
                     <th>Name</th>
                     <th>Type</th>
@@ -40,8 +41,8 @@
             <tbody>
                 @forelse($rooms as $room)
                 <tr class="text-center">
-                    <td>{{ $loop->iteration }}</td>
-
+                    {{-- <td>{{ $loop->iteration }}</td> --}}
+                    <td>{{ 'ROOMID'.$room->id }}</td>
                     <td>
                         <div class="d-flex gap-1 justify-content-center">
                             @foreach(['image','image2','image3','image4'] as $img)

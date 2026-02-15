@@ -102,7 +102,7 @@
 
                             <div class="p-3">
                                 <a href="{{ route('singleDetails', $room->id) }}">
-                                    <h4 class="sec_h4 mb-1">{{ $room->name }}</h4>
+                                    <h4 class="sec_h4 mb-1">{{ $room->name }}({{'ROOMID'.$room->id}})</h4>
                                 </a>
 
                                 <p class="text-muted mb-2 small">

@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->foreignId('room_id')->constrained()->onDelete('cascade');
             $table->string('image')->nullable();
             $table->string('name');
+            $table->string('type');
             $table->text('description')->nullable();
             $table->string('icon')->nullable(); // font-awesome icon class etc
             $table->timestamps();

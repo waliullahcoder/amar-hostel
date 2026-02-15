@@ -16,6 +16,7 @@ class Service extends Model
         'icon',
         'image',
         'room_id',
+        'type'
         ];
 
     public function room()

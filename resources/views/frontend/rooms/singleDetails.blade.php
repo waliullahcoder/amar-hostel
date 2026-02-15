@@ -70,7 +70,7 @@
          <!-- SEAT AVAILABILITY -->
         <div class="seat-box">
              <h3>{{ $room->name }}</h3>
-
+            <h4>{{ 'ROOMID'.$room->id }}</h4>
         <div class="price">
             ৳ {{ number_format($room->price) }} <span>/ night</span>
         </div>

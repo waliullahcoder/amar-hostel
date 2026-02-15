@@ -26,7 +26,9 @@ use App\Http\Controllers\Admin\{
     RoleController,
     PermissionController,
     SettingController,
-    AdminBookingController
+    AdminBookingController,
+    AdminServiceController
+    
 
 };
 
@@ -59,12 +61,12 @@ Route::group(['middleware' => ['admin']], function () {
     Route::delete('rooms/{room}', [AdminController::class,'roomDelete'])->name('rooms.destroy');
 
     // Services
-    Route::get('services', [AdminController::class,'services'])->name('services');
-    Route::get('services/create', [AdminController::class,'serviceCreate'])->name('services.create');
-    Route::post('services/store', [AdminController::class,'serviceStore'])->name('services.store');
-    Route::get('services/{service}/edit', [AdminController::class,'serviceEdit'])->name('services.edit');
-    Route::put('services/{service}', [AdminController::class,'serviceUpdate'])->name('services.update');
-    Route::delete('services/{service}', [AdminController::class,'serviceDelete'])->name('services.delete');
+    Route::get('services', [AdminServiceController::class,'services'])->name('services');
+    // Route::get('services/create', [AdminServiceController::class,'serviceCreate'])->name('services.create');
+    Route::post('services/store', [AdminServiceController::class,'serviceStore'])->name('services.store');
+    // Route::get('services/{service}/edit', [AdminServiceController::class,'serviceEdit'])->name('services.edit');
+    Route::put('services/{service}', [AdminServiceController::class,'serviceUpdate'])->name('services.update');
+    Route::delete('services/{service}', [AdminServiceController::class,'serviceDelete'])->name('services.destroy');
 
     // Bookings
     Route::get('bookings', [AdminController::class,'bookings'])->name('bookings');

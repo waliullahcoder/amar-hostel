@@ -18,7 +18,7 @@
                                     Book Now
                                 </a>
                             </div>
-                            <a href="{{ route('singleDetails', $room->id) }}"><h4 class="sec_h4">{{$room->name}}</h4></a>
+                            <a href="{{ route('singleDetails', $room->id) }}"><h4 class="sec_h4">{{$room->name}}({{'ROOMID'.$room->id}})</h4></a>
                             <h5>৳ {{$room->price}}<small>/night</small></h5>
                         </div>
                     </div>

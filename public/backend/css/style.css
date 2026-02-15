@@ -3620,7 +3620,7 @@ input.dt-button {
 .table>:not(caption)>*>* {
     font-size: 13px;
     vertical-align: middle;
-    padding: 5px 10px;
+    /* padding: 5px 10px; */
 }
 
 table.dataTable thead>tr>th.sorting:before,

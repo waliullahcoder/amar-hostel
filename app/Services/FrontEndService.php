@@ -10,7 +10,7 @@ class FrontEndService
 {
     public function allRooms()
     {
-        return Room::where('available', true)->get();
+        return Room::where('status', true)->get();
     }
 
     public function getRoom($id)

@@ -189,47 +189,47 @@ class AdminController extends Controller
     }
 
     // ================= SERVICES =================
-    public function services()
-    {
-        $services = Service::all();
-        return view('admin.services.index', compact('services'));
-    }
+    // public function services()
+    // {
+    //     $services = Service::all();
+    //     return view('admin.services.index', compact('services'));
+    // }
 
-    public function serviceCreate()
-    {
-        return view('admin.services.create');
-    }
+    // public function serviceCreate()
+    // {
+    //     return view('admin.services.create');
+    // }
 
-    public function serviceStore(Request $request)
-    {
-        $request->validate([
-            'name'=>'required',
-        ]);
+    // public function serviceStore(Request $request)
+    // {
+    //     $request->validate([
+    //         'name'=>'required',
+    //     ]);
 
-        Service::create($request->all());
-        return redirect()->route('admin.services')->with('success', 'Service Created Successfully');
-    }
+    //     Service::create($request->all());
+    //     return redirect()->route('admin.services')->with('success', 'Service Created Successfully');
+    // }
 
-    public function serviceEdit(Service $service)
-    {
-        return view('admin.services.edit', compact('service'));
-    }
+    // public function serviceEdit(Service $service)
+    // {
+    //     return view('admin.services.edit', compact('service'));
+    // }
 
-    public function serviceUpdate(Request $request, Service $service)
-    {
-        $request->validate([
-            'name'=>'required',
-        ]);
+    // public function serviceUpdate(Request $request, Service $service)
+    // {
+    //     $request->validate([
+    //         'name'=>'required',
+    //     ]);
 
-        $service->update($request->all());
-        return redirect()->route('admin.services')->with('success', 'Service Updated Successfully');
-    }
+    //     $service->update($request->all());
+    //     return redirect()->route('admin.services')->with('success', 'Service Updated Successfully');
+    // }
 
-    public function serviceDelete(Service $service)
-    {
-        $service->delete();
-        return redirect()->route('admin.services')->with('success', 'Service Deleted Successfully');
-    }
+    // public function serviceDelete(Service $service)
+    // {
+    //     $service->delete();
+    //     return redirect()->route('admin.services')->with('success', 'Service Deleted Successfully');
+    // }
 
     // ================= BOOKINGS =================
     public function bookings()
