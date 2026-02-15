@@ -81,15 +81,15 @@
                                 <i class="fas fa-book"></i>
                                 <b>{{ $item['product']->name ?? '' }}</b>
                             </li>
-                            <li class="list-group-item d-flex bg-light" title="Book Published Qty">
-                                <span class="d-inline-block" style="min-width: 135px;">Book Published Qty</span> =&gt;
+                            <li class="list-group-item d-flex bg-light" title="Room Published Qty">
+                                <span class="d-inline-block" style="min-width: 135px;">Room Published Qty</span> =&gt;
                                 &nbsp;&nbsp;&nbsp;
                                 <div class="flex-grow-1 text-end">
                                     {{ $item['production_qty'] ?? 0 }}
                                 </div>
                             </li>
-                            <li class="list-group-item d-flex bg-light" title="Books Sales Qty">
-                                <span class="d-inline-block" style="min-width: 135px;">Books Sales Qty</span> =&gt;
+                            <li class="list-group-item d-flex bg-light" title="Rooms Sales Qty">
+                                <span class="d-inline-block" style="min-width: 135px;">Rooms Sales Qty</span> =&gt;
                                 &nbsp;&nbsp;&nbsp;
                                 <div class="flex-grow-1 text-end">
                                     {{ $item['sales_qty'] ?? 0 }}
