@@ -41,17 +41,26 @@ class ViewController extends Controller
         return view('frontend.services', compact('services'));
     }
 
+    public function serviceDetails($service)
+    {
+        $service = $this->frontEndService->serviceDetails($service);
+        $services = $this->frontEndService->allServices();
+        return view('frontend.services.serviceDetails', compact('service','services'));
+    }
+
     public function contactPage()
     {
         return view('frontend.contact.contact');
     }
     public function aboutPage()
     {
-        return view('frontend.about.about');
+         $services = $this->frontEndService->allServices();
+        return view('frontend.about.about', compact('services'));
     }
     public function galleryPage()
     {
-        return view('frontend.gallery.gallery');
+         $services = $this->frontEndService->allServices();
+        return view('frontend.gallery.gallery', compact('services'));
     }
 
     // public function bookingPage()

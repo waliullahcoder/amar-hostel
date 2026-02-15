@@ -40,12 +40,9 @@
                                 Services <span class="ms-1">▼</span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li class="nav-item"><a class="nav-link" href="#">Restaurant & Dining</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">Swimming Pool</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">Spa & Massage</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">Gym & Fitness</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">Conference Hall</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">Airport Pickup</a></li>
+                                @foreach ($services['menu'] as $service)
+                                <li class="nav-item"><a class="nav-link" href="{{ route('serviceDetails', $service->id) }}">{{ $service->name }}</a></li>
+                                @endforeach
                             </ul>
                         </li>
 

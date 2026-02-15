@@ -28,6 +28,7 @@ Route::get('/about', [ViewController::class, 'aboutPage'])->name('aboutPage');
 Route::get('/gallery', [ViewController::class, 'galleryPage'])->name('galleryPage');
 Route::get('/rooms', [ViewController::class, 'roomsPage'])->name('roomsPage');
 Route::get('/room/details/{id}', [ViewController::class, 'singleDetails'])->name('singleDetails');
+Route::get('/service/details/{service}', [ViewController::class, 'serviceDetails'])->name('serviceDetails');
 //Login Register
 Route::get('/contact', [ViewController::class, 'contactPage'])->name('contactPage');
 Route::get('/signin', [ViewController::class, 'signinPage'])->name('auth.signinPage');

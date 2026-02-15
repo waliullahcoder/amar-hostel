@@ -4,10 +4,10 @@
   <section class="breadcrumb_area">
             <div class="container">
                 <div class="page-cover text-center">
-                    <h2 class="page-cover-tittle">About Us</h2>
+                    <h2 class="page-cover-tittle">Service Details</h2>
                     <ol class="breadcrumb">
                         <li><a href="index.html">Home</a></li>
-                        <li class="active">About Us</li>
+                        <li class="active">Services</li>
                     </ol>
                 </div>
             </div>
@@ -17,12 +17,12 @@
                 <div class="row">
                     <div class="col-md-6 d_flex align-items-center">
                         <div class="about_content ">
-                            <h2 class="title title_color">{{ $services['about']->name }}</h2>
-                            <p>{{ $services['about']->description }}</p>
+                            <h2 class="title title_color">{{ $service->name }}</h2>
+                            <p>{{ $service->description }}</p>
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <img class="img-fluid" src="{{ asset('storage/'.$services['about']->image) }}" alt="img" loading="lazy" decoding="async">
+                        <img class="img-fluid" src="{{ asset('storage/'.$service->image) }}" alt="img" loading="lazy" decoding="async">
                     </div>
                 </div>
             </div>
