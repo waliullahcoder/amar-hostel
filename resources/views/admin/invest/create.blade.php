@@ -6,23 +6,37 @@
             <label for="investor_id" class="form-label"><b>Investor <span class="text-danger">*</span></b></label>
             <select name="investor_id" id="investor_id" class="select form-select" data-placeholder="Select Investor" required>
                 <option value=""></option>
-                @foreach ($investors as $investor)
-                    <option value="{{ $investor->id }}">{{ $investor->name }}
+                @foreach ($investors as $item)
+                    <option value="{{ $item->id }}" {{ old('investor_id') == $item->id ? 'selected' : '' }}>
+                        {{ $item->name }}
                     </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-4 col-sm-6">
+            <label for="coa_id" class="form-label"><b>Cash Account <span class="text-danger">*</span></b></label>
+            <select name="coa_id" id="coa_id" class="form-select select" data-placeholder="Select Cash Account"
+                required>
+                <option value=""></option>
+                @foreach ($cashHeads as $item)
+                    <option value="{{ $item->id }}" {{ old('coa_id') == $item->id ? 'selected' : '' }}>
+                        {{ $item->head_name . ' - ' . $item->head_code }}</option>
                 @endforeach
             </select>
         </div>
         <div class="col-md-4 col-sm-6">
             <label for="date" class="form-label"><b>Date <span class="text-danger">*</span></b></label>
             <input type="text" class="form-control date_picker" id="date" name="date"
-                value="{{ old('date') ? date('d-m-Y', strtotime(old('date'))) : date('d-m-Y') }}" placeholder="Invest Date"
-                required>
+                value="{{ date('d-m-Y', strtotime(old('date', date('d-m-Y')))) }}" placeholder="Invest Date" required>
         </div>
         <div class="col-md-4 col-sm-6">
-            <label for="calculate" class="form-label"><b>Type <span class="text-danger">*</span></b></label>
-            <select name="calculate" id="calculate" class="form-select select" data-placeholder="Select Type" required>
-                <option value="1" {{ old('calculate') == '1' ? 'selected' : '' }}>Calculate</option>
-                <option value="0" {{ old('calculate') == '0' ? 'selected' : '' }}>Not Calculate</option>
+            <label for="product_id" class="form-label"><b>Product <span class="text-danger">*</span></b></label>
+            <select name="product_id" id="product_id" class="select form-select" data-placeholder="Select Product" required>
+                <option value=""></option>
+                @foreach ($products as $item)
+                    <option value="{{ $item->id }}" {{ old('product_id') == $item->id ? 'selected' : '' }}>
+                        {{ $item->name }}</option>
+                @endforeach
             </select>
         </div>
         <div class="col-md-4 col-sm-6">
@@ -35,34 +49,18 @@
             <input type="number" class="form-control" id="amount" name="amount" value="{{ old('amount') }}"
                 placeholder="Invest Amount" readonly required>
         </div>
-        <div class="col-md-4 col-sm-6">
-            <label for="coa_setup_id" class="form-label"><b>Cash Account <span class="text-danger">*</span></b></label>
-            <select name="coa_setup_id" id="coa_setup_id" class="select form-select" data-placeholder="Select Cash Account"
-                required>
-                <option value=""></option>
-                @foreach ($cash_heads as $cash_head)
-                    <option value="{{ $cash_head->id }}">{{ $cash_head->head_name . ' - ' . $cash_head->head_code }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
     </div>
 @endsection
 
 @push('js')
     <script type="text/javascript">
         $(document).ready(function() {
-            $(".date_picker").datepicker({
-                format: 'dd-mm-yyyy',
-                changeMonth: true,
-                changeYear: true,
-            });
-
             $(document).on('keyup', '#qty', function(e) {
                 var qty = $(this).val();
-                var share_value = "{{ $admin_setting->share_value }}";
-                var amount = qty * share_value;
+                var invest_value = "{{ $admin_setting->invest_value }}";
+                var amount = qty * invest_value;
                 $('#amount').val(amount);
+                $('.investAmount').val(amount);
             });
         });
     </script>

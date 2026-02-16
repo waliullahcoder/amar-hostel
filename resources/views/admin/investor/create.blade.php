@@ -36,26 +36,26 @@
             <input type="number" name="bkash" id="bkash" class="form-control" placeholder="Bkash Account"
                 value="{{ old('bkash') }}">
         </div>
-        <div class="col-lg-4 col-sm-6">
+        {{-- <div class="col-lg-4 col-sm-6">
             <label for="rocket" class="form-label"><b>Rocket Account</b></label>
             <input type="number" name="rocket" id="rocket" class="form-control" placeholder="Rocket Account"
                 value="{{ old('rocket') }}">
-        </div>
+        </div> --}}
         <div class="col-lg-4 col-sm-6">
             <label for="nagad" class="form-label"><b>Nagad Account</b></label>
             <input type="number" name="nagad" id="nagad" class="form-control" placeholder="Nagad Account"
                 value="{{ old('nagad') }}">
         </div>
         <div class="col-lg-4 col-sm-6">
-            <label for="bank" class="form-label"><b>Bank Name</b></label>
+            <label for="bank" class="form-label"><b>Bank - Branch</b></label>
             <input type="text" name="bank" id="bank" class="form-control" placeholder="Bank Name"
                 value="{{ old('bank') }}">
         </div>
-        <div class="col-lg-4 col-sm-6">
+        {{-- <div class="col-lg-4 col-sm-6">
             <label for="branch" class="form-label"><b>Branch Name</b></label>
             <input type="text" name="branch" id="branch" class="form-control" placeholder="Branch Name"
                 value="{{ old('branch') }}">
-        </div>
+        </div> --}}
         <div class="col-lg-4 col-sm-6">
             <label for="account_name" class="form-label"><b>Account Name</b></label>
             <input type="text" name="account_name" id="account_name" class="form-control" placeholder="Account Name"

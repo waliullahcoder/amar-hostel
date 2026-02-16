@@ -3,76 +3,97 @@
 @section('content')
     @php
         $currentRouteName = \Request::route()->getName();
-        $link = Route($currentRouteName);
-        $delete_link = str_replace('index', 'destroy', $currentRouteName);
+        $ajaxUrl = route($currentRouteName);
+        $deletePermission = str_replace('index', 'destroy', $currentRouteName);
+        $deleteUrl = route($deletePermission, 0);
     @endphp
-    <div class="card-body">
-        <table class="dataTable table align-middle" style="width:100%">
-            <thead>
-                <tr class="text-nowrap">
-                    <th width="3"></th>
-                    <th>Investor</th>
-                    <th>Sattlement No</th>
-                    <th>Date</th>
-                    <th>Amount</th>
-                    <th width="110" class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-            <tfoot class="bg-primary text-white">
+    <table class="dataTable table align-middle" style="width:100%">
+        <thead>
+            <tr class="text-nowrap">
+                <th></th>
+                <th>Date</th>
+                <th>Sattlement No</th>
+                <th>Investor</th>
+                <th>Amount</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+
+        @can($deletePermission)
+            <tfoot>
                 <tr>
-                    <th colspan="4"></th>
-                    <th class="text-white" id="total-value"></th>
-                    <th></th>
+                    <th class="text-center">
+                        <div class="custom-control custom-checkbox mx-auto">
+                            <div id="regular_all_select">
+                                <input type="checkbox" class="custom-control-input" id="selectAll">
+                                <label class="custom-control-label" for="selectAll"></label>
+                            </div>
+                            <div id="trash_all_select" style="display: none;">
+                                <input type="checkbox" class="custom-control-input" id="trash_selectAll">
+                                <label class="custom-control-label" for="trash_selectAll"></label>
+                            </div>
+                        </div>
+                    </th>
+                    <th colspan="5">
+                        <div class="text-end">
+                            <button type="button" id="bulk_delete" name="bulk_delete" data-url="{{ $deleteUrl }}"
+                                class="btn btn-xs btn-danger">
+                                Delete
+                            </button>
+                            <button type="button" id="trash_bulk_delete" name="bulk_delete" data-url="{{ $deleteUrl }}"
+                                class="btn btn-xs btn-danger" style="display: none;">
+                                Delete
+                            </button>
+                        </div>
+                    </th>
                 </tr>
             </tfoot>
-        </table>
-    </div>
+        @endcan
+    </table>
 @endsection
 
 @push('js')
     <script type="text/javascript">
         $(document).ready(function() {
-            var table = $('.dataTable').dataTable({
+            var table = $('.dataTable').DataTable({
                 processing: true,
                 serverSide: true,
-                scrollX: true,
+                responsive: true,
                 ajax: {
-                    url: "{{ $link }}",
+                    url: "{{ $ajaxUrl }}",
                     type: "GET",
                     data: function(data) {
                         data.type = $('#filter').val();
                     },
-                    "dataSrc": function(json) {
-                        $('#total-value').html(json.sumValue);
-                        return json.data;
-                    }
                 },
                 columns: [{
-                        data: "DT_RowIndex",
-                        name: "DT_RowIndex",
+                        data: "checkbox",
+                        name: "checkbox",
                         orderable: false,
                         searchable: false,
-                        className: 'text-center',
+                        className: "text-center",
+                        width: '20'
                     },
                     {
-                        data: 'investor.name',
-                        name: 'investor.name'
+                        data: 'formattedDate',
+                        name: 'formattedDate',
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'sattlement_no',
                         name: 'sattlement_no'
                     },
                     {
-                        data: 'date',
-                        name: 'date',
-                        orderable: false,
-                        searchable: false,
+                        data: 'investor.name',
+                        name: 'investor.name',
+                        defaultContent: ''
                     },
                     {
-                        data: 'amount',
-                        name: 'amount'
+                        data: 'payment',
+                        name: 'payment',
+                        className: "text-end"
                     },
                     {
                         data: 'actions',
@@ -80,9 +101,10 @@
                         orderable: false,
                         searchable: false,
                         className: "text-end",
+                        width: '100'
                     },
                 ],
-                "fnDrawCallback": function(oSettings) {
+                fnDrawCallback: function() {
                     const tooltips = document.querySelectorAll('.tt');
                     tooltips.forEach(t => {
                         new bootstrap.Tooltip(t);

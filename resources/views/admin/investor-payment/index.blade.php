@@ -11,18 +11,16 @@
         <thead>
             <tr class="text-nowrap">
                 <th></th>
-                <th>Investor Name</th>
-                <th>Phone</th>
-                <th>Bkash</th>
-                <th>Nagad</th>
-                <th>Bank - Branch</th>
-                <th>Account Name</th>
-                <th>Account No</th>
-                <th>Status</th>
+                <th>Payment No</th>
+                <th>Date</th>
+                <th>Investor</th>
+                <th>Payment Type</th>
+                <th>Amount</th>
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody></tbody>
+        <tbody>
+        </tbody>
 
         @can($deletePermission)
             <tfoot>
@@ -39,7 +37,7 @@
                             </div>
                         </div>
                     </th>
-                    <th colspan="9">
+                    <th colspan="6">
                         <div class="text-end">
                             <button type="button" id="bulk_delete" name="bulk_delete" data-url="{{ $deleteUrl }}"
                                 class="btn btn-xs btn-danger">
@@ -80,40 +78,27 @@
                         width: '20'
                     },
                     {
-                        data: 'name',
-                        name: 'name'
+                        data: 'payment_no',
+                        name: 'payment_no',
                     },
                     {
-                        data: 'phone',
-                        name: 'phone'
-                    },
-                    {
-                        data: 'bkash',
-                        name: 'bkash'
-                    },
-                    {
-                        data: 'nagad',
-                        name: 'nagad'
-                    },
-                    {
-                        data: 'bank',
-                        name: 'bank'
-                    },
-                    {
-                        data: 'account_name',
-                        name: 'account_name'
-                    },
-                    {
-                        data: 'account_no',
-                        name: 'account_no'
-                    },
-                    {
-                        data: 'status',
-                        name: 'status',
+                        data: 'formattedDate',
+                        name: 'formattedDate',
                         orderable: false,
                         searchable: false,
-                        className: "text-center",
-                        width: '40'
+                    },
+                    {
+                        data: 'investor.name',
+                        name: 'investor.name',
+                        defaultContent: ''
+                    },
+                    {
+                        data: 'payment_type',
+                        name: 'payment_type'
+                    },
+                    {
+                        data: 'amount',
+                        name: 'amount'
                     },
                     {
                         data: 'actions',
@@ -121,7 +106,7 @@
                         orderable: false,
                         searchable: false,
                         className: "text-end",
-                        width: '100'
+                        width: '90'
                     },
                 ],
                 "fnDrawCallback": function(oSettings) {

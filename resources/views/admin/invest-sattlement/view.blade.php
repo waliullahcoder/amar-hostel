@@ -6,13 +6,19 @@
             <div class="d-flex flex-wrap justify-content-between gap-2 align-items-center">
                 <h6 class="h6 mb-0 text-uppercase text-nowrap flex-grow-1">
                     {{ @$title ?? 'Please Set Title' }}</h6>
-                <a href="{{ Route('admin.invest-sattlement.index') }}" class="btn btn-primary btn-sm">Go Back</a>
+                <a href="{{ Route(str_replace('show', 'index', \Request::route()->getName())) }}"
+                    class="btn btn-primary btn-sm">Go Back</a>
             </div>
         </div>
-        <div class="card-body px-3">
+        <div class="card-body">
             <div class="table-responsive-sm">
                 <table class="table table-borderless table-striped mb-0">
                     <tbody>
+                        <tr>
+                            <th width="200">Investor Name</th>
+                            <th width="10">:</th>
+                            <td>{{ @$data->investor->name }}</td>
+                        </tr>
                         <tr>
                             <th width="200">Sattlement No.</th>
                             <th width="10">:</th>
@@ -24,45 +30,46 @@
                             <td>{{ date('d-m-Y', strtotime($data->date)) }}</td>
                         </tr>
                         <tr>
-                            <th width="200">Investor</th>
+                            <th width="200">Cash Head</th>
                             <th width="10">:</th>
-                            <td>{{ $data->investor->name }}</td>
+                            <td>{{ $data->coa->head_name }} - {{ $data->coa->head_code }}</td>
                         </tr>
                         <tr>
-                            <th width="200">Payment Type</th>
+                            <th width="200">Invest Amount</th>
                             <th width="10">:</th>
-                            <td>{{ $data->payment_type }}</td>
+                            <td>{{ $data->invest_amount }}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div class="table-responsive-sm mt-3">
-                <table class="table table-borderless table-striped mb-0">
+            <div class="pt-3">
+                <table class="table">
                     <thead class="bg-primary text-white">
                         <tr>
                             <th class="text-center" width="30">SL#</th>
-                            <th>Invest No</th>
-                            <th class="text-center">Qty</th>
-                            <th class="text-center">Amount</th>
+                            <th>Invest No.</th>
+                            <th>Invest Date</th>
+                            <th class="px-1 text-end">Invest Qty</th>
+                            <th class="px-1 text-end">Invest Amount</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach ($data->list as $row)
+                    <tbody id="schedules">
+                        @foreach ($data->list as $item)
                             <tr>
-                                <td class="text-center" width="30">{{ $loop->iteration }}</td>
-                                <td>{{ @$row->invest->invest_no }}</td>
-                                <td class="text-center">{{ $row->qty }}</td>
-                                <td class="text-center">{{ $row->amount }}</td>
+                                <td class="text-center">{{ $loop->iteration }}</td>
+                                <td>{{ $item->invest->invest_no ?? '' }}</td>
+                                <td>{{ $item->invest->formattedDate ?? '' }}</td>
+                                <td style="padding: 4px 0.25rem;">
+                                    <input type="number" class="form-control input-sm text-end" step="any"
+                                        value="{{ $item->invest->qty ?? 0 }}" placeholder="0.00" readonly>
+                                </td>
+                                <td style="padding: 4px 0.25rem;">
+                                    <input type="number" class="form-control input-sm text-end" step="any"
+                                        value="{{ $item->invest->amount ?? 0 }}" placeholder="0.00" readonly>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
-                    <tfoot class="bg-primary text-white">
-                        <tr>
-                            <th class="text-end" colspan="2">Total</th>
-                            <th class="text-center">{{ $data->qty }}</th>
-                            <th class="text-center">{{ number_format($data->amount) }}</th>
-                        </tr>
-                    </tfoot>
                 </table>
             </div>
         </div>

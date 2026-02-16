@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('small_logo')->nullable();
             $table->string('favicon')->nullable();
             $table->string('title')->nullable();
+            $table->decimal('invest_value', 16, 0)->default(0);
             $table->string('footer_text')->nullable();
             $table->string('primary_color')->nullable();
             $table->string('secondary_color')->nullable();

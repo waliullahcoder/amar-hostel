@@ -1,36 +1,35 @@
 @extends('layouts.admin.index_app')
 
 @section('content')
-    <div class="card-body">
-        <table class="dataTable table align-middle" style="width:100%">
-            <thead>
-                <tr class="text-nowrap">
-                    <th>SL#</th>
-                    <th>Investment Date</th>
-                    <th>Invest No</th>
-                    <th>Investor Name</th>
-                    <th>Phone</th>
-                    <th>Qty</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-            <tfoot>
-                <tr class="bg-primary">
-                    <th class="text-white" colspan="5">
-                        <div class="text-end">Total</div>
-                    </th>
-                    <th class="text-white" id="totalQty"></th>
-                    <th class="text-white" id="totalAmount"></th>
-                    <th></th>
-                    <th></th>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
+    <table class="dataTable table align-middle" style="width:100%">
+        <thead>
+            <tr class="text-nowrap">
+                <th>SL#</th>
+                <th>Date</th>
+                <th>Invest No</th>
+                <th>Book Name</th>
+                <th>Investor Name</th>
+                <th>Phone</th>
+                <th>Qty</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+        <tfoot>
+            <tr class="bg-primary">
+                <th class="text-white" colspan="6">
+                    <div class="text-end">Total</div>
+                </th>
+                <th class="text-white" id="totalQty"></th>
+                <th class="text-white" id="totalAmount"></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </tfoot>
+    </table>
 @endsection
 
 @push('js')
@@ -75,6 +74,11 @@
                         name: 'invest_no'
                     },
                     {
+                        data: 'product.name',
+                        name: 'product.name',
+                        defaultContent: ''
+                    },
+                    {
                         data: 'investor.name',
                         name: 'investor.name',
                         defaultContent: ''
@@ -103,7 +107,7 @@
                             if(row.sattled == 1){
                                 return '<span class="btn btn-xs btn-danger">Sattled</span>';
                             } else {
-                                return '<span class="btn btn-xs btn-success">On Going</span>';
+                                return '<span class="btn btn-xs btn-success text-nowrap">On Going</span>';
                             }
                         },
                         className: "text-end",
