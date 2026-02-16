@@ -188,12 +188,12 @@ class InvestController extends Controller
                     $countHead = count($headCode);
                     for ($i = 0; $i < $countHead; $i++) {
                         $coa = Coa::where('head_code', $headCode[$i])->first();
-                        dd($headCode[$i],$coa);
+                       
                         $postData[] = [
                             'voucher_no' => $data->invest_no,
                             'voucher_type' => "Invest",
                             'date' => date('Y-m-d', strtotime($request->date)),
-                            'coa_id' => $coa->id,
+                            'coa_id' => $coa->id?? null,
                             'coa_head_code' => $headCode[$i],
                             'narration' => 'Invest against invest no - ' . $data->invest_no,
                             'debit_amount' => $debit_amount[$i],
