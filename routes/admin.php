@@ -27,7 +27,14 @@ use App\Http\Controllers\Admin\{
     PermissionController,
     SettingController,
     AdminBookingController,
-    AdminServiceController
+    AdminServiceController,
+    ProductionController,
+    StoreController,
+    ClientController,
+    SalesOfficerController,
+    SalesController,
+    CollectionController,
+    SalesReturnController,
     
 
 };
@@ -59,6 +66,19 @@ Route::group(['middleware' => ['admin']], function () {
     Route::post('rooms/store', [AdminController::class,'roomStore'])->name('rooms.store');
     Route::put('rooms/{room}', [AdminController::class,'roomUpdate'])->name('rooms.update');
     Route::delete('rooms/{room}', [AdminController::class,'roomDelete'])->name('rooms.destroy');
+
+     // Production
+    Route::resource('/production', ProductionController::class);
+    Route::get('/production/{id}/print', [ProductionController::class, 'print'])->name('production.print');
+
+     // Store
+    Route::resource('/store', StoreController::class);
+
+    // Profit Distribution
+    Route::resource('/profit-distribution', ProfitDistributionController::class);
+
+    // Stock Status
+    Route::get('/stock-status', [ReportController::class, 'stockStatus'])->name('stock-status.index');
 
     // Services
     Route::get('services', [AdminServiceController::class,'services'])->name('services.index');
@@ -124,8 +144,20 @@ Route::group(['middleware' => ['admin']], function () {
     // Investor Payment
     Route::resource('/payment', PaymentController::class);
 
-    //Sales
+ // Client
+    Route::resource('/client', ClientController::class);
+
+    // Sales Officer
+    Route::resource('/sales-officer', SalesOfficerController::class);
+
+    // Sales
     Route::resource('/sales', SalesController::class);
+
+    // Collection
+    Route::resource('/collection', CollectionController::class);
+
+    // Sales Return
+    Route::resource('/sales-return', SalesReturnController::class);
 
     // Invest Sattlement
     Route::resource('/invest-sattlement', InvestSattlementController::class);

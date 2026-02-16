@@ -2,144 +2,68 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Carbon\Carbon;
-use App\Models\Wallet;
-use App\Models\Investor;
-use App\Models\InvestMonth;
+use App\HelperClass;
+use App\Models\Invest;
+use App\Models\Room;
+use App\Models\SalesList;
 use Illuminate\Http\Request;
-use App\Models\DeliveryList;
-use App\Models\InvestorProfit;
-use Barryvdh\DomPDF\Facade\Pdf;
-use App\Models\AccountTransaction;
+use App\Models\ProductionList;
+use App\Models\ProfitDistribution;
 use Illuminate\Support\Facades\DB;
-use App\Models\InvestorProfitList;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\Facades\DataTables;
-use App\Services\ActionButtons\ActionButtons;
+use App\Models\ProfitDistributionList;
 
 class ProfitDistributionController extends Controller
 {
+    public $path;
+    public $title;
+    public $create_title;
+    public $edit_title;
+    public $model;
+    public function __construct()
+    {
+        $this->path         = 'profit-distribution';
+        $this->title        = 'Profit Distribution';
+        $this->create_title = 'Add Distribution';
+        $this->edit_title   = 'Update Distribution';
+        $this->model        = ProfitDistribution::class;
+    }
+
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
-        if (!is_null($request->generate)) {
-            $title = 'Generate Profit';
-            $serial_no = $this->SerialNo();
-            $data = [];
-
-            $start_date = date('Y-m-01', strtotime($request->month . '-' . $request->year));
-            $end_date = date('Y-m-t', strtotime($request->month . '-' . $request->year));
-
-            $incomes = DeliveryList::whereHas('delivery', function ($q) use ($start_date, $end_date) {
-                $q->where('date', '>=', $start_date)->where('date', '<=', $end_date);
-            })->sum('subtotal');
-
-            $expenses = AccountTransaction::with('coa')
-                ->where('voucher_date', '>=', $start_date)
-                ->where('voucher_date', '<=', $end_date)
-                ->whereHas('coa.parent', function ($query) {
-                    $query->whereIn('head_code', [401, 402, 403, 404]);
-                })
-                ->sum(DB::raw('debit_amount'));
-
-            $total_profit = $incomes - $expenses;
-            $investor_percentage = 40;
-            $investor_part = round((($total_profit / 100) * 40));
-            $total_share = InvestMonth::whereHas('invest', function ($row) {
-                $row->where('calculate', true);
-            })->where('invest_month', $start_date)->sum('qty');
-
-            $check_data = InvestorProfit::where('year', $request->year)->where('month', $request->month)->first();
-            if (is_null($check_data) && $total_profit > 0 && $total_share > 0) {
-                $investors = InvestMonth::with(['investor'])->whereHas('invest', function ($row) {
-                    $row->where('calculate', true);
-                })->where('month', date('F', strtotime($request->month)))->where('year', $request->year)
-                    ->groupBy('investor_id')
-                    ->select('*', DB::raw('SUM(qty) as qty'), DB::raw('SUM(amount) as amount'))
-                    ->get();
-                $per_share_profit = round((($total_profit / 100) * 40) / $total_share);
-
-                foreach ($investors as $investor) {
-                    $data[] = [
-                        'investor' => $investor->investor,
-                        'total_share' => $total_share,
-                        'share_qty' => $investor->qty,
-                        'profit' => $per_share_profit * $investor->qty,
-                    ];
-                }
-            } else {
-                $total_profit = '';
-                $investor_percentage = '';
-                $investor_part = '';
-                $total_share = '';
-            }
-            return view('admin.profit_distribution.create', compact('title', 'serial_no', 'total_profit', 'investor_percentage', 'investor_part', 'total_share', 'data'));
-        }
-
-        if (request()->ajax()) {
-            $model = InvestorProfit::with(['list'])->orderBy('id', 'desc');
-            $type = request('type');
-            if (!empty($type) && $type == 'trash') {
-                $model->onlyTrashed();
-            }
-            $sumValue = number_format($model->sum('amount'));
-            return DataTables::eloquent($model)
-                ->with('sumValue', $sumValue)
-                ->addIndexColumn()
-                ->addColumn('checkbox', function ($row) {
-                    $checkbox = '<div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input ' . (!empty(request('type')) && request('type') == "trash" ? 'trash_multi_checkbox' : 'multi_checkbox') . '" id="' . $row->id . '" name="multi_checkbox[]" value="' . $row->id . '"><label for="' . $row->id . '" class="custom-control-label"></label></div>';
-                    return $checkbox;
-                })
-                ->addColumn('investors', function ($row) {
-                    $investor_ids = $row->list->pluck('investor_id')->toArray();
-                    return Investor::whereIn('id', $investor_ids)->pluck('name')->toArray();
-                })
-                ->addColumn('date', function ($row) {
-                    return date('d-m-Y', strtotime(@$row->date));
-                })
-                ->addColumn('actions', function ($row) {
-                    $type = request('type');
-                    $data = [
-                        'id' => $row->id,
-                        'edit' => !empty($type) && $type == 'trash' ? false : true,
-                    ];
-                    $additionalBtn = '';
-                    if (Auth::user()->can('admin.profit-distribute.show')) {
-                        $additionalBtn .= '<a class="btn btn-sm border-0 px-10px fs-15 text-white tt btn-print-1" href="' . Route('admin.profit-distribute.show', $row->id) . '" data-bs-toggle="tooltip" data-bs-placement="top" title="View"><i class="fas fa-eye"></i></a>';
-                    }
-                    if (Auth::user()->can('admin.profit-distribute.print')) {
-                        $additionalBtn .= '<a class="btn btn-sm border-0 px-10px fs-15 text-white tt btn-print-2" href="' . Route('admin.profit-distribute.print', $row->id) . '" data-bs-toggle="tooltip" data-bs-placement="top" title="Print"><i class="fas fa-print"></i></a>';
-                    }
-                    $diposited = $row->list->where('deposited_amount', '>', 0);
-                    if (count($diposited) > 0) {
-                        return '<div class="btn-group">' . $additionalBtn . '</div>';
-                    } else {
-                        return ActionButtons::actions($data, $additionalBtn);
-                    }
-                })
-                ->rawColumns(['checkbox', 'actions'])
-                ->make(true);
-        }
-
-        $title = "Profit Distributions";
-        return view('admin.profit_distribution.index', compact('title'));
+        $addition_btns = [[
+            'parameter' => true,
+            'target'    => '_self',
+            'title'     => 'View Distribution',
+            'route'     => "admin.{$this->path}.show",
+            'icon'      => '<i class="fas fa-eye"></i>',
+            'class'     => 'btn btn-sm btn-primary mw-fit',
+        ]];
+        return HelperClass::resourceDataView($this->model::orderBy('id', 'desc'), null, $addition_btns, $this->path, $this->title, ['paidList'], 'conditional');
     }
 
-    public function SerialNo()
+    public function serialNo()
     {
-        $data = InvestorProfit::withTrashed()->select(['serial_no'])->whereDate('created_at', '>=', date('Y-m-d'))->whereDate('created_at', '<=', date('Y-m-t'))->orderBy('id', 'desc')->first();
-        if ($data) {
-            $trim = str_replace("PD", '', $data->serial_no);
-            $dataPrefix = (int)$trim + 1;
-            $SerialNo = "PD" . $dataPrefix;
+        $prefix = 'PD' . date('ym'); // I + YYMM, e.g. I2506
+
+        $data = $this->model::withTrashed()
+            ->select(['serial_no'])
+            ->where('serial_no', 'like', $prefix . '%') // filter current month
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if (is_null($data)) {
+            $serial = '001';
         } else {
-            $SerialNo = "PD" . date('y') . date('m') . '000001';
+            $lastNumber = (int)substr($data->serial_no, -3); // last 3 digits
+            $serial = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
         }
-        return $SerialNo;
+
+        return $prefix . $serial;
     }
 
     /**
@@ -147,11 +71,62 @@ class ProfitDistributionController extends Controller
      */
     public function create(Request $request)
     {
-        $title = 'Generate Profit';
-        $current_time = Carbon::now();
-        $serial_no = $this->SerialNo();
-        $data = [];
-        return view('admin.profit_distribution.create', compact('title', 'current_time', 'serial_no', 'data'));
+        if ($request->ajax()) {
+            $detailData = [];
+            $checkData = $this->model::where('year', $request->year)->where('month', $request->month)->where('product_id', $request->product_id)->first();
+            if (is_null($checkData)) {
+                $startDate = date("Y-m-01", strtotime("$request->year-$request->month-01"));
+                $endDate = date("Y-m-t", strtotime("$request->year-$request->month-01"));
+                $sales = SalesList::with(['product.invests' => function ($q) {
+                        $q->where('sattled', false);
+                    }])
+                    ->whereHas('product', function ($query) use ($endDate) {
+                        $query->whereHas('invests', function ($subQuery) use ($endDate) {
+                            $subQuery->where('date', '<=', $endDate)->where('sattled', false);
+                        });
+                    })
+                    ->whereHas('sales', function ($query) use ($endDate) {
+                        $query->where('date', '<=', $endDate);
+                    })
+                    ->where('product_id', $request->product_id)
+                    ->where('distributed', false)
+                    ->select('product_id', DB::raw('SUM(qty - return_qty) as sumQty'), DB::raw('SUM(net_amount - return_amount) as sumAmount'))
+                    ->groupBy('product_id')
+                    ->get();
+
+                $invests = Invest::with(['investor', 'product'])->where('product_id', $request->product_id)->where('date', '<=', $endDate)->where('sattled', false)->get();
+                $product = Room::findOrFail($request->product_id);
+                $profitAmount = round($sales->sum('sumQty') * 0.9) * $product->profit;
+
+                $productionQty = ProductionList::whereHas('production', function ($query) use ($endDate) {
+                        $query->where('date', '<=', $endDate);
+                    })->where('product_id', $request->product_id)->sum('qty');
+
+                $detailData = [
+                    'invests' => $invests,
+                    'product' => $product,
+                    'production_qty' => $productionQty,
+                    'sales_qty' => round($sales->sum('sumQty') * 0.9),
+                    'sales_amount' => round($sales->sum('sumAmount') * 0.9),
+                    'invest_qty' => $invests->sum('qty'),
+                    'invest_amount' => $invests->sum('amount'),
+                    'profit_amount' => $profitAmount,
+                    'startDate' => $startDate,
+                    'endDate' => $endDate
+                ];
+
+                return response()->json([
+                    'status' => 'success',
+                    'data' => view('admin.profit-distribution.partial.data', ['detailData' => $detailData])->render()
+                ]);
+            }
+        }
+
+        $title = $this->create_title;
+        $serial_no = $this->serialNo();
+        $detailData = [];
+        $checkData = $this->model::where('year', date('Y'))->where('month', date('F'))->first();
+        return view("admin.{$this->path}.create", compact('title', 'serial_no', 'detailData'));
     }
 
     /**
@@ -163,137 +138,123 @@ class ProfitDistributionController extends Controller
             'year' => 'required',
             'month' => 'required',
             'date' => 'required',
-            'serial_no' => 'required',
-            'investor_id' => 'required',
-            'amount' => 'required',
+            'invest_id' => 'required'
         ]);
-
-        DB::transaction(function () use ($request) {
-            $serial_no = $this->SerialNo();
-            $data = InvestorProfit::create([
-                'serial_no' => $serial_no,
-                'year' => $request->year,
-                'month' => $request->month,
-                'date' =>  date('Y-m-d', strtotime($request->date)),
-                'total_profit' => $request->total_profit,
-                'investor_percentage' => $request->investor_percentage,
-                'total_share' => $request->total_share,
-                'amount' => array_sum($request->amount),
-                'created_by' => Auth::user()->id,
-            ]);
-
-            InvestMonth::whereHas('invest', function ($row) {
-                $row->where('calculate', true);
-            })->where('invest_month', date('Y-m-01', strtotime($request->month . '-' . $request->year)))->update(['distributed' => 1]);
-
-            foreach ($request->investor_id as $investor_id) {
-                InvestorProfitList::create([
-                    'investor_profit_id' => $data->id,
-                    'investor_id' => $investor_id,
-                    'share_qty' => $request->share_qty[$investor_id],
-                    'amount' => $request->amount[$investor_id],
+        
+        try {
+            DB::transaction(function () use ($request) {
+                $data = $this->model::create([
+                    'serial_no' => $this->serialNo(),
+                    'year'      => $request->year,
+                    'month'     => $request->month,
+                    'date'      => date('Y-m-d', strtotime($request->date)),
+                    'product_id'    => $request->product_id,
+                    'invest_qty'    => $request->invest_qty,
+                    'invest_amount' => $request->invest_amount,
+                    'profit_amount' => $request->profit_amount,
+                    'production_qty' => $request->production_qty, 
+                    'sales_qty'     => $request->sales_qty,
+                    'sales_amount'  => $request->sales_amount,
+                    'created_by'    => Auth::id(),
                 ]);
 
-                Wallet::create([
-                    'investor_id' => $investor_id,
-                    'investor_profit_id' => $data->id,
-                    'date' => date('Y-m-d', strtotime($request->date)),
-                    'amount_in' => $request->amount[$investor_id],
-                    'type' => 'Profit',
-                    'approved' => 1,
-                    'created_by' => Auth::user()->id,
-                ]);
-            }
-        });
+                $startDate = date("Y-m-01", strtotime("$request->year-$request->month-01"));
+                $endDate = date("Y-m-t", strtotime("$request->year-$request->month-01"));
+                $totalInvestQty = Invest::with(['investor', 'product'])->where('date', '<=', $endDate)->where('product_id', $request->product_id)->where('sattled', false)->sum('qty');
+                foreach ($request->invest_id as $invest_id) {
+                    $invest = Invest::find($invest_id);
+                    $perShareProfit = round($request->profit_amount / $totalInvestQty);
 
-        return redirect()->route('admin.profit-distribute.index')->withSuccessMessage('Added Successfully!');
+                    ProfitDistributionList::create([
+                        'profit_distribution_id' => $data->id,
+                        'invest_id'     => $invest_id,
+                        'investor_id'   => $invest->investor_id,
+                        'product_id'    => $invest->product_id,
+                        'profit_per_sale' => $invest->product->profit,
+                        'sales_qty'     => $request->sales_qty,
+                        'invest_qty'    => $invest->qty,
+                        'invest_amount' => $invest->amount,
+                        'amount'        => $perShareProfit * $invest->qty
+                    ]);
+                }
+            });
+        } catch (\Exception $e) {
+            return back()->withErrors($e->getMessage());
+        }
+
+        return redirect()->route("admin.{$this->path}.index")->withSuccessMessage('Created Successfully!');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, string $id)
+    public function show(string $id)
     {
-        if (!is_null($request->generate)) {
-            $generated_data = [];
-            $start_date = date('Y-m-01', strtotime($request->month . '-' . $request->year));
-            $end_date = date('Y-m-t', strtotime($request->month . '-' . $request->year));
-
-            $incomes = DeliveryList::whereHas('delivery', function ($q) use ($start_date, $end_date) {
-                $q->where('date', '>=', $start_date)->where('date', '<=', $end_date);
-            })->sum('subtotal');
-
-            $expenses = AccountTransaction::with('coa')
-                ->where('voucher_date', '>=', $start_date)
-                ->where('voucher_date', '<=', $end_date)
-                ->whereHas('coa.parent', function ($query) {
-                    $query->whereIn('head_code', [401, 402, 403, 404]);
-                })
-                ->sum(DB::raw('debit_amount'));
-
-            $total_profit = $incomes - $expenses;
-            $investor_percentage = 40;
-            $investor_part = round((($total_profit / 100) * 40));
-            $total_share = InvestMonth::whereHas('invest', function ($row) {
-                $row->where('calculate', true);
-            })->where('invest_month', $start_date)->sum('qty');
-
-            $check_data = InvestorProfit::whereNotIn('id', [$id])->where('year', $request->year)->where('month', $request->month)->first();
-            if (is_null($check_data) && $total_profit > 0 && $total_share > 0) {
-                $investors = InvestMonth::whereHas('invest', function ($row) {
-                    $row->where('calculate', true);
-                })->with(['investor'])->where('month', date('F', strtotime($request->month)))->where('year', $request->year)
-                    ->groupBy('investor_id')
-                    ->select('*', DB::raw('SUM(qty) as qty'), DB::raw('SUM(amount) as amount'))
-                    ->get();
-
-                $per_share_profit = round((($total_profit / 100) * 40) / $total_share);
-
-                foreach ($investors as $investor) {
-                    $data[] = [
-                        'investor' => $investor->investor,
-                        'total_share' => $total_share,
-                        'share_qty' => $investor->qty,
-                        'profit' => $per_share_profit * $investor->qty,
-                    ];
-                }
-            } else {
-                $total_profit = '';
-                $investor_percentage = '';
-                $investor_part = '';
-                $total_share = '';
-            }
-
-            $title = 'Update Profit Distribution';
-            $data = InvestorProfit::findOrFail($id);
-            return view('admin.profit_distribution.edit', compact('title', 'total_profit', 'investor_percentage', 'investor_part', 'total_share', 'data', 'generated_data'));
-        }
-
-        $title = 'View Profit Distribution';
-        $data = InvestorProfit::findOrFail($id);
-        return view('admin.profit_distribution.view', compact('title', 'data'));
-    }
-
-    public function print(Request $request, string $id)
-    {
-        $data = InvestorProfit::findOrFail($id);
-        $report_title = 'Profit Distribution <br> <span class="text-sm">' . $data->month . '-' . $data->year . '</span>';
-        // return view('admin.profit_distribution.print', compact('report_title', 'data'));
-        $pdf = Pdf::loadView('admin.profit_distribution.print', compact('report_title', 'data'));
-        $pdf->setPaper('A4', 'landscape');
-        return $pdf->stream('schedule_report_' . date('d_m_Y_h_i_s') . '.pdf');;
+        $title = 'View ' . $this->title;
+        $data = $this->model::findOrFail($id);
+        return view("admin.{$this->path}.view", compact('data', 'title'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(Request $request, string $id)
     {
-        $title = 'Update Profit Distribution';
-        $data = InvestorProfit::findOrFail($id);
-        $link = Route('admin.profit-distribute.update', $id);
-        $generated_data = [];
-        return view('admin.profit_distribution.edit', compact('title', 'data', 'link', 'generated_data'));
+        $detailData = [];
+        $data = $this->model::findOrFail($id);
+        $checkData = $this->model::whereNot('id', $id)->where('year', $request->year)->where('month', $request->month)->where('product_id', $request->product_id)->first();
+        if (is_null($checkData)) {
+            $startDate = date("Y-m-01", strtotime("$request->year-$request->month-01"));
+            $endDate = date("Y-m-t", strtotime("$request->year-$request->month-01"));
+            $sales = SalesList::with(['product.invests' => function ($q) {
+                $q->where('sattled', false);
+            }])
+                ->whereHas('product', function ($query) use ($endDate) {
+                    $query->whereHas('invests', function ($subQuery) use ($endDate) {
+                        $subQuery->where('date', '<=', $endDate)->where('sattled', false);
+                    });
+                })
+                ->whereHas('sales', function ($query) use ($endDate) {
+                    $query->where('date', '<=', $endDate);
+                })
+                ->where(function ($query) use ($data, $request) {
+                    $query->where('distributed', false);
+                })
+                ->where('product_id', $request->product_id)
+                ->groupBy('product_id')
+                ->select('product_id', DB::raw('SUM(qty) as sumQty'))
+                ->get();
+
+            $invests = Invest::with(['investor', 'product'])->where('date', '<=', $endDate)->where('sattled', false)->get();
+            $profitAmount = $sales->sum(function ($item) {
+                return $item->product->profit * $item->sumQty;
+            });
+            
+            $product = Room::findOrFail($request->product_id);
+
+            $detailData = [
+                'invests' => $invests,
+                'product' => $product,
+                'sales_qty' => round(($sales->sum('qty') - $sales->sum('return_qty')) * 0.9),
+                'invest_qty' => $invests->sum('qty'),
+                'invest_amount' => $invests->sum('amount'),
+                'profit_amount' => $profitAmount,
+                'startDate' => $startDate,
+                'endDate' => $endDate
+            ];
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'status' => 'success',
+                'data' => view('admin.profit-distribution.partial.data', ['detailData' => $detailData])->render()
+            ]);
+        }
+
+        $additionalData = [
+            'detailData' => $detailData,
+        ];
+        return HelperClass::resourceDataEdit($this->model, $id, $this->path, $this->edit_title, $additionalData);
     }
 
     /**
@@ -305,55 +266,60 @@ class ProfitDistributionController extends Controller
             'year' => 'required',
             'month' => 'required',
             'date' => 'required',
-            'serial_no' => 'required',
-            'investor_id' => 'required',
-            'amount' => 'required',
+            'invest_id' => 'required'
         ]);
 
-        DB::transaction(function () use ($request, $id) {
-            $data = InvestorProfit::findOrFail($id);
-            InvestMonth::whereHas('invest', function ($row) {
-                $row->where('calculate', true);
-            })->where('invest_month', date('Y-m-01', strtotime($data->month . '-' . $data->year)))->update(['distributed' => 0]);
-            $data->update([
-                'year' => $request->year,
-                'month' => $request->month,
-                'date' =>  date('Y-m-d', strtotime($request->date)),
-                'total_profit' => $request->total_profit,
-                'investor_percentage' => $request->investor_percentage,
-                'total_share' => $request->total_share,
-                'amount' => array_sum($request->amount),
-                'updated_by' => Auth::user()->id,
-            ]);
-
-            InvestMonth::whereHas('invest', function ($row) {
-                $row->where('calculate', true);
-            })->where('invest_month', date('Y-m-01', strtotime($request->month . '-' . $request->year)))->update(['distributed' => 1]);
-
-            InvestorProfitList::where('investor_profit_id', $id)->delete();
-            Wallet::where('investor_profit_id', $id)->forceDelete();
-            foreach ($request->investor_id as $investor_id) {
-                InvestorProfitList::create([
-                    'investor_profit_id' => $id,
-                    'investor_id' => $investor_id,
-                    'share_qty' => $request->share_qty[$investor_id],
-                    'amount' => $request->amount[$investor_id],
+        try {
+            DB::transaction(function () use ($request, $id) {
+                $data = $this->model::findOrFail($id);
+                $data->update([
+                    'year'  => $request->year,
+                    'month' => $request->month,
+                    'date'  => date('Y-m-d', strtotime($request->date)),
+                    'invest_qty' => $request->invest_qty,
+                    'invest_amount' => $request->invest_amount,
+                    'profit_amount' => $request->profit_amount,
+                    'production_qty' => $request->production_qty, 
+                    'sales_qty'     => $request->sales_qty,
+                    'sales_amount'  => $request->sales_amount,
+                    'updated_by'    => Auth::id(),
                 ]);
 
-                Wallet::create([
-                    'investor_id' => $investor_id,
-                    'investor_profit_id' => $data->id,
-                    'date' => date('Y-m-d', strtotime($request->date)),
-                    'amount_in' => $request->amount[$investor_id],
-                    'type' => 'Profit',
-                    'approved' => 1,
-                    'created_by' => $data->created_by,
-                    'updated_by' => Auth::user()->id,
-                ]);
-            }
-        });
+                ProfitDistributionList::where('profit_distribution_id', $id)->delete();
 
-        return redirect()->route('admin.profit-distribute.index')->withSuccessMessage('Updated Successfully!');
+                $startDate = date("Y-m-01", strtotime("$request->year-$request->month-01"));
+                $endDate = date("Y-m-t", strtotime("$request->year-$request->month-01"));
+                $invests = Invest::with(['investor', 'product'])->where('date', '<=', $endDate)->where('sattled', false)->get();
+                foreach ($request->invest_id as $invest_id) {
+                    $invest = Invest::find($invest_id);
+                    $totalInvestQty = $invests->where('product_id', $invest->product_id)->where('sattled', false)->sum('qty');
+
+                    $salesQty = SalesList::where('product_id', $invest->product_id)
+                        ->whereHas('sales', function ($query) use ($startDate, $endDate) {
+                            $query->whereBetween('date', [$startDate, $endDate]);
+                        })
+                        ->sum('qty');
+                    $totalProfit = $salesQty * $invest->product->profit;
+                    $perShareProfit = round($totalProfit / $totalInvestQty);
+
+                    ProfitDistributionList::create([
+                        'profit_distribution_id' => $data->id,
+                        'invest_id'     => $invest_id,
+                        'investor_id'   => $invest->investor_id,
+                        'product_id'    => $invest->product_id,
+                        'profit_per_sale' => $invest->product->profit,
+                        'sales_qty'     => $request->sales_qty,
+                        'invest_qty'    => $invest->qty,
+                        'invest_amount' => $invest->amount,
+                        'amount'        => $perShareProfit * $invest->qty
+                    ]);
+                }
+            });
+        } catch (\Exception $e) {
+            return back()->withErrors($e->getMessage());
+        }
+
+        return redirect()->route("admin.{$this->path}.index")->withSuccessMessage('Updated Successfully!');
     }
 
     /**
@@ -361,29 +327,6 @@ class ProfitDistributionController extends Controller
      */
     public function destroy(string $id)
     {
-        // Recovery Deleted Data
-        if (request()->has('recovery') && request('recovery') == 'true') {
-            $data = InvestorProfit::withTrashed()->findOrFail($id);
-            Wallet::withTrashed()->where('investor_profit_id', $id)->restore();
-            $data->restore();
-            return response()->json(['status' => 'success']);
-        }
-
-        if (request()->has('parmanent') && request('parmanent') == 'true') {
-            $data = InvestorProfit::withTrashed()->findOrFail($id);
-            Wallet::where('investor_profit_id', $id)->forceDelete();
-            $data->forceDelete();
-            return response()->json(['status' => 'success']);
-        }
-
-        $data = InvestorProfit::withTrashed()->findOrFail($id);
-        $data->update(['deleted_by' => Auth::user()->id]);
-        Wallet::where('investor_profit_id', $id)->update(['deleted_by' => Auth::user()->id]);
-        Wallet::where('investor_profit_id', $id)->forceDelete();
-        InvestMonth::whereHas('invest', function ($row) {
-            $row->where('calculate', true);
-        })->where('invest_month', date('Y-m-01', strtotime($data->month . '-' . $data->year)))->update(['distributed' => 0]);
-        $data->forceDelete();
-        return response()->json(['status' => 'success']);
+        return HelperClass::resourceDataDelete($this->model, $id);
     }
 }
