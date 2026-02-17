@@ -113,7 +113,7 @@ class SalesController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+   public function create(Request $request)
 {
     // ================= CLIENT CREDIT CHECK =================
     if ($request->ajax() && $request->has('client_id')) {
@@ -139,18 +139,16 @@ class SalesController extends Controller
         ]);
     }
 
-
     // ================= STOCK CHECK (PRODUCT ভিত্তিক) =================
     if ($request->ajax() && $request->has('product_id')) {
-
-        $stock = HelperClass::stock($request->product_id, $request->store_id);
+        $product = Room::find($request->product_id); // Room = Product
+        $stock = $product ? $product->available : 0;
 
         return response()->json([
             'status' => 'success',
             'stock' => $stock
         ]);
     }
-
 
     // ================= NORMAL PAGE LOAD =================
     $title = $this->create_title;
@@ -173,7 +171,6 @@ class SalesController extends Controller
               ->orWhere('head_name', 'Cash at Bank');
     })->get();
 
-    // Room = Product
     $products = Room::where('status', true)
                 ->orderBy('name', 'asc')
                 ->get();
@@ -190,6 +187,7 @@ class SalesController extends Controller
         )
     );
 }
+
 
 
     /**

@@ -60,7 +60,7 @@
 
     {{-- Product --}}
     <div class="col-md-3 col-sm-6">
-        <label class="form-label"><b>Books</b></label>
+        <label class="form-label"><b>Rooms</b></label>
         <select id="product_id" class="form-select select" data-placeholder="Select Product">
             <option value=""></option>
             @foreach ($products as $item)
@@ -162,23 +162,24 @@ $(function(){
         }
     });
 
-    // Stock check (product_id wise)
-    $('#product_id,#store_id').change(function(){
-        let product_id = $('#product_id').val();
-        let store_id = $('#store_id').val();
+    // Stock check (product_id অনুযায়ী)
+        $('#product_id').change(function(){
+            let product_id = $(this).val();
 
-        if(product_id && store_id){
-            $.post('{{ request()->fullUrl() }}',{
-                _method:'GET',
-                product_id:product_id,
-                store_id:store_id
-            },function(res){
-                if(res.status=='success'){
-                    $('#stock').val(res.stock);
-                }
-            });
-        }
-    });
+            if(product_id){
+                $.post('{{ request()->fullUrl() }}',{
+                    _method:'GET',
+                    product_id:product_id
+                }, function(res){
+                    if(res.status=='success'){
+                        $('#stock').val(res.stock);
+                    }
+                });
+            } else {
+                $('#stock').val(0);
+            }
+        });
+
 
     // Add product
     $('#add_item').click(function(){
