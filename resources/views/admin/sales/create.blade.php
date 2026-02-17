@@ -58,16 +58,16 @@
         </select>
     </div>
 
-    {{-- Product --}}
+    {{-- Rooms --}}
     <div class="col-md-3 col-sm-6">
         <label class="form-label"><b>Rooms</b></label>
-        <select id="product_id" class="form-select select" data-placeholder="Select Product">
+        <select id="product_id" class="form-select select" data-placeholder="Select Room">
             <option value=""></option>
             @foreach ($products as $item)
                 <option value="{{ $item->id }}"
-                        data-price="{{ $item->client_price }}"
+                        data-price="{{ $item->price }}"
                         data-commission="{{ $item->client_commission }}"
-                        data-rate="{{ $item->net_price }}">
+                        data-available="{{ $item->available }}">
                     {{ $item->name }}
                 </option>
             @endforeach
@@ -80,6 +80,12 @@
         <input type="number" id="stock" class="form-control" readonly value="0">
     </div>
 
+    {{-- Price --}}
+    <div class="col-md-2 col-6">
+        <label class="form-label"><b>Price</b></label>
+        <input type="number" id="price" class="form-control" readonly value="0">
+    </div>
+
     {{-- Quantity --}}
     <div class="col-md-2 col-6">
         <label class="form-label"><b>Quantity</b></label>
@@ -90,7 +96,7 @@
     <div class="col-md-2 col-sm-6">
         <label class="form-label text-white d-none d-sm-block">.</label>
         <button type="button" class="btn btn-primary w-100" id="add_item">
-            Add Product
+            Add Room
         </button>
     </div>
 
@@ -101,7 +107,7 @@
                 <thead class="bg-primary text-white">
                     <tr>
                         <th width="30">SL</th>
-                        <th>Book</th>
+                        <th>Room</th>
                         <th width="120">Price</th>
                         <th width="120">Commission %</th>
                         <th width="120">Net Price</th>
@@ -115,22 +121,19 @@
                     <tr>
                         <td colspan="5"></td>
                         <td><b>Total</b></td>
-                        <td><input type="number" id="total_amount" name="total_amount"
-                                class="form-control text-end" readonly value="0"></td>
+                        <td><input type="number" id="total_amount" name="total_amount" class="form-control text-end" readonly value="0"></td>
                         <td></td>
                     </tr>
                     <tr>
                         <td colspan="5"></td>
                         <td><b>Discount</b></td>
-                        <td><input type="number" id="discount" name="discount"
-                                class="form-control text-end" value="0"></td>
+                        <td><input type="number" id="discount" name="discount" class="form-control text-end" value="0"></td>
                         <td></td>
                     </tr>
                     <tr>
                         <td colspan="5"></td>
                         <td><b>Net</b></td>
-                        <td><input type="number" id="net_amount" name="net_amount"
-                                class="form-control text-end" readonly value="0"></td>
+                        <td><input type="number" id="net_amount" name="net_amount" class="form-control text-end" readonly value="0"></td>
                         <td></td>
                     </tr>
                 </tfoot>
@@ -162,38 +165,28 @@ $(function(){
         }
     });
 
-    // Stock check (product_id অনুযায়ী)
-        $('#product_id').change(function(){
-            let product_id = $(this).val();
+    // Stock & Price auto on product select
+    $('#product_id').change(function(){
+        let option = $('#product_id option:selected');
+        let stock = +option.data('available') || 0;
+        let price = +option.data('price') || 0;
 
-            if(product_id){
-                $.post('{{ request()->fullUrl() }}',{
-                    _method:'GET',
-                    product_id:product_id
-                }, function(res){
-                    if(res.status=='success'){
-                        $('#stock').val(res.stock);
-                    }
-                });
-            } else {
-                $('#stock').val(0);
-            }
-        });
+        $('#stock').val(stock);
+        $('#price').val(price);
+    });
 
-
-    // Add product
+    // Add product to table
     $('#add_item').click(function(){
         let product_id = $('#product_id').val();
         let product = $('#product_id option:selected').text();
-        let price = +$('#product_id option:selected').data('price');
+        let price = +$('#price').val();
         let commission = +$('#product_id option:selected').data('commission');
-        let rate = +$('#product_id option:selected').data('rate');
         let qty = +$('#quantity').val();
         let stock = +$('#stock').val();
         let sl = $('#tbody tr').length + 1;
 
         if(!product_id){
-            alert('Please select a product!');
+            alert('Please select a room!');
             return;
         }
 
@@ -203,26 +196,23 @@ $(function(){
         }
 
         if($('#product_'+product_id).length){
-            alert('Product already added!');
+            alert('Room already added!');
             return;
         }
+
+        let rate = Math.round(price - (price*(commission/100)));
 
         let tr = `<tr id="product_${product_id}">
             <td>${sl}</td>
             <td>${product}</td>
-            <td><input type="number" class="form-control price text-end"
-                data-id="${product_id}" id="price_${product_id}"
-                name="price[${product_id}]" value="${price}"></td>
-            <td><input type="number" class="form-control commission text-end"
-                data-id="${product_id}" id="commission_${product_id}"
-                name="commission[${product_id}]" value="${commission}"></td>
-            <td><input type="number" class="form-control text-end"
-                id="rate_${product_id}" value="${rate}" readonly></td>
-            <td><input type="number" class="form-control qty text-end"
-                data-id="${product_id}" id="qty_${product_id}"
-                name="qty[${product_id}]" value="${qty}"></td>
-            <td><input type="number" class="form-control text-end"
-                id="amount_${product_id}" readonly value="${rate*qty}"></td>
+            <td><input type="number" class="form-control price text-end" 
+                       id="price_${product_id}" name="price[${product_id}]" value="${price}" readonly></td>
+            <td><input type="number" class="form-control commission text-end" 
+                       id="commission_${product_id}" name="commission[${product_id}]" value="${commission}"></td>
+            <td><input type="number" class="form-control text-end" id="rate_${product_id}" value="${rate}" readonly></td>
+            <td><input type="number" class="form-control qty text-end" 
+                       id="qty_${product_id}" name="qty[${product_id}]" value="${qty}"></td>
+            <td><input type="number" class="form-control text-end" id="amount_${product_id}" value="${rate*qty}" readonly></td>
             <td>
                 <input type="hidden" class="product_id" name="product_id[]" value="${product_id}">
                 <button type="button" class="btn btn-sm btn-danger remove">X</button>
@@ -239,14 +229,13 @@ $(function(){
         calculate();
     });
 
-    // Calculate totals
-    $(document).on('keyup change','.price,.commission,.qty,#discount',function(){
+    // Recalculate totals on qty/commission/discount change
+    $(document).on('keyup change','.commission,.qty,#discount',function(){
         calculate();
     });
 
     function calculate(){
         let total = 0;
-
         $('.product_id').each(function(){
             let id = $(this).val();
             let price = +$('#price_'+id).val();
@@ -264,7 +253,7 @@ $(function(){
 
         $('#total_amount').val(total);
         let discount = +$('#discount').val();
-        $('#net_amount').val(total-discount);
+        $('#net_amount').val(total - discount);
     }
 
 });

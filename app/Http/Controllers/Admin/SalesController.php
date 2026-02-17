@@ -114,79 +114,62 @@ class SalesController extends Controller
      * Show the form for creating a new resource.
      */
    public function create(Request $request)
-{
-    // ================= CLIENT CREDIT CHECK =================
-    if ($request->ajax() && $request->has('client_id')) {
+    {
+        // ================= CLIENT CREDIT CHECK =================
+        if ($request->ajax() && $request->has('client_id')) {
 
-        $client = Client::findOrFail($request->client_id);
+            $client = Client::findOrFail($request->client_id);
 
-        $sales = $this->model::where('client_id', $request->client_id)
-                    ->sum('net_amount');
+            $sales = $this->model::where('client_id', $request->client_id)
+                        ->sum('net_amount');
 
-        $collections = Collection::where('client_id', $request->client_id)
-                        ->whereIn('collection_type', ['Payment', 'Advance'])
+            $collections = Collection::where('client_id', $request->client_id)
+                            ->whereIn('collection_type', ['Payment', 'Advance'])
+                            ->sum('amount');
+
+            $returns = SalesReturn::where('client_id', $request->client_id)
                         ->sum('amount');
 
-        $returns = SalesReturn::where('client_id', $request->client_id)
-                    ->sum('amount');
+            $credit_limit = $client->credit_limit + $collections - $sales + $returns;
 
-        $credit_limit = $client->credit_limit + $collections - $sales + $returns;
+            return response()->json([
+                'status' => 'success',
+                'credit_limit' => $credit_limit,
+                'limitation' => $client->credit_limit
+            ]);
+        }
 
-        return response()->json([
-            'status' => 'success',
-            'credit_limit' => $credit_limit,
-            'limitation' => $client->credit_limit
-        ]);
+        // ================= STOCK & PRICE CHECK (PRODUCT ভিত্তিক) =================
+        if ($request->ajax() && $request->has('product_id')) {
+            $product = Room::find($request->product_id);
+            $stock = $product ? $product->available : 0;
+            $price = $product ? $product->price : 0;
+
+            return response()->json([
+                'status' => 'success',
+                'stock' => $stock,
+                'price' => $price
+            ]);
+        }
+
+        // ================= NORMAL PAGE LOAD =================
+        $title = $this->create_title;
+        $invoice = $this->invoiceNo();
+
+        $clients = Client::where('status', true)->orderBy('name', 'asc')->get();
+        $stores = Store::where('status', true)->orderBy('name', 'asc')->get();
+        $salesOfficers = SalesOfficer::where('status', true)->orderBy('name', 'asc')->get();
+        $cash_heads = Coa::whereHas('parent', function ($query) {
+            $query->where('head_name', 'Cash In Hand')
+                ->orWhere('head_name', 'Cash at Bank');
+        })->get();
+        $products = Room::where('status', true)->orderBy('name', 'asc')->get();
+
+        return view("admin.{$this->path}.create", compact(
+            'title','invoice','clients','stores','salesOfficers','cash_heads','products'
+        ));
     }
 
-    // ================= STOCK CHECK (PRODUCT ভিত্তিক) =================
-    if ($request->ajax() && $request->has('product_id')) {
-        $product = Room::find($request->product_id); // Room = Product
-        $stock = $product ? $product->available : 0;
-
-        return response()->json([
-            'status' => 'success',
-            'stock' => $stock
-        ]);
-    }
-
-    // ================= NORMAL PAGE LOAD =================
-    $title = $this->create_title;
-    $invoice = $this->invoiceNo();
-
-    $clients = Client::where('status', true)
-                ->orderBy('name', 'asc')
-                ->get();
-
-    $stores = Store::where('status', true)
-                ->orderBy('name', 'asc')
-                ->get();
-
-    $salesOfficers = SalesOfficer::where('status', true)
-                    ->orderBy('name', 'asc')
-                    ->get();
-
-    $cash_heads = Coa::whereHas('parent', function ($query) {
-        $query->where('head_name', 'Cash In Hand')
-              ->orWhere('head_name', 'Cash at Bank');
-    })->get();
-
-    $products = Room::where('status', true)
-                ->orderBy('name', 'asc')
-                ->get();
-
-    return view("admin.{$this->path}.create",
-        compact(
-            'title',
-            'invoice',
-            'clients',
-            'stores',
-            'salesOfficers',
-            'cash_heads',
-            'products'
-        )
-    );
-}
 
 
 
