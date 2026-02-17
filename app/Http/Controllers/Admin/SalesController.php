@@ -8,12 +8,11 @@ use App\HelperClass;
 use App\Models\Store;
 use App\Models\Sales;
 use App\Models\Client;
-use App\Models\Product;
+use App\Models\Room;
 use App\Models\SalesList;
 use App\Models\Collection;
 use App\Models\SalesReturn;
 use Illuminate\Http\Request;
-use App\Models\ProductEdition;
 use App\Models\CollectionList;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
@@ -115,10 +114,6 @@ class SalesController extends Controller
      */
     public function create(Request $request)
     {
-        if ($request->ajax() && $request->has('product_id')) {
-            $editions = ProductEdition::where('product_id', $request->product_id)->where('status', true)->orderBy('name', 'asc')->get();
-            return response()->json(['status' => 'success', 'editions' => $editions]);
-        }
 
         if ($request->ajax() && $request->has('client_id')) {
             $client = Client::findOrFail($request->client_id);
@@ -319,10 +314,7 @@ class SalesController extends Controller
      */
     public function edit(Request $request, string $id)
     {
-        if ($request->ajax() && $request->has('product_id')) {
-            $editions = ProductEdition::where('product_id', $request->product_id)->where('status', true)->orderBy('name', 'asc')->get();
-            return response()->json(['status' => 'success', 'editions' => $editions]);
-        }
+  
 
         if ($request->ajax() && $request->has('client_id')) {
             $client = Client::findOrFail($request->client_id);

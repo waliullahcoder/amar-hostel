@@ -7,7 +7,6 @@ use App\Models\Store;
 use App\Models\Room;
 use App\Models\Production;
 use Illuminate\Http\Request;
-use App\Models\ProductEdition;
 use App\Models\ProductionList;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
@@ -75,10 +74,7 @@ class ProductionController extends Controller
      */
     public function create(Request $request)
     {
-        if ($request->ajax()) {
-            $editions = ProductEdition::where('product_id', $request->product_id)->where('status', true)->orderBy('name', 'asc')->get();
-            return response()->json(['status' => 'success', 'editions' => $editions]);
-        }
+      
 
         $title = $this->create_title;
         $production_no = $this->productionNo();
@@ -95,38 +91,44 @@ class ProductionController extends Controller
         $request->validate([
             'date' => 'required',
             'store_id' => 'required',
-            'product_id' => 'required',
-            'product_edition_id' => 'required',
-            'qty' => 'required'
+            'product_id' => 'required|array',
+            'qty' => 'required|array'
         ]);
 
         try {
+
             DB::transaction(function () use ($request) {
-                $data = $this->model::create([
+
+                $production = $this->model::create([
                     'store_id' => $request->store_id,
                     'production_no' => $this->productionNo(),
                     'date' => date('Y-m-d', strtotime($request->date)),
-                    'total_qty' => $request->total_qty,
+                    'total_qty' => $request->total_qty ?? 0,
                     'remarks' => $request->remarks,
                     'created_by' => Auth::id(),
                 ]);
 
-                foreach ($request->product_edition_id as $product_edition_id) {
+                foreach ($request->product_id as $product_id) {
+
                     ProductionList::create([
-                        'production_id' => $data->id,
+                        'production_id' => $production->id,
                         'store_id' => $request->store_id,
-                        'product_id' => $request->product_id[$product_edition_id],
-                        'product_edition_id' => $product_edition_id,
-                        'qty' => $request->qty[$product_edition_id],
+                        'product_id' => $product_id,
+                        'qty' => $request->qty[$product_id] ?? 0,
                     ]);
                 }
+
             });
+
         } catch (\Exception $e) {
+            dd($e->getMessage());
             return back()->withErrors($e->getMessage());
         }
 
-        return redirect()->route("admin.{$this->path}.index")->withSuccessMessage('Created Successfully!');
+        return redirect()->route("admin.{$this->path}.index")
+            ->withSuccessMessage('Created Successfully!');
     }
+
 
     /**
      * Display the specified resource.
@@ -152,10 +154,7 @@ class ProductionController extends Controller
      */
     public function edit(Request $request, string $id)
     {
-        if ($request->ajax()) {
-            $editions = ProductEdition::where('product_id', $request->product_id)->where('status', true)->orderBy('name', 'asc')->get();
-            return response()->json(['status' => 'success', 'editions' => $editions]);
-        }
+       
 
         $additionalData = [
             'products' => Room::where('status', true)->orderBy('name', 'asc')->get(),
@@ -167,45 +166,53 @@ class ProductionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        $request->validate([
-            'date' => 'required',
-            'store_id' => 'required',
-            'product_id' => 'required',
-            'product_edition_id' => 'required',
-            'qty' => 'required'
-        ]);
+   public function update(Request $request, string $id)
+{
+    $request->validate([
+        'date' => 'required',
+        'store_id' => 'required',
+        'product_id' => 'required|array',
+        'qty' => 'required|array'
+    ]);
 
-        try {
-            DB::transaction(function () use ($request, $id) {
-                $data = $this->model::findOrFail($id);
+    try {
 
-                $data->update([
+        DB::transaction(function () use ($request, $id) {
+
+            $production = $this->model::findOrFail($id);
+
+            $production->update([
+                'store_id' => $request->store_id,
+                'date' => date('Y-m-d', strtotime($request->date)),
+                'total_qty' => $request->total_qty ?? 0,
+                'remarks' => $request->remarks,
+                'updated_by' => Auth::id(),
+            ]);
+
+            // delete old list
+            ProductionList::where('production_id', $id)->delete();
+
+            // insert new list
+            foreach ($request->product_id as $product_id) {
+
+                ProductionList::create([
+                    'production_id' => $production->id,
                     'store_id' => $request->store_id,
-                    'date' => date('Y-m-d', strtotime($request->date)),
-                    'total_qty' => $request->total_qty,
-                    'remarks' => $request->remarks,
-                    'updated_by' => Auth::id(),
+                    'product_id' => $product_id,
+                    'qty' => $request->qty[$product_id] ?? 0,
                 ]);
+            }
 
-                ProductionList::where('production_id', $id)->delete();
-                foreach ($request->product_edition_id as $product_edition_id) {
-                    ProductionList::create([
-                        'production_id' => $data->id,
-                        'store_id' => $request->store_id,
-                        'product_id' => $request->product_id[$product_edition_id],
-                        'product_edition_id' => $product_edition_id,
-                        'qty' => $request->qty[$product_edition_id],
-                    ]);
-                }
-            });
-        } catch (\Exception $e) {
-            return back()->withErrors($e->getMessage());
-        }
+        });
 
-        return redirect()->route("admin.{$this->path}.index")->withSuccessMessage('Updated Successfully!');
+    } catch (\Exception $e) {
+        return back()->withErrors($e->getMessage());
     }
+
+    return redirect()->route("admin.{$this->path}.index")
+        ->withSuccessMessage('Updated Successfully!');
+}
+
 
     /**
      * Remove the specified resource from storage.

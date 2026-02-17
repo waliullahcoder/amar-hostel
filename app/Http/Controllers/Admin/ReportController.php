@@ -10,6 +10,10 @@ use App\Models\Payment;
 use App\Models\Investor;
 use Carbon\CarbonPeriod;
 use App\Models\TrialBalance;
+use App\Models\ProductionList;
+use App\Models\SalesList;
+use App\Models\SalesReturnList;
+use App\Models\ProfitDistribution;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\InvestSattlement;
@@ -414,101 +418,142 @@ class ReportController extends Controller
     }
 
     public function stockStatus(Request $request)
-    {
-        if ($request->ajax()) {
-            $term = $request->get('q');
-            $results = Room::where('name', 'LIKE', "%$term%")
-                ->select('id', 'name', 'code')
-                ->get();
+{
+    if ($request->ajax()) {
 
-            return response()->json($results);
-        }
+        $term = $request->get('q');
 
-        $title = 'Stock Status';
-        $data = [];
-        $date_range = explode('to', $request->date_range);
-        $start_date = !is_null($request->date_range) ? date('Y-m-d', strtotime($date_range[0])) : date('Y-m-01');
-        $end_date = !is_null($request->date_range) ? date('Y-m-d', strtotime($date_range[1])) : date('Y-m-t');
+        $results = Room::where('name', 'LIKE', "%$term%")
+            ->select('id', 'name', 'code')
+            ->get();
 
-        $store_ids = $request->has('store_id') ? (array)$request->store_id : Store::where('status', true)->pluck('id')->toArray();
-        $product_ids = $request->has('product_id') ? (array)$request->product_id : Room::pluck('id')->toArray();
-
-        if ($request->has('filter')) {
-            // Get all product editions for selected products
-            $editions = \App\Models\Room::whereIn('id', $product_ids)->get();
-            // $edition_ids = $editions->pluck('id')->toArray();
-            $searched_products = $editions->map(function($edition) {
-                $edition->edition_name = $edition->name;
-                return $edition;
-            });
-
-            // Production (in)
-            $productions = \App\Models\ProductionList::whereIn('product_id', $product_ids)
-                ->whereIn('store_id', $store_ids)
-                ->whereHas('production', function($q) use ($start_date, $end_date) {
-                    $q->where('date', '>=', $start_date)->where('date', '<=', $end_date);
-                })->get();
-
-            // Sales (out)
-            $sales = \App\Models\SalesList::whereIn('product_id', $product_ids)
-                ->whereIn('store_id', $store_ids)
-                ->whereHas('sales', function($q) use ($start_date, $end_date) {
-                    $q->where('date', '>=', $start_date)->where('date', '<=', $end_date);
-                })->get();
-
-            // Sales Return (in)
-            $sales_returns = \App\Models\SalesReturnList::whereIn('product_id', $product_ids)
-                ->whereIn('store_id', $store_ids)
-                ->whereHas('return', function($q) use ($start_date, $end_date) {
-                    $q->where('date', '>=', $start_date)->where('date', '<=', $end_date);
-                })->get();
-
-            // Opening calculation (before start_date)
-            $opening_productions = \App\Models\ProductionList::whereIn('product_id', $product_ids)
-                ->whereIn('store_id', $store_ids)
-                ->whereHas('production', function($q) use ($start_date) {
-                    $q->where('date', '<', $start_date);
-                })->get();
-            $opening_sales = \App\Models\SalesList::whereIn('product_id', $product_ids)
-                ->whereIn('store_id', $store_ids)
-                ->whereHas('sales', function($q) use ($start_date) {
-                    $q->where('date', '<', $start_date);
-                })->get();
-            $opening_sales_returns = \App\Models\SalesReturnList::whereIn('product_id', $product_ids)
-                ->whereIn('store_id', $store_ids)
-                ->whereHas('return', function($q) use ($start_date) {
-                    $q->where('date', '<', $start_date);
-                })->get();
-
-            $data = [];
-            foreach ($searched_products as $edition) {
-                $prod_id = $edition->product_id;
-                $edition_id = $edition->id;
-                $row = [
-                    'product' => $edition->product_name,
-                    'edition' => $edition->edition_name,
-                    'opening' =>
-                        $opening_productions->where('product_edition_id', $edition_id)->sum('qty')
-                        - $opening_sales->where('product_edition_id', $edition_id)->sum('qty')
-                        + $opening_sales_returns->where('product_edition_id', $edition_id)->sum('qty'),
-                    'production' => $productions->where('product_edition_id', $edition_id)->sum('qty'),
-                    'sales' => $sales->where('product_edition_id', $edition_id)->sum('qty'),
-                    'sales_return' => $sales_returns->where('product_edition_id', $edition_id)->sum('qty'),
-                ];
-                $row['stock'] = $row['opening'] + $row['production'] - $row['sales'] + $row['sales_return'];
-                $data[] = $row;
-            }
-        }
-
-        if (!is_null($request->print)) {
-            $report_title = 'Stock Status Report <br> <span class="text-sm">' . date('d-m-Y', strtotime($start_date)) . ' To ' . date('d-m-Y', strtotime($end_date)) . '</span>';
-            $pdf = Pdf::loadView('admin.reports.stock-status.print', compact('report_title', 'data'));
-            return $pdf->stream('stock_status_' . date('d_m_Y_h_i_s') . '.pdf');
-        }
-
-        $stores = Store::where('status', true)->orderBy('name', 'asc')->get();
-        return view('admin.reports.stock-status.index', compact('title', 'stores', 'start_date', 'end_date', 'data', 'stores'));
+        return response()->json($results);
     }
+
+    $title = 'Stock Status';
+    $data = [];
+
+    $date_range = explode('to', $request->date_range);
+
+    $start_date = !is_null($request->date_range)
+        ? date('Y-m-d', strtotime($date_range[0]))
+        : date('Y-m-01');
+
+    $end_date = !is_null($request->date_range)
+        ? date('Y-m-d', strtotime($date_range[1]))
+        : date('Y-m-t');
+
+    $store_ids = $request->has('store_id')
+        ? (array)$request->store_id
+        : Store::where('status', true)->pluck('id')->toArray();
+
+    $product_ids = $request->has('product_id')
+        ? (array)$request->product_id
+        : Room::pluck('id')->toArray();
+
+
+    if ($request->has('filter')) {
+
+        $rooms = Room::whereIn('id', $product_ids)->get();
+
+        // ===== PRODUCTION (IN) =====
+        $productions = ProductionList::whereIn('product_id', $product_ids)
+            ->whereIn('store_id', $store_ids)
+            ->whereHas('production', function ($q) use ($start_date, $end_date) {
+                $q->whereBetween('date', [$start_date, $end_date]);
+            })->get();
+
+        // ===== SALES (OUT) =====
+        $sales = SalesList::whereIn('product_id', $product_ids)
+            ->whereIn('store_id', $store_ids)
+            ->whereHas('sales', function ($q) use ($start_date, $end_date) {
+                $q->whereBetween('date', [$start_date, $end_date]);
+            })->get();
+
+        // ===== SALES RETURN (IN) =====
+        $sales_returns = SalesReturnList::whereIn('product_id', $product_ids)
+            ->whereIn('store_id', $store_ids)
+            ->whereHas('return', function ($q) use ($start_date, $end_date) {
+                $q->whereBetween('date', [$start_date, $end_date]);
+            })->get();
+
+
+        // ===== OPENING CALCULATION (BEFORE START DATE) =====
+        $opening_productions = ProductionList::whereIn('product_id', $product_ids)
+            ->whereIn('store_id', $store_ids)
+            ->whereHas('production', function ($q) use ($start_date) {
+                $q->where('date', '<', $start_date);
+            })->get();
+
+        $opening_sales = SalesList::whereIn('product_id', $product_ids)
+            ->whereIn('store_id', $store_ids)
+            ->whereHas('sales', function ($q) use ($start_date) {
+                $q->where('date', '<', $start_date);
+            })->get();
+
+        $opening_sales_returns = SalesReturnList::whereIn('product_id', $product_ids)
+            ->whereIn('store_id', $store_ids)
+            ->whereHas('return', function ($q) use ($start_date) {
+                $q->where('date', '<', $start_date);
+            })->get();
+
+
+        foreach ($rooms as $room) {
+
+            $room_id = $room->id;
+
+            $opening =
+                $opening_productions->where('product_id', $room_id)->sum('qty')
+                - $opening_sales->where('product_id', $room_id)->sum('qty')
+                + $opening_sales_returns->where('product_id', $room_id)->sum('qty');
+
+            $production = $productions->where('product_id', $room_id)->sum('qty');
+
+            $sale = $sales->where('product_id', $room_id)->sum('qty');
+
+            $sales_return = $sales_returns->where('product_id', $room_id)->sum('qty');
+
+            $stock = $opening + $production - $sale + $sales_return;
+
+            $data[] = [
+                'product' => $room->name,
+                'opening' => $opening,
+                'production' => $production,
+                'sales' => $sale,
+                'sales_return' => $sales_return,
+                'stock' => $stock,
+            ];
+        }
+    }
+
+
+    if (!is_null($request->print)) {
+
+        $report_title = 'Stock Status Report <br>
+            <span class="text-sm">' .
+            date('d-m-Y', strtotime($start_date)) .
+            ' To ' .
+            date('d-m-Y', strtotime($end_date)) .
+            '</span>';
+
+        $pdf = Pdf::loadView(
+            'admin.reports.stock-status.print',
+            compact('report_title', 'data')
+        );
+
+        return $pdf->stream('stock_status_' . date('d_m_Y_h_i_s') . '.pdf');
+    }
+
+    $stores = Store::where('status', true)
+        ->orderBy('name', 'asc')
+        ->get();
+
+    return view(
+        'admin.reports.stock-status.index',
+        compact('title', 'stores', 'start_date', 'end_date', 'data')
+    );
+}
+
 
     public function investorStatement(Request $request)
     {

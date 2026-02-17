@@ -28,8 +28,5 @@ class SalesList extends Model
         return $this->belongsTo(Room::class, 'product_id');
     }
 
-    public function edition()
-    {
-        return $this->belongsTo(ProductEdition::class, 'product_edition_id');
-    }
+ 
 }
