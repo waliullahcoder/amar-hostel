@@ -34,7 +34,7 @@ class SalesController extends Controller
     public function __construct()
     {
         $this->path = 'sales';
-        $this->title = 'Dealer Sales';
+        $this->title = 'Sales';
         $this->create_title = 'Add Sales';
         $this->edit_title = 'Update Sales';
         $this->model = Sales::class;

@@ -48,46 +48,17 @@
     </div>
 
     {{-- Client --}}
-    <div class="col-md-3 col-sm-6">
-        <label class="form-label"><b>Client *</b></label>
-        <select name="client_id" id="client_id" class="form-select select" required>
-            <option value=""></option>
-            @foreach ($additionalData['clients'] as $item)
-                <option value="{{ $item->id }}" {{ $data->client_id==$item->id?'selected':'' }}>{{ $item->name }}</option>
-            @endforeach
-        </select>
-    </div>
+   <select name="client_id" id="client_id" class="form-select" required disabled>
+    <option value=""></option>
+    @foreach ($additionalData['clients'] as $item)
+        <option value="{{ $item->id }}" {{ $data->client_id==$item->id?'selected':'' }}>
+            {{ $item->name }}
+        </option>
+    @endforeach
+</select>
+<input type="hidden" name="client_id" value="{{ $data->client_id }}">
 
-    {{-- Product --}}
-    <div class="col-md-3 col-sm-6">
-        <label class="form-label"><b>Rooms</b></label>
-        <select id="product_id" class="form-select select">
-            <option value=""></option>
-            @foreach ($additionalData['products'] as $item)
-                <option value="{{ $item->id }}" data-price="{{ $item->client_price }}" data-commission="{{ $item->client_commission }}">
-                    {{ $item->name }}
-                </option>
-            @endforeach
-        </select>
-    </div>
-
-    {{-- Stock --}}
-    <div class="col-md-2 col-6">
-        <label class="form-label"><b>Stock</b></label>
-        <input type="number" id="stock" class="form-control" readonly value="0">
-    </div>
-
-    {{-- Quantity --}}
-    <div class="col-md-2 col-6">
-        <label class="form-label"><b>Quantity</b></label>
-        <input type="number" id="quantity" class="form-control" value="1">
-    </div>
-
-    {{-- Add Button --}}
-    <div class="col-md-2 col-sm-6">
-        <label class="form-label d-none d-sm-block text-white">.</label>
-        <button type="button" class="btn btn-primary w-100" id="add_item">Add Room</button>
-    </div>
+   
 
     {{-- Table --}}
     <div class="col-12">

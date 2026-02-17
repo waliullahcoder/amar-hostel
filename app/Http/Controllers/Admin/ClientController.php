@@ -24,9 +24,9 @@ class ClientController extends Controller
     public function __construct()
     {
         $this->path = 'client';
-        $this->title = 'Dealer Setup';
-        $this->create_title = 'Add Dealer';
-        $this->edit_title = 'Update Dealer';
+        $this->title = 'Client Setup';
+        $this->create_title = 'Add Client';
+        $this->edit_title = 'Update Client';
         $this->model = Client::class;
     }
 
