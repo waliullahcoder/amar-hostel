@@ -14,6 +14,7 @@ use App\Models\Collection;
 use App\Models\SalesReturn;
 use Illuminate\Http\Request;
 use App\Models\CollectionList;
+use App\Models\ProductionList;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -113,33 +114,83 @@ class SalesController extends Controller
      * Show the form for creating a new resource.
      */
     public function create(Request $request)
-    {
+{
+    // ================= CLIENT CREDIT CHECK =================
+    if ($request->ajax() && $request->has('client_id')) {
 
-        if ($request->ajax() && $request->has('client_id')) {
-            $client = Client::findOrFail($request->client_id);
-            $sales = $this->model::where('client_id', $request->client_id)->sum('net_amount');
-            $collections = Collection::where('client_id', $request->client_id)->whereIn('collection_type', ['Payment', 'Advance'])->sum('amount');
-            $returns = SalesReturn::where('client_id', $request->client_id)->sum('amount');
-            $credit_limit = $client->credit_limit + $collections - $sales + $returns;
-            return response()->json(['status' => 'success', 'credit_limit' => $credit_limit, 'limitation' => $client->credit_limit]);
-        }
+        $client = Client::findOrFail($request->client_id);
 
-        if ($request->ajax()) {
-            $stock = HelperClass::stock($request->product_edition_id, $request->store_id);
-            return response()->json(['status' => 'success', 'stock' => $stock]);
-        }
+        $sales = $this->model::where('client_id', $request->client_id)
+                    ->sum('net_amount');
 
-        $title = $this->create_title;
-        $invoice = $this->invoiceNo();
-        $clients = Client::where('status', true)->orderBy('name', 'asc')->get();
-        $stores = Store::where('status', true)->orderBy('name', 'asc')->get();
-        $salesOfficers = SalesOfficer::where('status', true)->orderBy('name', 'asc')->get();
-        $cash_heads = Coa::whereHas('parent', function ($query) {
-            $query->where('head_name', 'Cash In Hand')->orWhere('head_name', 'Cash at Bank');
-        })->get();
-        $products = Room::where('status', true)->orderBy('name', 'asc')->get();
-        return view("admin.{$this->path}.create", compact('title', 'invoice', 'clients', 'stores', 'salesOfficers', 'cash_heads', 'products'));
+        $collections = Collection::where('client_id', $request->client_id)
+                        ->whereIn('collection_type', ['Payment', 'Advance'])
+                        ->sum('amount');
+
+        $returns = SalesReturn::where('client_id', $request->client_id)
+                    ->sum('amount');
+
+        $credit_limit = $client->credit_limit + $collections - $sales + $returns;
+
+        return response()->json([
+            'status' => 'success',
+            'credit_limit' => $credit_limit,
+            'limitation' => $client->credit_limit
+        ]);
     }
+
+
+    // ================= STOCK CHECK (PRODUCT ভিত্তিক) =================
+    if ($request->ajax() && $request->has('product_id')) {
+
+        $stock = HelperClass::stock($request->product_id, $request->store_id);
+
+        return response()->json([
+            'status' => 'success',
+            'stock' => $stock
+        ]);
+    }
+
+
+    // ================= NORMAL PAGE LOAD =================
+    $title = $this->create_title;
+    $invoice = $this->invoiceNo();
+
+    $clients = Client::where('status', true)
+                ->orderBy('name', 'asc')
+                ->get();
+
+    $stores = Store::where('status', true)
+                ->orderBy('name', 'asc')
+                ->get();
+
+    $salesOfficers = SalesOfficer::where('status', true)
+                    ->orderBy('name', 'asc')
+                    ->get();
+
+    $cash_heads = Coa::whereHas('parent', function ($query) {
+        $query->where('head_name', 'Cash In Hand')
+              ->orWhere('head_name', 'Cash at Bank');
+    })->get();
+
+    // Room = Product
+    $products = Room::where('status', true)
+                ->orderBy('name', 'asc')
+                ->get();
+
+    return view("admin.{$this->path}.create",
+        compact(
+            'title',
+            'invoice',
+            'clients',
+            'stores',
+            'salesOfficers',
+            'cash_heads',
+            'products'
+        )
+    );
+}
+
 
     /**
      * Store a newly created resource in storage.

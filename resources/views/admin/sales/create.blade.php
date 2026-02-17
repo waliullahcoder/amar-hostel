@@ -1,417 +1,271 @@
 @extends('layouts.admin.create_app')
 
 @section('content')
-    <div class="row g-3">
-        <div class="{{ old('sale_type') == 'Cash' ? 'col-md-2' : 'col-md-3' }} col-sm-6" id="sale_type_area">
-            <label for="sale_type" class="form-label"><b>Sale Type <span class="text-danger">*</span></b></label>
-            <select name="sale_type" id="sale_type" class="select form-select" data-placeholder="Sale Type" required>
-                <option value="Credit" {{ old('sale_type') == 'Credit' ? 'selected' : '' }}>Credit</option>
-                <option value="Cash" {{ old('sale_type') == 'Cash' ? 'selected' : '' }}>Cash</option>
-            </select>
-        </div>
-        <div class="col-md-2 col-sm-6" id="accounts_area"
-            style="display: {{ old('sale_type') == 'Cash' ? 'block' : 'none' }};">
-            <label for="coa_id" class="form-label"><b>Cash Account <span class="text-danger">*</span></b></label>
-            <select name="coa_id" id="coa_id" class="select form-select" data-placeholder="Select Cash Account"
-                {{ old('sale_type') == 'Cash' ? 'required' : '' }}>
-                <option value="">Select Cash Account</option>
-                @foreach ($cash_heads as $item)
-                    <option value="{{ $item->id }}" {{ old('coa_id') == $item->id ? 'selected' : '' }}>
-                        {{ $item->head_name . ' - ' . $item->head_code }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-md-3 col-sm-6" id="invoice_area">
-            <label for="invoice" class="form-label"><b>Invoice No. <span class="text-danger">*</span></b></label>
-            <input type="text" class="form-control" id="invoice" name="invoice" value="{{ $invoice }}" readonly
-                placeholder="Invoice No." required>
-        </div>
-        <div class="col-md-3 col-sm-6" id="date_area">
-            <label for="date" class="form-label"><b>Date <span class="text-danger">*</span></b></label>
-            <input type="text" class="form-control date_picker" id="date" name="date"
-                value="{{ date('d-m-Y', strtotime(old('date', date('d-m-Y')))) }}" placeholder="Date" required>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <label for="store_id" class="form-label"><b>Store <span class="text-danger">*</span></b></label>
-            <select name="store_id" id="store_id" class="select form-select" data-placeholder="Select Store" required>
-                @foreach ($stores as $item)
-                    <option value="{{ $item->id }}" {{ old('store_id') == $item->id ? 'selected' : '' }}>
-                        {{ $item->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <label for="client_id" class="form-label"><b>Client <span class="text-danger">*</span></b></label>
-            <select name="client_id" id="client_id" class="select form-select" data-placeholder="Select Client" required>
-                <option value=""></option>
-                @foreach ($clients as $item)
-                    <option value="{{ $item->id }}" {{ old('client_id') == $item->id ? 'selected' : '' }}>
-                        {{ $item->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <label for="product_id" class="form-label"><b>Books</b></label>
-            <select id="product_id" class="select form-select" data-placeholder="Select Product">
-                <option value=""></option>
-                @foreach ($products as $item)
-                    <option value="{{ $item->id }}" data-price="{{ $item->client_price }}"
-                        data-commission="{{ $item->client_commission }}" data-rate="{{ $item->net_price }}">
-                        {{ $item->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <label for="product_edition_id" class="form-label"><b>Editions</b></label>
-            <select id="product_edition_id" class="select form-select" data-placeholder="Select Book Editions">
-                <option value=""></option>
-            </select>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <label for="sales_officer_id" class="form-label"><b>TSO <span class="text-danger">*</span></b></label>
-            <select id="sales_officer_id" name="sales_officer_id" class="select form-select" data-placeholder="Select TSO"
-                required>
-                <option value=""></option>
-                @foreach ($salesOfficers as $item)
-                    <option value="{{ $item->id }}" {{ old('sales_officer_id') == $item->id ? 'selected' : '' }}>
-                        {{ $item->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-md-4 col-sm-6">
-            <label for="remarks" class="form-label"><b>Remarks</b></label>
-            <input type="text" class="form-control" name="remarks" id="remarks" placeholder="Remarks">
-        </div>
-        <div class="col-md-2 col-sm-6">
-            <label for="credit_limit" class="form-label"><b>Credit Limit</b></label>
-            <input type="number" class="form-control" id="credit_limit" name="credit_limit" placeholder="Credit Limit"
-                value="0" readonly>
-            <input type="hidden" id="limitation" value="">
-        </div>
-        <div class="col-md-2 col-6">
-            <label for="stock" class="form-label"><b>Stock</b></label>
-            <input type="number" class="form-control" id="stock" step="any" value="0"
-                placeholder="Stock" readonly>
-        </div>
-        <div class="col-md-2 col-6">
-            <label for="quantity" class="form-label"><b>Quantity</b></label>
-            <input type="number" class="form-control" id="quantity" step="any" value="1"
-                placeholder="Quantity">
-        </div>
-        <div class="col-md-2 col-sm-6">
-            <label class="form-label text-white d-sm-block d-none"><b>Add Item</b></label>
-            <button type="button" class="btn btn-xs btn-primary w-100 py-2" id="add_item">Add Product</button>
-        </div>
-        <div class="col-12">
-            <div class="table-responsive">
-                <table class="table table-striped align-middle mb-0">
-                    <thead class="bg-primary border-primary text-white text-nowrap">
-                        <tr>
-                            <th class="px-2 text-center" width="30">SL#</th>
-                            <th class="px-1">Book</th>
-                            <th class="px-1">Edition</th>
-                            <th class="px-1 text-end" width="120">Price</th>
-                            <th class="px-1 text-end" width="120">Commission %</th>
-                            <th class="px-1 text-end" width="120">Net Price</th>
-                            <th class="px-1 text-end" width="120">Quantity</th>
-                            <th class="px-1 text-end" width="120">Amount</th>
-                            <th class="px-1 text-center" width="40"><i class="far fa-times"></i></th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody">
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td style="padding: 0.25rem 0.25rem;" colspan="6"></td>
-                            <td style="padding: 2px 0.25rem;" colspan="3">
-                                <div class="input-group align-items-center">
-                                    <b style="width: 100px;">Total</b>
-                                    <input type="number" id="total_amount" name="total_amount" readonly
-                                        class="form-control input-sm text-end" placeholder="Total Amount" value="0">
-                                    <span class="text-center" style="width: 40px;">TK.</span>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 0.25rem 0.25rem;" colspan="6"></td>
-                            <td style="padding: 2px 0.25rem;" colspan="3">
-                                <div class="input-group align-items-center">
-                                    <b style="width: 100px;">Discount</b>
-                                    <input type="number" id="discount" name="discount"
-                                        class="form-control input-sm text-end" placeholder="Discount" value="0">
-                                    <span class="text-center" style="width: 40px;">TK.</span>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 0.25rem 0.25rem;" colspan="6"></td>
-                            <td style="padding: 2px 0.25rem;" colspan="3">
-                                <div class="input-group align-items-center">
-                                    <b style="width: 100px;">Net Amount</b>
-                                    <input type="number" id="net_amount" name="net_amount" readonly
-                                        class="form-control input-sm text-end" placeholder="net Amount" value="0">
-                                    <span class="text-center" style="width: 40px;">TK.</span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
-        <div class="text-end text-danger mt-3" id="limit_crosed" style="display: none;">This bill has
-            exceeded its due limit</div>
+<div class="row g-3">
+
+    {{-- Sale Type --}}
+    <div class="col-md-3 col-sm-6" id="sale_type_area">
+        <label class="form-label"><b>Sale Type *</b></label>
+        <select name="sale_type" id="sale_type" class="form-select select" data-placeholder="Sale Type" required>
+            <option value="Credit">Credit</option>
+            <option value="Cash">Cash</option>
+        </select>
     </div>
+
+    {{-- Cash Account --}}
+    <div class="col-md-3 col-sm-6" id="accounts_area" style="display:none;">
+        <label class="form-label"><b>Cash Account *</b></label>
+        <select name="coa_id" id="coa_id" class="form-select select" data-placeholder="Select Cash Account">
+            <option value="">Select Cash Account</option>
+            @foreach ($cash_heads as $item)
+                <option value="{{ $item->id }}">
+                    {{ $item->head_name }} - {{ $item->head_code }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+
+    {{-- Invoice --}}
+    <div class="col-md-3 col-sm-6">
+        <label class="form-label"><b>Invoice No *</b></label>
+        <input type="text" class="form-control" name="invoice" value="{{ $invoice }}" readonly required>
+    </div>
+
+    {{-- Date --}}
+    <div class="col-md-3 col-sm-6">
+        <label class="form-label"><b>Date *</b></label>
+        <input type="text" class="form-control date_picker" name="date" value="{{ date('d-m-Y') }}" required>
+    </div>
+
+    {{-- Store --}}
+    <div class="col-md-3 col-sm-6">
+        <label class="form-label"><b>Store *</b></label>
+        <select name="store_id" id="store_id" class="form-select select" data-placeholder="Select Store" required>
+            @foreach ($stores as $item)
+                <option value="{{ $item->id }}">{{ $item->name }}</option>
+            @endforeach
+        </select>
+    </div>
+
+    {{-- Client --}}
+    <div class="col-md-3 col-sm-6">
+        <label class="form-label"><b>Client *</b></label>
+        <select name="client_id" class="form-select select" data-placeholder="Select Client" required>
+            <option value=""></option>
+            @foreach ($clients as $item)
+                <option value="{{ $item->id }}">{{ $item->name }}</option>
+            @endforeach
+        </select>
+    </div>
+
+    {{-- Product --}}
+    <div class="col-md-3 col-sm-6">
+        <label class="form-label"><b>Books</b></label>
+        <select id="product_id" class="form-select select" data-placeholder="Select Product">
+            <option value=""></option>
+            @foreach ($products as $item)
+                <option value="{{ $item->id }}"
+                        data-price="{{ $item->client_price }}"
+                        data-commission="{{ $item->client_commission }}"
+                        data-rate="{{ $item->net_price }}">
+                    {{ $item->name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+
+    {{-- Stock --}}
+    <div class="col-md-2 col-6">
+        <label class="form-label"><b>Stock</b></label>
+        <input type="number" id="stock" class="form-control" readonly value="0">
+    </div>
+
+    {{-- Quantity --}}
+    <div class="col-md-2 col-6">
+        <label class="form-label"><b>Quantity</b></label>
+        <input type="number" id="quantity" class="form-control" value="1">
+    </div>
+
+    {{-- Add Button --}}
+    <div class="col-md-2 col-sm-6">
+        <label class="form-label text-white d-none d-sm-block">.</label>
+        <button type="button" class="btn btn-primary w-100" id="add_item">
+            Add Product
+        </button>
+    </div>
+
+    {{-- TABLE --}}
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="bg-primary text-white">
+                    <tr>
+                        <th width="30">SL</th>
+                        <th>Book</th>
+                        <th width="120">Price</th>
+                        <th width="120">Commission %</th>
+                        <th width="120">Net Price</th>
+                        <th width="120">Qty</th>
+                        <th width="120">Amount</th>
+                        <th width="40"></th>
+                    </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5"></td>
+                        <td><b>Total</b></td>
+                        <td><input type="number" id="total_amount" name="total_amount"
+                                class="form-control text-end" readonly value="0"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5"></td>
+                        <td><b>Discount</b></td>
+                        <td><input type="number" id="discount" name="discount"
+                                class="form-control text-end" value="0"></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="5"></td>
+                        <td><b>Net</b></td>
+                        <td><input type="number" id="net_amount" name="net_amount"
+                                class="form-control text-end" readonly value="0"></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+</div>
 @endsection
 
 @push('js')
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $(document).on('change', '#sale_type', function() {
-                var sale_type = $(this).val();
-                if (sale_type == 'Cash') {
-                    $('#accounts_area').show();
-                    $('#coa_id').prop('required', true);
-                    $('#sale_type_area').removeClass('col-md-3').addClass('col-md-2');
-                    $('#invoice_area').removeClass('col-md-3').addClass('col-md-2');
-                } else {
-                    $('#accounts_area').hide();
-                    $('#coa_id').prop('required', false);
-                    $('#sale_type_area').removeClass('col-md-2').addClass('col-md-3');
-                    $('#invoice_area').removeClass('col-md-2').addClass('col-md-3');
-                }
-                dueLimit();
-            });
+<script>
+$(function(){
 
-            $(document).on('change', '#client_id', function() {
-                var client_id = $(this).val();
-                $.ajax({
-                    url: '{{ request()->fullUrl() }}',
-                    type: 'POST',
-                    data: {
-                        _method: 'GET',
-                        client_id: client_id
-                    },
-                    success: function(response) {
-                        if (response.status == 'success') {
-                            $('#credit_limit').val(response.credit_limit);
-                            $('#limitation').val(response.limitation);
-                            dueLimit();
-                        }
-                    }
-                });
-            });
+    // Select2 init
+    $('.select').select2({
+        theme: 'bootstrap-5',
+        width: '100%'
+    });
 
-            function dueLimit() {
-                var credit_limit = +$('#credit_limit').val();
-                var net_amount = +$('#net_amount').val();
-                var limitation = $('#limitation').val();
-                var sale_type = $('#sale_type').val();
-                if (sale_type == 'Credit' && limitation != '' && credit_limit < net_amount) {
-                    $('#limit_crosed').show();
-                    $('.submit_btn').prop('disabled', true);
-                } else {
-                    $('#limit_crosed').hide();
-                    $('.submit_btn').prop('disabled', false);
-                }
-            }
+    // Sale type toggle
+    $('#sale_type').change(function(){
+        if($(this).val() == 'Cash'){
+            $('#accounts_area').show();
+            $('#coa_id').prop('required',true);
+        }else{
+            $('#accounts_area').hide();
+            $('#coa_id').prop('required',false);
+        }
+    });
 
-            $(document).on('change', '#store_id', function() {
-                $('#tbody tr').remove();
-                checkStock();
-            });
+    // Stock check (product_id wise)
+    $('#product_id,#store_id').change(function(){
+        let product_id = $('#product_id').val();
+        let store_id = $('#store_id').val();
 
-            $(document).on('change', '#product_id', function() {
-                var product_id = $(this).val();
-                $('#product_edition_id option').remove();
-                $('#product_edition_id').append(`<option value=""></option>`);
-                if (product_id) {
-                    $.ajax({
-                        url: '{{ request()->fullUrl() }}',
-                        type: 'POST',
-                        data: {
-                            _method: 'GET',
-                            product_id: product_id,
-                        },
-                        success: function(response) {
-                            if (response.status == 'success') {
-                                $.each(response.editions, function(key, value) {
-                                    $('#product_edition_id').append(
-                                        `<option value="${value.id}">${value.name}</option>`
-                                    );
-                                });
-                            }
-                        }
-                    });
+        if(product_id && store_id){
+            $.post('{{ request()->fullUrl() }}',{
+                _method:'GET',
+                product_id:product_id,
+                store_id:store_id
+            },function(res){
+                if(res.status=='success'){
+                    $('#stock').val(res.stock);
                 }
             });
+        }
+    });
 
-            $(document).on('change', '#product_edition_id', function() {
-                checkStock();
-            });
+    // Add product
+    $('#add_item').click(function(){
+        let product_id = $('#product_id').val();
+        let product = $('#product_id option:selected').text();
+        let price = +$('#product_id option:selected').data('price');
+        let commission = +$('#product_id option:selected').data('commission');
+        let rate = +$('#product_id option:selected').data('rate');
+        let qty = +$('#quantity').val();
+        let stock = +$('#stock').val();
+        let sl = $('#tbody tr').length + 1;
 
-            function checkStock() {
-                $('#stock').val(0);
-                var store_id = $('#store_id').val();
-                var product_edition_id = $('#product_edition_id').val();
-                if (store_id) {
-                    $.ajax({
-                        url: '{{ request()->fullUrl() }}',
-                        type: 'POST',
-                        data: {
-                            _method: 'GET',
-                            store_id: store_id,
-                            product_edition_id: product_edition_id
-                        },
-                        success: function(response) {
-                            if (response.status == 'success') {
-                                $('#stock').val(response.stock);
-                            }
-                        }
-                    });
-                }
-            }
+        if(!product_id){
+            alert('Please select a product!');
+            return;
+        }
 
-            $(document).on('click', '#add_item', function() {
-                var product_id = $('#product_id option:selected').val();
-                var product_edition_id = $('#product_edition_id').val();
-                var edition = $('#product_edition_id option:selected').text();
-                var product = $('#product_id option:selected').text();
+        if(qty <=0 || qty > stock){
+            alert('Stock not available!');
+            return;
+        }
 
-                var price = +$('#product_id option:selected').data('price');
-                var commission = +$('#product_id option:selected').data('commission');
-                var rate = +$('#product_id option:selected').data('rate');
+        if($('#product_'+product_id).length){
+            alert('Product already added!');
+            return;
+        }
 
-                var qty = +$('#quantity').val();
-                var stock = +$('#stock').val();
-                var sl = $('#tbody tr').length + 1;
-                if (product_edition_id == '') {
-                    Swal.fire({
-                        width: "22rem",
-                        toast: true,
-                        position: 'top-right',
-                        text: "Please select a product!",
-                        icon: "error",
-                        showConfirmButton: false,
-                        timer: 1500,
-                        showClass: {
-                            popup: `animate__animated animate__bounceInRight animate__faster`
-                        },
-                        hideClass: {
-                            popup: `animate__animated animate__bounceOutRight animate__faster`
-                        }
-                    });
-                    return false;
-                }
-                if ($('#edition_' + product_edition_id).length) {
-                    Swal.fire({
-                        width: "22rem",
-                        toast: true,
-                        position: 'top-right',
-                        text: "Product already added!",
-                        icon: "error",
-                        showConfirmButton: false,
-                        timer: 1500,
-                        showClass: {
-                            popup: `animate__animated animate__bounceInRight animate__faster`
-                        },
-                        hideClass: {
-                            popup: `animate__animated animate__bounceOutRight animate__faster`
-                        }
-                    });
-                    return false;
-                }
-                if (stock <= 0 || qty > stock) {
-                    Swal.fire({
-                        width: "22rem",
-                        toast: true,
-                        position: 'top-right',
-                        text: "Stock not available!",
-                        icon: "error",
-                        showConfirmButton: false,
-                        timer: 1500,
-                        showClass: {
-                            popup: `animate__animated animate__bounceInRight animate__faster`
-                        },
-                        hideClass: {
-                            popup: `animate__animated animate__bounceOutRight animate__faster`
-                        }
-                    });
-                    return false;
-                }
-                var tr =
-                    `<tr id="edition_${product_edition_id}">
-                        <td class="text-center" style="padding: 0.25rem 0.25rem;">${sl}</td>
-                        <td class="text-nowrap" style="padding: 2px 0.25rem;">${product}</td>
-                        <td class="text-nowrap" style="padding: 2px 0.25rem;">${edition}</td>
-                        <td style="padding: 2px 0.25rem;">
-                            <input type="number" class="form-control input-sm text-end price" step="any" id="price_${product_edition_id}" data-id="${product_edition_id}" name="price[${product_edition_id}]" value="${price}" placeholder="0.00" required>
-                        </td>
-                        <td style="padding: 2px 0.25rem;">
-                            <input type="number" class="form-control input-sm text-end commission" step="any" id="commission_${product_edition_id}" data-id="${product_edition_id}" name="commission[${product_edition_id}]" value="${commission}" placeholder="0.00" required>
-                        </td>
-                        <td style="padding: 2px 0.25rem;">
-                            <input type="number" class="form-control input-sm text-end rate" step="any" id="rate_${product_edition_id}" name="rate[${product_edition_id}]" value="${rate}" placeholder="0.00" readonly required>
-                        </td>
-                        <td style="padding: 2px 0.25rem;">
-                            <input type="number" class="form-control input-sm text-end qty" min="1" step="1" id="qty_${product_edition_id}" name="qty[${product_edition_id}]" max="${stock}" value="${qty}" placeholder="0.00" required>
-                        </td>
-                        <td style="padding: 2px 0.25rem;">
-                            <input type="number" class="form-control input-sm text-end" step="any" id="amount_${product_edition_id}" name="amount[${product_edition_id}]" value="${rate*qty}" readonly placeholder="0.00" required>
-                        </td>
-                        <td style="padding: 2px 0.25rem;" class="text-center">
-                            <input type="hidden" class="product_edition_id" name="product_edition_id[]" value="${product_edition_id}">
-                            <input type="hidden" name="product_id[${product_edition_id}]" value="${product_id}">
-                            <button type="button" class="btn btn-sm btn-danger remove"><i class="far fa-times"></i></button>
-                        </td>
-                    </tr>`;
-                $('#tbody').append(tr);
-                calculate();
-                dueLimit();
-            });
+        let tr = `<tr id="product_${product_id}">
+            <td>${sl}</td>
+            <td>${product}</td>
+            <td><input type="number" class="form-control price text-end"
+                data-id="${product_id}" id="price_${product_id}"
+                name="price[${product_id}]" value="${price}"></td>
+            <td><input type="number" class="form-control commission text-end"
+                data-id="${product_id}" id="commission_${product_id}"
+                name="commission[${product_id}]" value="${commission}"></td>
+            <td><input type="number" class="form-control text-end"
+                id="rate_${product_id}" value="${rate}" readonly></td>
+            <td><input type="number" class="form-control qty text-end"
+                data-id="${product_id}" id="qty_${product_id}"
+                name="qty[${product_id}]" value="${qty}"></td>
+            <td><input type="number" class="form-control text-end"
+                id="amount_${product_id}" readonly value="${rate*qty}"></td>
+            <td>
+                <input type="hidden" class="product_id" name="product_id[]" value="${product_id}">
+                <button type="button" class="btn btn-sm btn-danger remove">X</button>
+            </td>
+        </tr>`;
 
-            $(document).on('wheel keyup change', '.qty,#discount', function() {
-                calculate();
-                dueLimit();
-            });
+        $('#tbody').append(tr);
+        calculate();
+    });
 
-            $(document).on('click', '.remove', function() {
-                $(this).closest('tr').remove();
-                calculate();
-                dueLimit();
-            });
+    // Remove product
+    $(document).on('click','.remove',function(){
+        $(this).closest('tr').remove();
+        calculate();
+    });
 
-            $(document).on('wheel keyup change', '.price,.commission', function() {
-                var id = $(this).data('id');
-                var price = +$('#price_' + id).val();
-                var commission = +$('#commission_' + id).val();
-                if (commission > 100) {
-                    commission = 100;
-                    $('#commission_' + id).val(100);
-                }
-                var rate = Math.round(price - (price * (commission / 100)));
-                $('#rate_' + id).val(rate);
-                calculate();
-                dueLimit();
-            });
+    // Calculate totals
+    $(document).on('keyup change','.price,.commission,.qty,#discount',function(){
+        calculate();
+    });
 
-            function calculate() {
-                var total_amount = 0;
-                $('.product_edition_id').each(function(index, value) {
-                    var product_edition_id = $(this).val();
-                    var rate = +$('#rate_' + product_edition_id).val();
-                    var qty = +$('#qty_' + product_edition_id).val();
-                    $('#amount_' + product_edition_id).val(rate * qty)
-                    total_amount += rate * qty;
-                });
-                $('#total_amount').val(total_amount);
-                var discount = +$('#discount').val();
-                $('#net_amount').val(total_amount - discount);
-            }
+    function calculate(){
+        let total = 0;
+
+        $('.product_id').each(function(){
+            let id = $(this).val();
+            let price = +$('#price_'+id).val();
+            let commission = +$('#commission_'+id).val();
+            let qty = +$('#qty_'+id).val();
+
+            let rate = Math.round(price - (price*(commission/100)));
+            $('#rate_'+id).val(rate);
+
+            let amount = rate*qty;
+            $('#amount_'+id).val(amount);
+
+            total += amount;
         });
-    </script>
+
+        $('#total_amount').val(total);
+        let discount = +$('#discount').val();
+        $('#net_amount').val(total-discount);
+    }
+
+});
+</script>
 @endpush
