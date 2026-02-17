@@ -112,11 +112,9 @@ class InvestorPaymentController extends Controller
         if (in_array($request->payment_type, ['Payment', 'Advance'])) {
             $request->validate(['coa_id' => 'required']);
         }
-
-        if (in_array($request->payment_type, ['Payment', 'Adjust'])) {
-            $request->validate(['distribution_list_id' => 'required']);
-        }
-
+        // if (in_array($request->payment_type, ['Payment', 'Adjust'])) {
+        //     $request->validate(['distribution_list_id' => 'required']);
+        // }
         try {
             DB::transaction(function () use ($request) {
                 $data = $this->model::create([
@@ -184,6 +182,7 @@ class InvestorPaymentController extends Controller
                 }
             });
         } catch (\Exception $e) {
+            dd($e);
             return back()->withErrors($e->getMessage());
         }
 

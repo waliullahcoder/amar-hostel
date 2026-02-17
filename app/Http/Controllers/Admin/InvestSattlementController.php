@@ -102,7 +102,6 @@ class InvestSattlementController extends Controller
             'investor_id' => 'required',
             'invest_id' => 'required'
         ]);
-
         try {
             DB::transaction(function () use ($request) {
                 $investQty = 0;
@@ -165,7 +164,7 @@ class InvestSattlementController extends Controller
                             'voucher_no' => $data->sattlement_no,
                             'voucher_type' => "Invest Sattlement",
                             'date' => date('Y-m-d', strtotime($request->date)),
-                            'coa_id' => $coa->id,
+                            'coa_id' => $coa->id??0,
                             'coa_head_code' => $headCode[$i],
                             'narration' => 'Invest Sattlement against payment no - ' . $data->sattlement_no,
                             'debit_amount' => $debit_amount[$i],
@@ -179,6 +178,7 @@ class InvestSattlementController extends Controller
                 }
             });
         } catch (\Exception $e) {
+            dd($e);
             return back()->withErrors($e->getMessage());
         }
 

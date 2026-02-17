@@ -96,7 +96,7 @@ class ProfitDistributionController extends Controller
 
                 $invests = Invest::with(['investor', 'product'])->where('product_id', $request->product_id)->where('date', '<=', $endDate)->where('sattled', false)->get();
                 $product = Room::findOrFail($request->product_id);
-                $profitAmount = round($sales->sum('sumQty') * 0.9) * $product->profit;
+                $profitAmount = round($sales->sum('qty') * 0.9) * $product->profit;
 
                 $productionQty = ProductionList::whereHas('production', function ($query) use ($endDate) {
                         $query->where('date', '<=', $endDate);
@@ -106,15 +106,14 @@ class ProfitDistributionController extends Controller
                     'invests' => $invests,
                     'product' => $product,
                     'production_qty' => $productionQty,
-                    'sales_qty' => round($sales->sum('sumQty') * 0.9),
-                    'sales_amount' => round($sales->sum('sumAmount') * 0.9),
+                    'sales_qty' => round($sales->sum('qty')),
+                    'sales_amount' => round($sales->sum('net_amount')),
                     'invest_qty' => $invests->sum('qty'),
                     'invest_amount' => $invests->sum('amount'),
                     'profit_amount' => $profitAmount,
                     'startDate' => $startDate,
                     'endDate' => $endDate
                 ];
-
                 return response()->json([
                     'status' => 'success',
                     'data' => view('admin.profit-distribution.partial.data', ['detailData' => $detailData])->render()
