@@ -29,17 +29,17 @@
                 @endforeach
             </select>
         </div>
-        <div class="col-md-4 col-sm-6">
+        {{-- <div class="col-md-4 col-sm-6">
             <label for="product_edition_id" class="form-label"><b>Editions</b></label>
             <select id="product_edition_id" class="select form-select" data-placeholder="Select Room Editions">
                 <option value=""></option>
             </select>
-        </div>
-        <div class="col-md-2 col-6">
+        </div> --}}
+        <div class="col-md-4 col-6">
             <label for="quantity" class="form-label"><b>Quantity</b></label>
             <input type="number" class="form-control" id="quantity" step="any" value="1" placeholder="Quantity">
         </div>
-        <div class="col-md-2 col-6">
+        <div class="col-md-4 col-6">
             <label class="form-label text-white"><b>Add Item</b></label>
             <button type="button" class="btn btn-xs btn-primary w-100 py-2" id="add_item">Add Product</button>
         </div>
@@ -77,128 +77,114 @@
 
 @push('js')
     <script type="text/javascript">
-        $(document).ready(function() {
-            $(document).on('click', '#add_item', function() {
-                var product_id = $('#product_id option:selected').val();
-                var product = $('#product_id option:selected').text();
-                var product_edition_id = $('#product_edition_id option:selected').val();
-                var edition = $('#product_edition_id option:selected').text();
-                var qty = +$('#quantity').val();
-                var sl = $('#tbody tr').length + 1;
-                if (product_id == '') {
-                    Swal.fire({
-                        width: "22rem",
-                        toast: true,
-                        position: 'top-right',
-                        text: "Please select a book!",
-                        icon: "error",
-                        showConfirmButton: false,
-                        timer: 1500,
-                        showClass: {
-                            popup: `animate__animated animate__bounceInRight animate__faster`
-                        },
-                        hideClass: {
-                            popup: `animate__animated animate__bounceOutRight animate__faster`
-                        }
-                    });
-                    return false;
-                }
-                if (product_edition_id == '') {
-                    Swal.fire({
-                        width: "22rem",
-                        toast: true,
-                        position: 'top-right',
-                        text: "Please select a book edition!",
-                        icon: "error",
-                        showConfirmButton: false,
-                        timer: 1500,
-                        showClass: {
-                            popup: `animate__animated animate__bounceInRight animate__faster`
-                        },
-                        hideClass: {
-                            popup: `animate__animated animate__bounceOutRight animate__faster`
-                        }
-                    });
-                    return false;
-                }
-                if ($('#edition_' + product_edition_id).length) {
-                    Swal.fire({
-                        width: "22rem",
-                        toast: true,
-                        position: 'top-right',
-                        text: "Room Edition already added!",
-                        icon: "error",
-                        showConfirmButton: false,
-                        timer: 1500,
-                        showClass: {
-                            popup: `animate__animated animate__bounceInRight animate__faster`
-                        },
-                        hideClass: {
-                            popup: `animate__animated animate__bounceOutRight animate__faster`
-                        }
-                    });
-                    return false;
-                }
-                var tr =
-                    `<tr id="edition_${product_edition_id}">
-                        <td class="text-center" style="padding: 0.25rem 0.25rem;">${sl}</td>
-                        <td class="text-nowrap" style="padding: 2px 0.25rem;">${product}</td>
-                        <td class="text-nowrap" style="padding: 2px 0.25rem;">${edition}</td>
-                        <td style="padding: 2px 0.25rem;">
-                            <input type="number" class="form-control input-sm text-end qty" min="1" step="1" id="qty_${product_edition_id}" name="qty[${product_edition_id}]" value="${qty}" placeholder="0.00" required>
-                        </td>
-                        <td style="padding: 2px 0.25rem;" class="text-center">
-                            <input type="hidden" class="product_edition_id" name="product_edition_id[]" value="${product_edition_id}">
-                            <input type="hidden" name="product_id[${product_edition_id}]" value="${product_id}">
-                            <button type="button" class="btn btn-sm btn-danger remove"><i class="far fa-times"></i></button>
-                        </td>
-                    </tr>`;
-                $('#tbody').append(tr);
-                calculate();
-            });
+    $(document).ready(function() {
 
-            $(document).on('change', '#product_id', function() {
-                var product_id = $(this).val();
-                $('#product_edition_id option').remove();
-                $('#product_edition_id').append(`<option value=""></option>`);
-                if (product_id) {
-                    $.ajax({
-                        url: '{{ request()->fullUrl() }}',
-                        type: 'POST',
-                        data: {
-                            _method: 'GET',
-                            product_id: product_id,
-                        },
-                        success: function(response) {
-                            if (response.status == 'success') {
-                                $.each(response.editions, function(key, value) {
-                                    $('#product_edition_id').append(
-                                        `<option value="${value.id}">${value.name}</option>`
-                                    );
-                                });
-                            }
-                        }
-                    });
-                }
-            });
+        $(document).on('click', '#add_item', function() {
 
-            $(document).on('wheel keyup change', '.qty', function() {
-                calculate();
-            });
+            var product_id = $('#product_id option:selected').val();
+            var product = $('#product_id option:selected').text();
+            var qty = +$('#quantity').val();
+            var sl = $('#tbody tr').length + 1;
 
-            $(document).on('click', '.remove', function() {
-                $(this).closest('tr').remove();
-                calculate();
-            });
-
-            function calculate() {
-                var totalQty = 0;
-                $('.product_edition_id').each(function(index, value) {
-                    var product_edition_id = $(this).val();
-                    totalQty += +$('#qty_' + product_edition_id).val();
+            if (product_id == '') {
+                Swal.fire({
+                    width: "22rem",
+                    toast: true,
+                    position: 'top-right',
+                    text: "Please select a room!",
+                    icon: "error",
+                    showConfirmButton: false,
+                    timer: 1500
                 });
-                $('#totalQty').val(totalQty);
+                return false;
             }
+
+            if (qty <= 0) {
+                Swal.fire({
+                    width: "22rem",
+                    toast: true,
+                    position: 'top-right',
+                    text: "Quantity must be greater than 0!",
+                    icon: "error",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                return false;
+            }
+
+            // same room already added check
+            if ($('#product_' + product_id).length) {
+                Swal.fire({
+                    width: "22rem",
+                    toast: true,
+                    position: 'top-right',
+                    text: "Room already added!",
+                    icon: "error",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                return false;
+            }
+
+            var tr =
+                `<tr id="product_${product_id}">
+                    <td class="text-center">${sl}</td>
+                    <td class="text-nowrap">${product}</td>
+                    <td>
+                        <input type="number" 
+                               class="form-control text-end qty" 
+                               min="1" 
+                               step="1" 
+                               id="qty_${product_id}" 
+                               name="qty[${product_id}]" 
+                               value="${qty}" 
+                               required>
+                    </td>
+                    <td class="text-center">
+                        <input type="hidden" name="product_id[]" value="${product_id}">
+                        <button type="button" class="btn btn-sm btn-danger remove">
+                            <i class="far fa-times"></i>
+                        </button>
+                    </td>
+                </tr>`;
+
+            $('#tbody').append(tr);
+
+            $('#quantity').val(1);
+            calculate();
         });
-    </script>
+
+
+        $(document).on('keyup change wheel', '.qty', function() {
+            calculate();
+        });
+
+
+        $(document).on('click', '.remove', function() {
+            $(this).closest('tr').remove();
+            reSerial();
+            calculate();
+        });
+
+
+        function calculate() {
+            var totalQty = 0;
+
+            $('.qty').each(function() {
+                totalQty += +$(this).val();
+            });
+
+            $('#totalQty').val(totalQty);
+        }
+
+
+        function reSerial() {
+            $('#tbody tr').each(function(index) {
+                $(this).find('td:first').text(index + 1);
+            });
+        }
+
+    });
+</script>
+
 @endpush

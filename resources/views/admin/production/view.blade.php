@@ -44,7 +44,6 @@
                     <tr>
                         <th class="text-center" width="20">SL#</th>
                         <th>Room Name</th>
-                        <th>Edition</th>
                         <th class="text-end">Quantity</th>
                     </tr>
                 </thead>
@@ -53,7 +52,6 @@
                         <tr>
                             <td class="text-center">{{ $loop->iteration }}</td>
                             <td class="text-nowrap">{{ $row->product->name ?? '' }}</td>
-                            <td class="text-nowrap">{{ $row->edition->name ?? '' }}</td>
                             <td class="text-end">{{ $row->qty }} </td>
                         </tr>
                     @endforeach

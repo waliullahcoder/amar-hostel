@@ -1,226 +1,188 @@
 @extends('layouts.admin.edit_app')
 
 @section('content')
-    <div class="row g-3">
-        <div class="col-md-4 col-sm-6">
-            <label for="production" class="form-label"><b>Production No. <span class="text-danger">*</span></b></label>
-            <input type="text" class="form-control" id="production" name="production" value="{{ $data->production_no }}"
-                readonly placeholder="Production No." required>
-        </div>
-        <div class="col-md-4 col-sm-6">
-            <label for="date" class="form-label"><b>Date <span class="text-danger">*</span></b></label>
-            <input type="text" class="form-control date_picker" id="date" name="date"
-                value="{{ date('d-m-Y', strtotime(old('date', $data->date))) }}" placeholder="Date" required>
-        </div>
-        <div class="col-md-4 col-sm-6">
-            <label for="store_id" class="form-label"><b>Store</b></label>
-            <select id="store_id" name="store_id" class="select form-select" data-placeholder="Select Store">
-                @foreach ($additionalData['stores'] as $item)
-                    <option value="{{ $item->id }}">{{ $item->name }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-md-4 col-sm-6">
-            <label for="product_id" class="form-label"><b>Rooms</b></label>
-            <select id="product_id" class="select form-select" data-placeholder="Select Room">
-                <option value=""></option>
-                @foreach ($additionalData['products'] as $item)
-                    <option value="{{ $item->id }}">{{ $item->name }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="col-md-4 col-sm-6">
-            <label for="product_edition_id" class="form-label"><b>Editions</b></label>
-            <select id="product_edition_id" class="select form-select" data-placeholder="Select Room Editions">
-                <option value=""></option>
-            </select>
-        </div>
-        <div class="col-md-2 col-6">
-            <label for="quantity" class="form-label"><b>Quantity</b></label>
-            <input type="number" class="form-control" id="quantity" step="any" value="1" placeholder="Quantity">
-        </div>
-        <div class="col-md-2 col-6">
-            <label class="form-label text-white"><b>Add Item</b></label>
-            <button type="button" class="btn btn-xs btn-primary w-100 py-2" id="add_item">Add Product</button>
-        </div>
-        <div class="col-12">
-            <div class="table-responsive">
-                <table class="table table-striped align-middle mb-0">
-                    <thead class="bg-primary border-primary text-white text-nowrap">
-                        <tr>
-                            <th class="px-2 text-center" width="30">SL#</th>
-                            <th class="px-1">Room Name</th>
-                            <th class="px-1">Edition</th>
-                            <th class="px-1 text-end" width="250">Quantity</th>
-                            <th class="px-1 text-center" width="40"><i class="far fa-times"></i></th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody">
-                        @foreach ($data->list as $item)
-                            <tr id="edition_{{ $item->product_edition_id }}">
-                                <td class="text-center" style="padding: 0.25rem 0.25rem;">{{ $loop->iteration }}</td>
-                                <td class="text-nowrap" style="padding: 2px 0.25rem;">{{ $item->product->name }}</td>
-                                <td class="text-nowrap" style="padding: 2px 0.25rem;">{{ $item->edition->name }}</td>
-                                <td style="padding: 2px 0.25rem;">
-                                    <input type="number" class="form-control input-sm text-end qty" min="1"
-                                        step="1" id="qty_{{ $item->product_edition_id }}"
-                                        name="qty[{{ $item->product_edition_id }}]" value="{{ $item->qty }}"
-                                        placeholder="0.00" required>
-                                </td>
-                                <td style="padding: 2px 0.25rem;" class="text-center">
-                                    <input type="hidden" class="product_edition_id" name="product_edition_id[]"
-                                        value="{{ $item->product_edition_id }}">
-                                    <input type="hidden" name="product_id[{{ $item->product_edition_id }}]"
-                                        value="{{ $item->product_id }}">
-                                    <button type="button" class="btn btn-sm btn-danger remove"><i
-                                            class="far fa-times"></i></button>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td class="text-end" style="padding: 0.25rem 0.25rem;" colspan="3">
-                                <b style="width: 100px;">Total Qty</b>
+<div class="row g-3">
+
+    <div class="col-md-4 col-sm-6">
+        <label class="form-label"><b>Production No.</b></label>
+        <input type="text" class="form-control" value="{{ $data->production_no }}" readonly>
+    </div>
+
+    <div class="col-md-4 col-sm-6">
+        <label class="form-label"><b>Date</b></label>
+        <input type="text" class="form-control date_picker"
+               name="date"
+               value="{{ date('d-m-Y', strtotime(old('date', $data->date))) }}"
+               required>
+    </div>
+
+    <div class="col-md-4 col-sm-6">
+        <label class="form-label"><b>Store</b></label>
+        <select name="store_id" class="form-select" required>
+            @foreach ($additionalData['stores'] as $item)
+                <option value="{{ $item->id }}"
+                    {{ $data->store_id == $item->id ? 'selected' : '' }}>
+                    {{ $item->name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+
+    <div class="col-md-4 col-sm-6">
+        <label class="form-label"><b>Rooms</b></label>
+        <select id="product_id" class="form-select">
+            <option value="">Select Room</option>
+            @foreach ($additionalData['products'] as $item)
+                <option value="{{ $item->id }}">{{ $item->name }}</option>
+            @endforeach
+        </select>
+    </div>
+
+    <div class="col-md-2 col-6">
+        <label class="form-label"><b>Quantity</b></label>
+        <input type="number" id="quantity" class="form-control" value="1" min="1">
+    </div>
+
+    <div class="col-md-2 col-6">
+        <label class="form-label text-white">Add</label>
+        <button type="button" class="btn btn-primary w-100" id="add_item">
+            Add Room
+        </button>
+    </div>
+
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="bg-primary text-white">
+                    <tr>
+                        <th width="40">SL</th>
+                        <th>Room</th>
+                        <th width="200">Quantity</th>
+                        <th width="50"></th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+
+                    @foreach ($data->list as $item)
+                        <tr id="product_{{ $item->product_id }}">
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $item->product->name }}</td>
+                            <td>
+                                <input type="number"
+                                       class="form-control qty"
+                                       min="1"
+                                       id="qty_{{ $item->product_id }}"
+                                       name="qty[{{ $item->product_id }}]"
+                                       value="{{ $item->qty }}">
                             </td>
-                            <td style="padding: 2px 0.25rem;" colspan="1">
-                                <input type="number" id="totalQty" name="total_qty" readonly
-                                    class="form-control input-sm text-end" placeholder="Total Qty"
-                                    value="{{ $data->total_qty }}">
+                            <td class="text-center">
+                                <input type="hidden"
+                                       name="product_id[]"
+                                       value="{{ $item->product_id }}">
+                                <button type="button"
+                                        class="btn btn-sm btn-danger remove">
+                                    <i class="far fa-times"></i>
+                                </button>
                             </td>
-                            <td style="padding: 2px 0.25rem;"></td>
                         </tr>
-                    </tfoot>
-                </table>
-            </div>
+                    @endforeach
+
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <td colspan="2" class="text-end"><b>Total Qty</b></td>
+                        <td>
+                            <input type="number"
+                                   id="totalQty"
+                                   name="total_qty"
+                                   class="form-control text-end"
+                                   value="{{ $data->total_qty }}"
+                                   readonly>
+                        </td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+
+            </table>
         </div>
     </div>
+
+</div>
 @endsection
-
 @push('js')
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $(document).on('click', '#add_item', function() {
-                var product_id = $('#product_id option:selected').val();
-                var product = $('#product_id option:selected').text();
-                var product_edition_id = $('#product_edition_id option:selected').val();
-                var edition = $('#product_edition_id option:selected').text();
-                var qty = +$('#quantity').val();
-                var sl = $('#tbody tr').length + 1;
-                if (product_id == '') {
-                    Swal.fire({
-                        width: "22rem",
-                        toast: true,
-                        position: 'top-right',
-                        text: "Please select a book!",
-                        icon: "error",
-                        showConfirmButton: false,
-                        timer: 1500,
-                        showClass: {
-                            popup: `animate__animated animate__bounceInRight animate__faster`
-                        },
-                        hideClass: {
-                            popup: `animate__animated animate__bounceOutRight animate__faster`
-                        }
-                    });
-                    return false;
-                }
-                if (product_edition_id == '') {
-                    Swal.fire({
-                        width: "22rem",
-                        toast: true,
-                        position: 'top-right',
-                        text: "Please select a book edition!",
-                        icon: "error",
-                        showConfirmButton: false,
-                        timer: 1500,
-                        showClass: {
-                            popup: `animate__animated animate__bounceInRight animate__faster`
-                        },
-                        hideClass: {
-                            popup: `animate__animated animate__bounceOutRight animate__faster`
-                        }
-                    });
-                    return false;
-                }
-                if ($('#edition_' + product_edition_id).length) {
-                    Swal.fire({
-                        width: "22rem",
-                        toast: true,
-                        position: 'top-right',
-                        text: "Room Edition already added!",
-                        icon: "error",
-                        showConfirmButton: false,
-                        timer: 1500,
-                        showClass: {
-                            popup: `animate__animated animate__bounceInRight animate__faster`
-                        },
-                        hideClass: {
-                            popup: `animate__animated animate__bounceOutRight animate__faster`
-                        }
-                    });
-                    return false;
-                }
-                var tr =
-                    `<tr id="edition_${product_edition_id}">
-                        <td class="text-center" style="padding: 0.25rem 0.25rem;">${sl}</td>
-                        <td class="text-nowrap" style="padding: 2px 0.25rem;">${product}</td>
-                        <td class="text-nowrap" style="padding: 2px 0.25rem;">${edition}</td>
-                        <td style="padding: 2px 0.25rem;">
-                            <input type="number" class="form-control input-sm text-end qty" min="1" step="1" id="qty_${product_edition_id}" name="qty[${product_edition_id}]" value="${qty}" placeholder="0.00" required>
-                        </td>
-                        <td style="padding: 2px 0.25rem;" class="text-center">
-                            <input type="hidden" class="product_edition_id" name="product_edition_id[]" value="${product_edition_id}">
-                            <input type="hidden" name="product_id[${product_edition_id}]" value="${product_id}">
-                            <button type="button" class="btn btn-sm btn-danger remove"><i class="far fa-times"></i></button>
-                        </td>
-                    </tr>`;
-                $('#tbody').append(tr);
-                calculate();
-            });
+<script>
+$(document).ready(function() {
 
-            $(document).on('change', '#product_id', function() {
-                var product_id = $(this).val();
-                $('#product_edition_id option').remove();
-                $('#product_edition_id').append(`<option value=""></option>`);
-                if (product_id) {
-                    $.ajax({
-                        url: '{{ request()->fullUrl() }}',
-                        type: 'POST',
-                        data: {
-                            _method: 'GET',
-                            product_id: product_id,
-                        },
-                        success: function(response) {
-                            if (response.status == 'success') {
-                                $.each(response.editions, function(key, value) {
-                                    $('#product_edition_id').append(
-                                        `<option value="${value.id}">${value.name}</option>`
-                                    );
-                                });
-                            }
-                        }
-                    });
-                }
-            });
+    calculate();
 
-            $(document).on('wheel keyup change', '.qty', function() {
-                calculate();
-            });
+    $('#add_item').click(function() {
 
-            $(document).on('click', '.remove', function() {
-                $(this).closest('tr').remove();
-                calculate();
-            });
+        var product_id = $('#product_id').val();
+        var product = $('#product_id option:selected').text();
+        var qty = +$('#quantity').val();
+        var sl = $('#tbody tr').length + 1;
 
-            function calculate() {
-                var totalQty = 0;
-                $('.product_edition_id').each(function(index, value) {
-                    var product_edition_id = $(this).val();
-                    totalQty += +$('#qty_' + product_edition_id).val();
-                });
-                $('#totalQty').val(totalQty);
-            }
+        if(product_id == ''){
+            alert('Please select a room');
+            return;
+        }
+
+        if($('#product_' + product_id).length){
+            alert('Room already added');
+            return;
+        }
+
+        var tr = `
+        <tr id="product_${product_id}">
+            <td>${sl}</td>
+            <td>${product}</td>
+            <td>
+                <input type="number"
+                       class="form-control qty"
+                       min="1"
+                       id="qty_${product_id}"
+                       name="qty[${product_id}]"
+                       value="${qty}">
+            </td>
+            <td class="text-center">
+                <input type="hidden" name="product_id[]" value="${product_id}">
+                <button type="button" class="btn btn-sm btn-danger remove">
+                    <i class="far fa-times"></i>
+                </button>
+            </td>
+        </tr>`;
+
+        $('#tbody').append(tr);
+        $('#quantity').val(1);
+        calculate();
+    });
+
+    $(document).on('keyup change', '.qty', function(){
+        calculate();
+    });
+
+    $(document).on('click', '.remove', function(){
+        $(this).closest('tr').remove();
+        reSerial();
+        calculate();
+    });
+
+    function calculate(){
+        var total = 0;
+        $('.qty').each(function(){
+            total += +$(this).val();
         });
-    </script>
+        $('#totalQty').val(total);
+    }
+
+    function reSerial(){
+        $('#tbody tr').each(function(index){
+            $(this).find('td:first').text(index+1);
+        });
+    }
+
+});
+</script>
 @endpush
+
