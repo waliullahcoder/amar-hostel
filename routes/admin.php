@@ -35,6 +35,7 @@ use App\Http\Controllers\Admin\{
     SalesController,
     CollectionController,
     SalesReturnController,
+    InvestorPaymentController,
     
 
 };
@@ -133,6 +134,9 @@ Route::group(['middleware' => ['admin']], function () {
 
     // Invest
     Route::resource('/invest', InvestController::class);
+
+     // Investor Payment
+    Route::resource('/investor-payment', InvestorPaymentController::class);
 
     // Invest Renew
     Route::resource('/invest-renew', InvestRenewController::class);
