@@ -70,119 +70,160 @@ class ProfitDistributionController extends Controller
      * Show the form for creating a new resource.
      */
     public function create(Request $request)
-    {
-        if ($request->ajax()) {
-            $detailData = [];
-            $checkData = $this->model::where('year', $request->year)->where('month', $request->month)->where('product_id', $request->product_id)->first();
-            if (is_null($checkData)) {
-                $startDate = date("Y-m-01", strtotime("$request->year-$request->month-01"));
-                $endDate = date("Y-m-t", strtotime("$request->year-$request->month-01"));
-                $sales = SalesList::with(['product.invests' => function ($q) {
-                        $q->where('sattled', false);
-                    }])
-                    ->whereHas('product', function ($query) use ($endDate) {
-                        $query->whereHas('invests', function ($subQuery) use ($endDate) {
-                            $subQuery->where('date', '<=', $endDate)->where('sattled', false);
-                        });
-                    })
-                    ->whereHas('sales', function ($query) use ($endDate) {
-                        $query->where('date', '<=', $endDate);
-                    })
-                    ->where('product_id', $request->product_id)
-                    ->where('distributed', false)
-                    ->select('product_id', DB::raw('SUM(qty - return_qty) as sumQty'), DB::raw('SUM(net_amount - return_amount) as sumAmount'))
-                    ->groupBy('product_id')
-                    ->get();
+{
+    if ($request->ajax() && $request->product_id) {
 
-                $invests = Invest::with(['investor', 'product'])->where('product_id', $request->product_id)->where('date', '<=', $endDate)->where('sattled', false)->get();
-                $product = Room::findOrFail($request->product_id);
-                $profitAmount = round($sales->sum('qty') * 0.9) * $product->profit;
+        $startDate = date("Y-m-01", strtotime("$request->year-$request->month-01"));
+        $endDate   = date("Y-m-t", strtotime("$request->year-$request->month-01"));
 
-                $productionQty = ProductionList::whereHas('production', function ($query) use ($endDate) {
-                        $query->where('date', '<=', $endDate);
-                    })->where('product_id', $request->product_id)->sum('qty');
+        // SALES DATA
+        $salesQty = SalesList::where('product_id', $request->product_id)
+            ->where('distributed', false)
+            ->whereHas('sales', function ($q) use ($endDate) {
+                $q->where('date', '<=', $endDate);
+            })
+            ->sum(DB::raw('qty - return_qty'));
 
-                $detailData = [
-                    'invests' => $invests,
-                    'product' => $product,
-                    'production_qty' => $productionQty,
-                    'sales_qty' => round($sales->sum('qty')),
-                    'sales_amount' => round($sales->sum('net_amount')),
-                    'invest_qty' => $invests->sum('qty'),
-                    'invest_amount' => $invests->sum('amount'),
-                    'profit_amount' => $profitAmount,
-                    'startDate' => $startDate,
-                    'endDate' => $endDate
-                ];
-                return response()->json([
-                    'status' => 'success',
-                    'data' => view('admin.profit-distribution.partial.data', ['detailData' => $detailData])->render()
-                ]);
-            }
+        $salesQty = round($salesQty * 0.9);
+
+        $salesAmount = SalesList::where('product_id', $request->product_id)
+            ->where('distributed', false)
+            ->whereHas('sales', function ($q) use ($endDate) {
+                $q->where('date', '<=', $endDate);
+            })
+            ->sum(DB::raw('net_amount - return_amount'));
+
+        // INVEST DATA
+        $invests = Invest::with(['investor', 'product'])
+            ->where('product_id', $request->product_id)
+            ->where('date', '<=', $endDate)
+            ->where('sattled', false)
+            ->get();
+
+        $product = Room::findOrFail($request->product_id);
+
+        $totalInvestQty    = $invests->sum('qty');
+        $totalInvestAmount = $invests->sum('amount');
+
+        $totalProfit = $salesQty * $product->profit;
+
+        $perShareProfit = 0;
+        if ($product->required_share > 0) {
+            $perShareProfit = round($totalProfit / $product->required_share);
         }
 
-        $title = $this->create_title;
-        $serial_no = $this->serialNo();
-        $detailData = [];
-        $checkData = $this->model::where('year', date('Y'))->where('month', date('F'))->first();
-        return view("admin.{$this->path}.create", compact('title', 'serial_no', 'detailData'));
+        // Production Qty
+        $productionQty = ProductionList::where('product_id', $request->product_id)
+            ->whereHas('production', function ($q) use ($endDate) {
+                $q->where('date', '<=', $endDate);
+            })
+            ->sum('qty');
+
+        $detailData = [
+            'invests' => $invests,
+            'product' => $product,
+            'production_qty' => $productionQty,
+            'sales_qty' => $salesQty,
+            'sales_amount' => round($salesAmount),
+            'invest_qty' => $totalInvestQty,
+            'invest_amount' => $totalInvestAmount,
+            'profit_amount' => $totalProfit,
+            'per_share_profit' => $perShareProfit,
+            'startDate' => $startDate,
+            'endDate' => $endDate
+        ];
+
+        return response()->json([
+            'status' => 'success',
+            'data' => view('admin.profit-distribution.partial.data', compact('detailData'))->render()
+        ]);
     }
+
+    $title = "Profit Distribution Create";
+    $serial_no = rand(1000, 9999);
+    $detailData = [];
+
+    return view("admin.profit-distribution.create", compact('title', 'serial_no', 'detailData'));
+}
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'year' => 'required',
-            'month' => 'required',
-            'date' => 'required',
-            'invest_id' => 'required'
+{
+    dd($request->all());
+    $request->validate([
+        'year' => 'required',
+        'month' => 'required',
+        'date' => 'required',
+        'product_id' => 'required',
+        'invest_id' => 'required|array'
+    ]);
+
+    DB::beginTransaction();
+
+    try {
+
+        $product = Room::findOrFail($request->product_id);
+
+        $distribution = $this->model::create([
+            'serial_no' => $this->serialNo(),
+            'year' => $request->year,
+            'month' => $request->month,
+            'date' => date('Y-m-d', strtotime($request->date)),
+            'product_id' => $request->product_id,
+            'invest_qty' => $request->invest_qty,
+            'invest_amount' => $request->invest_amount,
+            'profit_amount' => $request->profit_amount,
+            'production_qty' => $request->production_qty,
+            'sales_qty' => $request->sales_qty,
+            'sales_amount' => $request->sales_amount,
+            'created_by' => auth()->id(),
         ]);
-        
-        try {
-            DB::transaction(function () use ($request) {
-                $data = $this->model::create([
-                    'serial_no' => $this->serialNo(),
-                    'year'      => $request->year,
-                    'month'     => $request->month,
-                    'date'      => date('Y-m-d', strtotime($request->date)),
-                    'product_id'    => $request->product_id,
-                    'invest_qty'    => $request->invest_qty,
-                    'invest_amount' => $request->invest_amount,
-                    'profit_amount' => $request->profit_amount,
-                    'production_qty' => $request->production_qty, 
-                    'sales_qty'     => $request->sales_qty,
-                    'sales_amount'  => $request->sales_amount,
-                    'created_by'    => Auth::id(),
-                ]);
 
-                $startDate = date("Y-m-01", strtotime("$request->year-$request->month-01"));
-                $endDate = date("Y-m-t", strtotime("$request->year-$request->month-01"));
-                $totalInvestQty = Invest::with(['investor', 'product'])->where('date', '<=', $endDate)->where('product_id', $request->product_id)->where('sattled', false)->sum('qty');
-                foreach ($request->invest_id as $invest_id) {
-                    $invest = Invest::find($invest_id);
-                    $perShareProfit = round($request->profit_amount / $totalInvestQty);
-
-                    ProfitDistributionList::create([
-                        'profit_distribution_id' => $data->id,
-                        'invest_id'     => $invest_id,
-                        'investor_id'   => $invest->investor_id,
-                        'product_id'    => $invest->product_id,
-                        'profit_per_sale' => $invest->product->profit,
-                        'sales_qty'     => $request->sales_qty,
-                        'invest_qty'    => $invest->qty,
-                        'invest_amount' => $invest->amount,
-                        'amount'        => $perShareProfit * $invest->qty
-                    ]);
-                }
-            });
-        } catch (\Exception $e) {
-            return back()->withErrors($e->getMessage());
+        $perShareProfit = 0;
+        if ($product->required_share > 0) {
+            $perShareProfit = round($request->profit_amount / $product->required_share);
         }
 
-        return redirect()->route("admin.{$this->path}.index")->withSuccessMessage('Created Successfully!');
+        foreach ($request->invest_id as $invest_id) {
+
+            $invest = Invest::findOrFail($invest_id);
+
+            ProfitDistributionList::create([
+                'profit_distribution_id' => $distribution->id,
+                'invest_id' => $invest_id,
+                'investor_id' => $invest->investor_id,
+                'product_id' => $invest->product_id,
+                'profit_per_sale' => $product->profit,
+                'sales_qty' => $request->sales_qty,
+                'invest_qty' => $invest->qty,
+                'invest_amount' => $invest->amount,
+                'amount' => $perShareProfit * $invest->qty
+            ]);
+        }
+
+        // Mark settled
+        Invest::whereIn('id', $request->invest_id)
+            ->update(['sattled' => true]);
+
+        SalesList::where('product_id', $request->product_id)
+            ->where('distributed', false)
+            ->update(['distributed' => true]);
+
+        DB::commit();
+
+    } catch (\Exception $e) {
+        dd($e->getMessage());
+        DB::rollback();
+        return back()->withErrors($e->getMessage());
     }
+
+    return redirect()
+        ->route("admin.{$this->path}.index")
+        ->withSuccessMessage('Profit Distributed Successfully!');
+}
+
 
     /**
      * Display the specified resource.

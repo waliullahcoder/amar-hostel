@@ -78,7 +78,7 @@
                                 }
                             @endphp
                             <li class="list-group-item {{ $bg }} text-center">
-                                <i class="fas fa-book"></i>
+                                <i class="fas fa-bed"></i>
                                 <b>{{ $item['product']->name ?? '' }}</b>
                             </li>
                             <li class="list-group-item d-flex bg-light" title="Room Published Qty">

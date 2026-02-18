@@ -60,28 +60,29 @@
 
 @push('js')
     <script type="text/javascript">
-        $(document).ready(function() {
-            $(document).on('change', '#year,#month,#product_id', function(e) {
-                $('#response').html('');
-                var year = $('#year').val();
-                var month = $('#month').val();
-                var product_id = $('#product_id').val();
-                $.ajax({
-                    url: '{{ request()->fullUrl() }}',
-                    type: 'POST',
-                    data: {
-                        _method: 'GET',
-                        year: year,
-                        month: month,
-                        product_id: product_id
-                    },
-                    success: function(response) {
-                        if (response.status == 'success') {
-                            $('#response').html(response.data);
-                        }
-                    }
-                });
-            });
+      $(document).on('change', '#year,#month,#product_id', function () {
+
+    let year = $('#year').val();
+    let month = $('#month').val();
+    let product_id = $('#product_id').val();
+
+    if(product_id != '') {
+        $.ajax({
+            url: "{{ route('admin.profit-distribution.create') }}",
+            type: "GET",
+            data: {
+                year: year,
+                month: month,
+                product_id: product_id
+            },
+            success: function (response) {
+                if (response.status === 'success') {
+                    $('#response').html(response.data);
+                }
+            }
         });
+    }
+});
+
     </script>
 @endpush
