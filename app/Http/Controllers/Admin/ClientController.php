@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Coa;
+use App\Models\CoaSetup;
 use App\HelperClass;
 use App\Models\Area;
 use App\Models\Client;
@@ -73,16 +73,16 @@ class ClientController extends Controller
 
         try {
             DB::transaction(function () use ($request) {
-                $parent = Coa::findOrFail(7);
+                $parent = CoaSetup::findOrFail(7);
                 $prefix = $parent->head_code;
-                $maxCode = Coa::withTrashed()->where('parent_id', $parent->id)->max('head_code');
+                $maxCode = CoaSetup::withTrashed()->where('parent_id', $parent->id)->max('head_code');
                 if ($maxCode) {
                     $next = str_pad((int) substr($maxCode, strlen($prefix)) + 1, 2, '0', STR_PAD_LEFT);
                     $headCode = $prefix . $next;
                 } else {
                     $headCode = $prefix . '01';
                 }
-                $account = Coa::create([
+                $account = CoaSetup::create([
                     'parent_id'   => $parent->id,
                     'head_code'   => $headCode,
                     'head_name'   => $request->name,
@@ -163,7 +163,7 @@ class ClientController extends Controller
             DB::transaction(function () use ($request, $id) {
                 $data = $this->model::findOrFail($id);
 
-                $account = Coa::find($data->coa_id);
+                $account = CoaSetup::find($data->coa_id);
                 if ($account) {
                     $account->update([
                         'head_name' => $request->name,
@@ -171,16 +171,16 @@ class ClientController extends Controller
                         'updated_by' => Auth::id()
                     ]);
                 } else {
-                    $parent = Coa::findOrFail(7);
+                    $parent = CoaSetup::findOrFail(7);
                     $prefix = $parent->head_code;
-                    $maxCode = Coa::withTrashed()->where('parent_id', $parent->id)->max('head_code');
+                    $maxCode = CoaSetup::withTrashed()->where('parent_id', $parent->id)->max('head_code');
                     if ($maxCode) {
                         $next = str_pad((int) substr($maxCode, strlen($prefix)) + 1, 2, '0', STR_PAD_LEFT);
                         $headCode = $prefix . $next;
                     } else {
                         $headCode = $prefix . '01';
                     }
-                    $account = Coa::create([
+                    $account = CoaSetup::create([
                         'parent_id'   => $parent->id,
                         'head_code'   => $headCode,
                         'head_name'   => $request->name,
@@ -226,7 +226,7 @@ class ClientController extends Controller
             try {
                 DB::transaction(function () use ($id) {
                     $data = $this->model::onlyTrashed()->findOrFail($id);
-                    $coa = Coa::onlyTrashed()->find($data->coa_id);
+                    $coa = CoaSetup::onlyTrashed()->find($data->coa_id);
                     if ($coa) {
                         $coa->restore();
                     }
@@ -246,7 +246,7 @@ class ClientController extends Controller
                     $ids = request()->has('id') ? request('id') : [$id];
                     foreach ((array) $ids as $deleteId) {
                         $data = $this->model::onlyTrashed()->findOrFail($deleteId);
-                        $coa = Coa::onlyTrashed()->find($data->coa_id);
+                        $coa = CoaSetup::onlyTrashed()->find($data->coa_id);
                         if ($coa) {
                             $coa->forceDelete();
                         }
@@ -267,7 +267,7 @@ class ClientController extends Controller
                 foreach ((array) $ids as $deleteId) {
                     $data = $this->model::findOrFail($deleteId);
 
-                    $coa = Coa::find($data->coa_id);
+                    $coa = CoaSetup::find($data->coa_id);
                     if ($coa) {
                         $coa->update(['deleted_by' => Auth::id()]);
                         $coa->delete();

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Coa;
+use App\Models\CoaSetup;
 use App\Models\Invest;
 use App\Models\Investor;
 use Carbon\CarbonPeriod;
@@ -33,15 +33,15 @@ class ReportController extends Controller
         if ($request->ajax() && $request->has('getHeads')) {
             $value = $request->head_type;
             if ($value == 'gl') {
-                $heads = Coa::where('general', 1)->orderBy('head_name', 'asc')->get();
+                $heads = CoaSetup::where('general', 1)->orderBy('head_name', 'asc')->get();
             } else {
-                $heads = Coa::whereNull('parent_id')->orderBy('head_name', 'asc')->get();
+                $heads = CoaSetup::whereNull('parent_id')->orderBy('head_name', 'asc')->get();
             }
             return response()->json(['status' => 'success', 'heads' => $heads]);
         }
 
         if (!is_null($request->print)) {
-            $query = Coa::query();
+            $query = CoaSetup::query();
             $parent_head = $request->parent_head;
             if ($parent_head) {
                 $query->where('head_code', 'LIKE', $parent_head . '%')->where('transaction', 1);
@@ -189,9 +189,9 @@ class ReportController extends Controller
         if ($request->ajax() && $request->has('getHeads')) {
             $value = $request->head_type;
             if ($value == 'gl') {
-                $heads = Coa::where('general', 1)->orderBy('head_name', 'asc')->get();
+                $heads = CoaSetup::where('general', 1)->orderBy('head_name', 'asc')->get();
             } else {
-                $heads = Coa::whereNull('parent_id')->orderBy('head_name', 'asc')->get();
+                $heads = CoaSetup::whereNull('parent_id')->orderBy('head_name', 'asc')->get();
             }
             return response()->json(['status' => 'success', 'heads' => $heads]);
         }
@@ -247,7 +247,7 @@ class ReportController extends Controller
         }
 
         $title = 'Cash Book';
-        $coas = Coa::where('transaction', 1)->where('head_code', 'LIKE', '10102%')->orderBy('head_name', 'asc')->get();
+        $coas = CoaSetup::where('transaction', 1)->where('head_code', 'LIKE', '10102%')->orderBy('head_name', 'asc')->get();
         return view('admin.reports.cash-book.index', compact('title', 'coas', 'start_date', 'end_date', 'previousBalance', 'data'));
     }
 
@@ -273,7 +273,7 @@ class ReportController extends Controller
         }
 
         $title = 'Bank Book';
-        $coas = Coa::where('transaction', 1)->where('head_code', 'LIKE', '10103%')->orderBy('head_name', 'asc')->get();
+        $coas = CoaSetup::where('transaction', 1)->where('head_code', 'LIKE', '10103%')->orderBy('head_name', 'asc')->get();
         return view('admin.reports.bank-book.index', compact('title', 'coas', 'start_date', 'end_date', 'previousBalance', 'data'));
     }
 
@@ -299,7 +299,7 @@ class ReportController extends Controller
         }
 
         $title = 'Transaction Ledger';
-        $coas = Coa::where('transaction', 1)->orderBy('head_name', 'asc')->get();
+        $coas = CoaSetup::where('transaction', 1)->orderBy('head_name', 'asc')->get();
         return view('admin.reports.transaction-ledger.index', compact('title', 'coas', 'start_date', 'end_date', 'previousBalance', 'data'));
     }
 
@@ -329,7 +329,7 @@ class ReportController extends Controller
         }
 
         $title = 'General Ledger';
-        $coas = Coa::where('general', 1)->orderBy('head_name', 'asc')->get();
+        $coas = CoaSetup::where('general', 1)->orderBy('head_name', 'asc')->get();
         return view('admin.reports.general-ledger.index', compact('title', 'coas', 'start_date', 'end_date', 'previousBalance', 'data'));
     }
 
@@ -450,8 +450,8 @@ class ReportController extends Controller
         }
 
         $title = 'Head Transactions';
-        $coa_ids = Coa::where('parent_id', $request->id)->pluck('id')->toArray();
-        $child_coa_ids = Coa::whereIn('parent_id', $coa_ids)->pluck('id')->toArray();
+        $coa_ids = CoaSetup::where('parent_id', $request->id)->pluck('id')->toArray();
+        $child_coa_ids = CoaSetup::whereIn('parent_id', $coa_ids)->pluck('id')->toArray();
         $coa_ids = array_merge($coa_ids, $child_coa_ids);
         $data = AccountTransaction::with('coa')->select('*', DB::raw('SUM(debit_amount) as debit_amount'), DB::raw('SUM(credit_amount) as credit_amount'))
             ->whereIn('coa_id', $coa_ids)
@@ -486,7 +486,7 @@ class ReportController extends Controller
         }
 
         $title = 'Balance Sheet';
-        $coas = Coa::where('general', 1)->orderBy('head_name', 'asc')->get();
+        $coas = CoaSetup::where('general', 1)->orderBy('head_name', 'asc')->get();
         return view('admin.reports.balance-sheet.index', compact('title', 'coas', 'data'));
     }
 
@@ -509,13 +509,13 @@ class ReportController extends Controller
 
     public function assets($parent_head)
     {
-        $parents = Coa::with('parent')->whereHas('parent', function ($query) use ($parent_head) {
+        $parents = CoaSetup::with('parent')->whereHas('parent', function ($query) use ($parent_head) {
             $query->where('head_name', $parent_head);
         })->orderBy('head_name', 'asc')->get();
 
         $info = [];
         foreach ($parents as $parent) {
-            $childs = Coa::select('head_name', 'head_code', 'id')
+            $childs = CoaSetup::select('head_name', 'head_code', 'id')
                 ->where('parent_id', $parent->id)
                 ->get();
             $childInfo = [];

@@ -14,7 +14,7 @@ class Expense extends Model
 
     public function coa()
     {
-        return $this->belongsTo(Coa::class);
+        return $this->belongsTo(CoaSetup::class);
     }
 
     public function items()

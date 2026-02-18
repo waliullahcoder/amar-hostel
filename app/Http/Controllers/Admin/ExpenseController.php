@@ -7,7 +7,7 @@ use App\Models\Expense;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\AccountTransactionAuto;
-use App\Models\Coa;
+use App\Models\CoaSetup;
 use App\Models\ExpenseItem;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -72,11 +72,11 @@ class ExpenseController extends Controller
     {
         $title = $this->create_title;
 
-        $cashHeads = Coa::whereHas('parent', function ($query) {
+        $cashHeads = CoaSetup::whereHas('parent', function ($query) {
             $query->whereIn('head_name', ['Cash In Hand', 'Cash at Bank']);
         })->where('transaction', 1)->orderBy('head_name', 'asc')->get();
 
-        $debitHeads = Coa::where(function ($query) {
+        $debitHeads = CoaSetup::where(function ($query) {
             $query->whereIn('head_type', ['E']);
         })->where('head_code', 'like', '403%')->where('transaction', 1)->orderBy('head_name', 'asc')->get();
 
@@ -106,7 +106,7 @@ class ExpenseController extends Controller
                     'document' => $request->hasFile('document') ? HelperClass::saveImage($request->document, 2000, $this->path) : null,
                 ]);
 
-                $head = Coa::find($request->cash_head);
+                $head = CoaSetup::find($request->cash_head);
                 $postData = [[
                     'voucher_no' => $data->transaction_no,
                     'voucher_type' => "Expense",
@@ -180,11 +180,11 @@ class ExpenseController extends Controller
         $title = $this->edit_title;
         $data = $this->model::findOrFail($id);
 
-        $cashHeads = Coa::whereHas('parent', function ($query) {
+        $cashHeads = CoaSetup::whereHas('parent', function ($query) {
             $query->whereIn('head_name', ['Cash In Hand', 'Cash at Bank']);
         })->where('transaction', 1)->orderBy('head_name', 'asc')->get();
 
-        $debitHeads = Coa::whereNotIn('id', $data->items->pluck('coa_id')->toArray())->where(function ($query) {
+        $debitHeads = CoaSetup::whereNotIn('id', $data->items->pluck('coa_id')->toArray())->where(function ($query) {
             $query->whereIn('head_type', ['E']);
         })->where('head_code', 'like', '403%')->where('transaction', 1)->orderBy('head_name', 'asc')->get();
 
@@ -221,7 +221,7 @@ class ExpenseController extends Controller
                 // Remove old transactions
                 AccountTransactionAuto::where('voucher_no', $data->transaction_no)->where('voucher_type', 'Expense')->forceDelete();
 
-                $head = Coa::find($request->cash_head);
+                $head = CoaSetup::find($request->cash_head);
 
                 // First entry (credit for cash/bank)
                 $postData = [[

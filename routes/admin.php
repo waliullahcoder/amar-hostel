@@ -128,7 +128,6 @@ Route::group(['middleware' => ['admin']], function () {
 
     // Accounts Transaction
     // Chart of Account
-    Route::resource('/coa', CoaController::class);
 
     // Debit Voucher
     Route::resource('/debit-voucher', DebitVoucherController::class);
@@ -184,6 +183,11 @@ Route::group(['middleware' => ['admin']], function () {
 
     // Sales Return
     Route::resource('/sales-return', SalesReturnController::class);
+
+        // User
+    Route::resource('/user', AdminController::class);
+    Route::get('/user/{id}/password', [AdminController::class, 'changePassword'])->name('user.password');
+    Route::put('/user/password/{id}', [AdminController::class, 'passwordUpdate'])->name('user.password.update');
 
     // Invest Sattlement
     Route::resource('/invest-sattlement', InvestSattlementController::class);

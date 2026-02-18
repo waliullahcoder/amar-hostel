@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use Carbon\Carbon;
-use App\Models\Coa;
+use App\Models\CoaSetup;
 use App\HelperClass;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -119,11 +119,11 @@ class CreditVoucherController extends Controller
     {
         $title = $this->create_title;
 
-        $debitCoas = Coa::whereHas('parent', function ($query) {
+        $debitCoas = CoaSetup::whereHas('parent', function ($query) {
             $query->whereIn('head_name', ['Cash In Hand', 'Cash at Bank']);
         })->where('transaction', '1')->orderBy('head_name', 'asc')->get();
 
-        $coas = Coa::where(function ($query) {
+        $coas = CoaSetup::where(function ($query) {
             $query->whereIn('head_type', ['L', 'I']);
         })->where('transaction', '1')->orderBy('head_name', 'asc')->get();
 
@@ -144,7 +144,7 @@ class CreditVoucherController extends Controller
 
         try {
             DB::transaction(function () use ($request) {
-                $head = Coa::find($request->debit_head);
+                $head = CoaSetup::find($request->debit_head);
                 $total_debit = array_sum($request->credit_amount);
 
                 $data = $this->model::create([
@@ -228,11 +228,11 @@ class CreditVoucherController extends Controller
             ->where('debit_amount', 0.00)
             ->get();
 
-        $debitCoas = Coa::whereHas('parent', function ($query) {
+        $debitCoas = CoaSetup::whereHas('parent', function ($query) {
             $query->whereIn('head_name', ['Cash In Hand', 'Cash at Bank']);
         })->where('transaction', '1')->orderBy('head_name', 'asc')->get();
 
-        $coas = Coa::whereNotIn('id', $creditEntries->pluck('coa_id')->toArray())->where(function ($query) {
+        $coas = CoaSetup::whereNotIn('id', $creditEntries->pluck('coa_id')->toArray())->where(function ($query) {
             $query->whereIn('head_type', ['L', 'I']);
         })->where('transaction', '1')->orderBy('head_name', 'asc')->get();
 
@@ -252,7 +252,7 @@ class CreditVoucherController extends Controller
 
         try {
             DB::transaction(function () use ($request, $id) {
-                $head = Coa::find($request->debit_head);
+                $head = CoaSetup::find($request->debit_head);
                 $total_debit = array_sum($request->credit_amount);
 
                 $data = $this->model::findOrFail($id);

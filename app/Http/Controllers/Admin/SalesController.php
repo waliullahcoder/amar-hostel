@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use Carbon\Carbon;
-use App\Models\Coa;
+use App\Models\CoaSetup;
 use App\HelperClass;
 use App\Models\Store;
 use App\Models\Sales;
@@ -159,7 +159,7 @@ class SalesController extends Controller
         $clients = Client::where('status', true)->orderBy('name', 'asc')->get();
         $stores = Store::where('status', true)->orderBy('name', 'asc')->get();
         $salesOfficers = SalesOfficer::where('status', true)->orderBy('name', 'asc')->get();
-        $cash_heads = Coa::whereHas('parent', function ($query) {
+        $cash_heads = CoaSetup::whereHas('parent', function ($query) {
             $query->where('head_name', 'Cash In Hand')
                 ->orWhere('head_name', 'Cash at Bank');
         })->get();
@@ -236,14 +236,14 @@ class SalesController extends Controller
                 // ================= Account Transaction =================
                 $client = Client::find($request->client_id);
                 if ($client->coa) {
-                    $income_head = Coa::where('head_type', 'I')->where('head_name', 'Product Sales')->first();
+                    $income_head = CoaSetup::where('head_type', 'I')->where('head_name', 'Product Sales')->first();
                     $headCode = [$client->coa->head_code, $income_head->head_code];
                     $debit_amount = [$request->net_amount, 0.00];
                     $credit_amount = [0.00, $request->net_amount];
 
                     $postData = [];
                     for ($i = 0; $i < count($headCode); $i++) {
-                        $coa = Coa::where('head_code', $headCode[$i])->first();
+                        $coa = CoaSetup::where('head_code', $headCode[$i])->first();
                         $postData[] = [
                             'voucher_no' => $data->invoice,
                             'voucher_type' => "Client Sales",
@@ -294,14 +294,14 @@ class SalesController extends Controller
                     ]);
 
                     if ($client->coa) {
-                        $cash_head = Coa::findOrFail($request->coa_id);
+                        $cash_head = CoaSetup::findOrFail($request->coa_id);
                         $headCode = [$cash_head->head_code, $client->coa->head_code];
                         $debit_amount = [$request->net_amount, 0.00];
                         $credit_amount = [0.00, $request->net_amount];
 
                         $postData = [];
                         for ($i = 0; $i < count($headCode); $i++) {
-                            $coa = Coa::where('head_code', $headCode[$i])->first();
+                            $coa = CoaSetup::where('head_code', $headCode[$i])->first();
                             $postData[] = [
                                 'voucher_no' => $payment_no,
                                 'voucher_type' => "Client Collection",
@@ -391,7 +391,7 @@ class SalesController extends Controller
             'clients'       => Client::where('status', true)->orderBy('name','asc')->get(),
             'stores'        => Store::where('status', true)->orderBy('name','asc')->get(),
             'salesOfficers' => SalesOfficer::where('status', true)->orderBy('name','asc')->get(),
-            'cash_heads'    => Coa::whereHas('parent', function($q){
+            'cash_heads'    => CoaSetup::whereHas('parent', function($q){
                 $q->where('head_name','Cash In Hand')
                   ->orWhere('head_name','Cash at Bank');
             })->get(),
@@ -494,14 +494,14 @@ class SalesController extends Controller
                 // ----------- ACCOUNT TRANSACTIONS -----------
                 $client = Client::find($request->client_id);
                 if ($client && $client->coa) {
-                    $income_head = Coa::where('head_type','I')->where('head_name','Product Sales')->first();
+                    $income_head = CoaSetup::where('head_type','I')->where('head_name','Product Sales')->first();
                     $headCode = collect([$client->coa->head_code, $income_head->head_code]);
                     $debit_amount  = collect([$request->net_amount, 0.00]);
                     $credit_amount = collect([0.00, $request->net_amount]);
 
                     $postData = [];
                     foreach ($headCode as $i => $code) {
-                        $coa = Coa::where('head_code', $code)->first();
+                        $coa = CoaSetup::where('head_code', $code)->first();
                         $postData[] = [
                             'voucher_no'   => $data->invoice,
                             'voucher_type' => 'Client Sales',
@@ -549,14 +549,14 @@ class SalesController extends Controller
                     ]);
 
                     // CASH COLLECTION TRANSACTION
-                    $cash_head = Coa::findOrFail($request->coa_id);
+                    $cash_head = CoaSetup::findOrFail($request->coa_id);
                     $headCode  = collect([$cash_head->head_code, $client->coa->head_code]);
                     $debit_amount  = collect([$request->net_amount, 0.00]);
                     $credit_amount = collect([0.00, $request->net_amount]);
 
                     $postData = [];
                     foreach ($headCode as $i => $code) {
-                        $coa = Coa::where('head_code', $code)->first();
+                        $coa = CoaSetup::where('head_code', $code)->first();
                         $postData[] = [
                             'voucher_no'   => $payment_no,
                             'voucher_type' => 'Client Collection',

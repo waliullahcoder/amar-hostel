@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use Carbon\Carbon;
-use App\Models\Coa;
+use App\Models\CoaSetup;
 use App\HelperClass;
 use App\Models\Invest;
 use App\Models\Room;
@@ -132,7 +132,7 @@ class InvestController extends Controller
         $title = $this->create_title;
         $invest_no = $this->investNo();
         $investors = Investor::where('status', true)->orderBy('name', 'asc')->get();
-        $cashHeads = Coa::with('parent')->whereHas('parent', function ($query) {
+        $cashHeads = CoaSetup::with('parent')->whereHas('parent', function ($query) {
             $query->whereIn('head_name', ['Cash In Hand', 'Cash at Bank']);
         })->get();
         $products = Room::where('status', true)->orderBy('id', 'desc')->get();
@@ -168,7 +168,7 @@ class InvestController extends Controller
 
                 $investor = Investor::findOrFail($request->investor_id);
                 if ($investor->coa) {
-                    $cash_head = Coa::findOrFail($request->coa_id);
+                    $cash_head = CoaSetup::findOrFail($request->coa_id);
                     $headCode = collect([
                         '0' => $cash_head->head_code,
                         '1' => $investor->coa->head_code
@@ -187,7 +187,7 @@ class InvestController extends Controller
                     $postData = [];
                     $countHead = count($headCode);
                     for ($i = 0; $i < $countHead; $i++) {
-                        $coa = Coa::where('head_code', $headCode[$i])->first();
+                        $coa = CoaSetup::where('head_code', $headCode[$i])->first();
                        
                         $postData[] = [
                             'voucher_no' => $data->invest_no,
@@ -229,7 +229,7 @@ class InvestController extends Controller
     {
         $additionalData = [
             'investors' => Investor::where('status', true)->orderBy('name', 'asc')->get(),
-            'cashHeads' => Coa::with('parent')->whereHas('parent', function ($query) {
+            'cashHeads' => CoaSetup::with('parent')->whereHas('parent', function ($query) {
                 $query->whereIn('head_name', ['Cash In Hand', 'Cash at Bank']);
             })->get(),
             'products' => Room::where('status', true)->orderBy('id', 'desc')->get()
@@ -266,7 +266,7 @@ class InvestController extends Controller
 
                 $investor = Investor::findOrFail($request->investor_id);
                 if ($investor->coa) {
-                    $cash_head = Coa::findOrFail($request->coa_id);
+                    $cash_head = CoaSetup::findOrFail($request->coa_id);
                     $headCode = collect([
                         '0' => $cash_head->head_code,
                         '1' => $investor->coa->head_code
@@ -285,7 +285,7 @@ class InvestController extends Controller
                     $postData = [];
                     $countHead = count($headCode);
                     for ($i = 0; $i < $countHead; $i++) {
-                        $coa = Coa::where('head_code', $headCode[$i])->first();
+                        $coa = CoaSetup::where('head_code', $headCode[$i])->first();
                         $postData[] = [
                             'voucher_no' => $data->invest_no,
                             'voucher_type' => "Invest",

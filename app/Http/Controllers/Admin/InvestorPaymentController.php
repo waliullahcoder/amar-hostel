@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use Exception;
 use Carbon\Carbon;
-use App\Models\Coa;
+use App\Models\CoaSetup;
 use App\HelperClass;
 use App\Models\Sales;
 use App\Models\Client;
@@ -92,7 +92,7 @@ class InvestorPaymentController extends Controller
         $title = $this->create_title;
         $payment_no = $this->paymentNo();
         $investors = Investor::where('status', true)->orderBy('name', 'asc')->get();
-        $cash_heads = Coa::whereHas('parent', function ($query) {
+        $cash_heads = CoaSetup::whereHas('parent', function ($query) {
             $query->whereIn('head_name', ['Cash In Hand', 'Cash at Bank']);
         })->get();
         return view("admin.{$this->path}.create", compact('title', 'payment_no', 'investors', 'cash_heads'));
@@ -144,7 +144,7 @@ class InvestorPaymentController extends Controller
 
                 $investor = Investor::findOrFail($request->investor_id);
                 if ($investor->profit_account && $request->payment_type != 'Adjust') {
-                    $cash_head = Coa::findOrFail($request->coa_id);
+                    $cash_head = CoaSetup::findOrFail($request->coa_id);
                     $headCode = collect([
                         '0' => $investor->profit_account->head_code,
                         '1' => $cash_head->head_code
@@ -163,7 +163,7 @@ class InvestorPaymentController extends Controller
                     $postData = [];
                     $countHead = count($headCode);
                     for ($i = 0; $i < $countHead; $i++) {
-                        $coa = Coa::where('head_code', $headCode[$i])->first();
+                        $coa = CoaSetup::where('head_code', $headCode[$i])->first();
                         $postData[] = [
                             'voucher_no' => $data->payment_no,
                             'voucher_type' => "Investor Payment",
@@ -244,7 +244,7 @@ class InvestorPaymentController extends Controller
 
         $additionalData = [
             'investors' => Investor::where('status', true)->orderBy('name', 'asc')->get(),
-            'cash_heads' => Coa::whereHas('parent', function ($query) {
+            'cash_heads' => CoaSetup::whereHas('parent', function ($query) {
                 $query->whereIn('head_name', ['Cash In Hand', 'Cash at Bank']);
             })->get(),
             'due' => round(max(0, $due), 2),
@@ -312,7 +312,7 @@ class InvestorPaymentController extends Controller
 
                 $investor = Investor::findOrFail($request->investor_id);
                 if ($investor->profit_account && $request->payment_type != 'Adjust') {
-                    $cash_head = Coa::findOrFail($request->coa_id);
+                    $cash_head = CoaSetup::findOrFail($request->coa_id);
                     $headCode = collect([
                         '0' => $investor->profit_account->head_code,
                         '1' => $cash_head->head_code
@@ -331,7 +331,7 @@ class InvestorPaymentController extends Controller
                     $postData = [];
                     $countHead = count($headCode);
                     for ($i = 0; $i < $countHead; $i++) {
-                        $coa = Coa::where('head_code', $headCode[$i])->first();
+                        $coa = CoaSetup::where('head_code', $headCode[$i])->first();
                         $postData[] = [
                             'voucher_no' => $data->payment_no,
                             'voucher_type' => "Investor Payment",

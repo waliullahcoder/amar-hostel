@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use Carbon\Carbon;
-use App\Models\Coa;
+use App\Models\CoaSetup;
 use App\HelperClass;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -124,7 +124,7 @@ class JournalVoucherController extends Controller
     {
         $title = $this->create_title;
         $voucher_no = $this->voucherNo();
-        $coas = Coa::where('transaction', '1')->orderBy('head_name', 'asc')->get();
+        $coas = CoaSetup::where('transaction', '1')->orderBy('head_name', 'asc')->get();
         return view("admin.{$this->path}.create", compact('title', 'coas', 'voucher_no'));
     }
 
@@ -208,7 +208,7 @@ class JournalVoucherController extends Controller
         $journalEntries = $this->model::with('coa')->where('voucher_no', $data->voucher_no)
             ->where('voucher_type', 'JV')
             ->get();
-        $coas = Coa::whereNotIn('id', $journalEntries->pluck('coa_id')->toArray())->where('transaction', '1')->orderBy('head_name', 'asc')->get();
+        $coas = CoaSetup::whereNotIn('id', $journalEntries->pluck('coa_id')->toArray())->where('transaction', '1')->orderBy('head_name', 'asc')->get();
 
         return view("admin.{$this->path}.edit", compact('title', 'data', 'journalEntries', 'coas'));
     }

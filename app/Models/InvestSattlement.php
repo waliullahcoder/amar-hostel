@@ -18,7 +18,7 @@ class InvestSattlement extends Model
 
     public function coa()
     {
-        return $this->belongsTo(Coa::class, 'coa_id');
+        return $this->belongsTo(CoaSetup::class, 'coa_id');
     }
 
     public function list()

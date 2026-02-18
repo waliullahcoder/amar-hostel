@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use Exception;
 use Carbon\Carbon;
-use App\Models\Coa;
+use App\Models\CoaSetup;
 use App\HelperClass;
 use App\Models\Store;
 use App\Models\Sales;
@@ -199,7 +199,7 @@ class SalesReturnController extends Controller
 
                 $client = Client::find($request->client_id);
                 if ($client->coa) {
-                    $income_head = Coa::where('head_type', 'I')->where('head_name', 'Sales Return')->first();
+                    $income_head = CoaSetup::where('head_type', 'I')->where('head_name', 'Sales Return')->first();
                     $headCode = collect([
                         '0' => $income_head->head_code,
                         '1' => $client->coa->head_code
@@ -218,7 +218,7 @@ class SalesReturnController extends Controller
                     $countHead = count($headCode);
                     $postData = [];
                     for ($i = 0; $i < $countHead; $i++) {
-                        $coa = Coa::where('head_code', $headCode[$i])->first();
+                        $coa = CoaSetup::where('head_code', $headCode[$i])->first();
                         $postData[] = [
                             'voucher_no' => $data->return_no,
                             'voucher_type' => "Sales Return",
@@ -413,7 +413,7 @@ class SalesReturnController extends Controller
 
                 $client = Client::find($request->client_id);
                 if ($client->coa) {
-                    $income_head = Coa::where('head_type', 'I')->where('head_name', 'Sales Return')->first();
+                    $income_head = CoaSetup::where('head_type', 'I')->where('head_name', 'Sales Return')->first();
                     $headCode = collect([
                         '0' => $income_head->head_code,
                         '1' => $client->coa->head_code
@@ -432,7 +432,7 @@ class SalesReturnController extends Controller
                     $countHead = count($headCode);
                     $postData = [];
                     for ($i = 0; $i < $countHead; $i++) {
-                        $coa = Coa::where('head_code', $headCode[$i])->first();
+                        $coa = CoaSetup::where('head_code', $headCode[$i])->first();
                         $postData[] = [
                             'voucher_no' => $data->return_no,
                             'voucher_type' => "Sales Return",

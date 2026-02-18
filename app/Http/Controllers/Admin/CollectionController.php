@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use Exception;
 use Carbon\Carbon;
-use App\Models\Coa;
+use App\Models\CoaSetup;
 use App\HelperClass;
 use App\Models\Sales;
 use App\Models\Client;
@@ -104,7 +104,7 @@ class CollectionController extends Controller
     public function create(Request $request)
     {
         if ($request->ajax() && $request->payment_type) {
-            $cash_heads = Coa::whereHas('parent', function ($query) use ($request) {
+            $cash_heads = CoaSetup::whereHas('parent', function ($query) use ($request) {
                 if ($request->payment_type == 'Cash') {
                     $query->where('head_name', 'Cash In Hand');
                 }
@@ -135,7 +135,7 @@ class CollectionController extends Controller
         $title = $this->create_title;
         $payment_no = $this->paymentNo();
         $clients = Client::where('status', true)->orderBy('name', 'asc')->get();
-        $cash_heads = Coa::whereHas('parent', function ($query) {
+        $cash_heads = CoaSetup::whereHas('parent', function ($query) {
             $query->where('head_name', 'Cash In Hand');
         })->get();
         return view("admin.{$this->path}.create", compact('title', 'payment_no', 'clients', 'cash_heads'));
@@ -189,7 +189,7 @@ class CollectionController extends Controller
 
                 $client = Client::findOrFail($request->client_id);
                 if ($client->coa && $request->collection_type != 'Adjust') {
-                    $cash_head = Coa::findOrFail($request->coa_id);
+                    $cash_head = CoaSetup::findOrFail($request->coa_id);
                     $headCode = collect([
                         '0' => $cash_head->head_code,
                         '1' => $client->coa->head_code
@@ -208,7 +208,7 @@ class CollectionController extends Controller
                     $postData = [];
                     $countHead = count($headCode);
                     for ($i = 0; $i < $countHead; $i++) {
-                        $coa = Coa::where('head_code', $headCode[$i])->first();
+                        $coa = CoaSetup::where('head_code', $headCode[$i])->first();
                         $postData[] = [
                             'voucher_no' => $data->payment_no,
                             'voucher_type' => "Client Collection",
@@ -251,7 +251,7 @@ class CollectionController extends Controller
     public function edit(Request $request, string $id)
     {
         if ($request->ajax() && $request->payment_type) {
-            $cash_heads = Coa::whereHas('parent', function ($query) use ($request) {
+            $cash_heads = CoaSetup::whereHas('parent', function ($query) use ($request) {
                 if ($request->payment_type == 'Cash') {
                     $query->where('head_name', 'Cash In Hand');
                 }
@@ -300,7 +300,7 @@ class CollectionController extends Controller
 
         $additionalData = [
             'clients' => Client::where('status', true)->orderBy('name', 'asc')->get(),
-            'cash_heads' => Coa::whereHas('parent', function ($query) use ($data) {
+            'cash_heads' => CoaSetup::whereHas('parent', function ($query) use ($data) {
                 if ($data->payment_type == 'Cash') {
                     $query->where('head_name', 'Cash In Hand');
                 }
@@ -373,7 +373,7 @@ class CollectionController extends Controller
 
                 $client = Client::findOrFail($request->client_id);
                 if ($client->coa && $request->collection_type != 'Adjust') {
-                    $cash_head = Coa::findOrFail($request->coa_id);
+                    $cash_head = CoaSetup::findOrFail($request->coa_id);
                     $headCode = collect([
                         '0' => $cash_head->head_code,
                         '1' => $client->coa->head_code
@@ -392,7 +392,7 @@ class CollectionController extends Controller
                     $postData = [];
                     $countHead = count($headCode);
                     for ($i = 0; $i < $countHead; $i++) {
-                        $coa = Coa::where('head_code', $headCode[$i])->first();
+                        $coa = CoaSetup::where('head_code', $headCode[$i])->first();
                         $postData[] = [
                             'voucher_no' => $data->payment_no,
                             'voucher_type' => "Client Collection",
