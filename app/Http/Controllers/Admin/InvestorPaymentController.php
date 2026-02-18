@@ -168,7 +168,7 @@ class InvestorPaymentController extends Controller
                             'voucher_no' => $data->payment_no,
                             'voucher_type' => "Investor Payment",
                             'date' => date('Y-m-d', strtotime($request->date)),
-                            'coa_id' => $coa->id,
+                            'coa_id' => $coa->id??0,
                             'coa_head_code' => $headCode[$i],
                             'narration' => 'Investor Payment against payment no - ' . $data->payment_no,
                             'debit_amount' => $debit_amount[$i],

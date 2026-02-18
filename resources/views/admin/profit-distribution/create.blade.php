@@ -1,6 +1,16 @@
 @extends('layouts.admin.create_app')
 
 @section('content')
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
     <div class="row g-3">
         <div class="col-md-3 col-sm-6">
             <label for="date" class="form-label"><b>Date <span class="text-danger">*</span></b></label>

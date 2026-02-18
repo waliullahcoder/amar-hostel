@@ -87,20 +87,20 @@ class AuthController extends Controller
 
             $distribution = ProfitDistribution::where('product_id', $item->id)->first();
             if($distribution){
-                $productionQty  = $distribution->production_qty;
-                $salesQty       = $distribution->sales_qty;
-                $salesAmount    = $distribution->sales_amount;
-                $totalProfit    = $distribution->profit_amount;
+                $productionQty  = $distribution->production_qty??0;
+                $salesQty       = $distribution->sales_qty??0;
+                $salesAmount    = $distribution->sales_amount??0;
+                $totalProfit    = $distribution->profit_amount??0;
             }
 
             $data[] = [
-                'product'           => $item,
-                'production_qty'    => $productionQty,
-                'sales_qty'         => $salesQty,
-                'sales_amount'      => $salesAmount,
-                'investor_profit'   => $totalProfit,
-                'share_qty'         => $totalShare,
-                'sattled_qty'       => $sattledQty,
+                'product'           => $item??[],
+                'production_qty'    => $productionQty??0,
+                'sales_qty'         => $salesQty??0,
+                'sales_amount'      => $salesAmount??0,
+                'investor_profit'   => $totalProfit??0,
+                'share_qty'         => $totalShare??0,
+                'sattled_qty'       => $sattledQty??0,
                 'per_share_profit' => round($totalProfit > 0 && $item->required_share > 0 ? $totalProfit / $item->required_share : 0, 2)
             ];
         }

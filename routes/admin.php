@@ -36,6 +36,7 @@ use App\Http\Controllers\Admin\{
     CollectionController,
     SalesReturnController,
     InvestorPaymentController,
+    ExpenseController,
     
 
 };
@@ -77,6 +78,9 @@ Route::group(['middleware' => ['admin']], function () {
 
     // Profit Distribution
     Route::resource('/profit-distribution', ProfitDistributionController::class);
+
+     // Expense
+    Route::resource('/expense', ExpenseController::class);
 
     // Stock Status
     Route::get('/stock-status', [ReportController::class, 'stockStatus'])->name('stock-status.index');
