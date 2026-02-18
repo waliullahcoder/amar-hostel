@@ -6,7 +6,7 @@
             <tr>
                 <td>
                     <b class="d-inline-block" style="min-width: 120px;">Credit Account Head :</b>
-                    <span class="d-inline-block" style="min-width: 200px;">{{ @$data->coa->head_name }} - {{ @$data->coa->head_code }}</span>
+                    <span class="d-inline-block" style="min-width: 200px;">{{ @$data->head_name }} - {{ @$data->head_code }}</span>
                 </td>
                 <td class="text-right">
                     <b class="d-inline-block text-left">Date :</b>
@@ -38,7 +38,7 @@
                 @foreach ($debitEntries as $item)
                     <tr>
                         <th class="text-center">{{ $loop->iteration }}</th>
-                        <th>{{ $item->coa->head_name }} - {{ $item->coa->head_code }}</th>
+                        <th>{{ $item->head_name }} - {{ $item->head_code }}</th>
                         <td class="text-right">{{ number_format($item->debit_amount, 2) }}</td>
                     </tr>
                 @endforeach

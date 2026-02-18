@@ -54,10 +54,10 @@
                                 <td class="py-1">
                                     <input type="hidden" name="coa_id[]" class="coa_id" value="{{ $item->coa_setup_id }}">
                                     <input type="hidden" name="head_code[{{ $item->coa_setup_id }}]" class="head_code"
-                                        value="{{ $item->coa->head_code }}">
+                                        value="{{ $item->head_code }}">
                                     <input type="text" class="head_name w-100"
                                         name="head_name[{{ $item->coa_setup_id }}]" readonly
-                                        value="{{ $item->coa->head_name }} - {{ $item->coa->head_code }}">
+                                        value="{{ $item->head_name }} - {{ $item->head_code }}">
                                 </td>
                                 <td class="py-1">
                                     <input type="number" class="debit text-end"

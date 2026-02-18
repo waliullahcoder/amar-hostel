@@ -38,7 +38,7 @@
                             @foreach ($data as $row)
                                 <tr>
                                     <td class="text-center" width="30">{{ $loop->iteration }}</td>
-                                    <td>{{ @$row->voucher_no }}</td>
+                                    <td>{{ $row->voucher_no }}</td>
                                     @php
                                         $debitAccounts = \App\Models\AccountTransaction::with(['coa'])
                                             ->where('voucher_no', $row->voucher_no)
@@ -47,7 +47,8 @@
                                     @endphp
                                     <td>
                                         @foreach ($debitAccounts as $item)
-                                            {{ $item->coa->head_name ?? '' }} - {{ $item->coa->head_code ?? '' }}
+                                            {{ $item->head_name ?? '' }} -
+                                            {{ $item->head_code ?? '' }}{{ !$loop->last ? ', ' : '' }}
                                         @endforeach
                                     </td>
                                     <td class="text-end">{{ number_format($row->debit_amount, 2) }}</td>

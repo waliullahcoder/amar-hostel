@@ -32,7 +32,7 @@
                         <tr>
                             <th width="200">Cash Head</th>
                             <th width="10">:</th>
-                            <td>{{ $data->coa->head_name }} - {{ $data->coa->head_code }}</td>
+                            <td>{{ $data->head_name }} - {{ $data->head_code }}</td>
                         </tr>
                         <tr>
                             <th width="200">Invest Amount</th>

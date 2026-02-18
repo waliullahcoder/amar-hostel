@@ -2,70 +2,83 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Models\AccountTransaction;
-use App\Models\AccountTransactionAuto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\AccountTransaction;
+use App\Http\Controllers\Controller;
+use App\Models\AccountTransactionAuto;
 use Yajra\DataTables\Facades\DataTables;
+use App\Services\ActionButtons\ActionButtons;
 
 class AutomationRejectController extends Controller
 {
+    public $path;
+    public $title;
+    public $model;
+    public function __construct()
+    {
+        $this->path = 'automation-refuse';
+        $this->title = 'Refuse Automation';
+        $this->model = AccountTransaction::class;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         if (request()->ajax()) {
-            $model = AccountTransaction::with(['company'])
-                ->whereNotIn('voucher_type', ['CV', 'DV', 'JV'])
+            $model = $this->model::whereNotIn('voucher_type', ['CV', 'DV', 'JV'])
+                ->selectRaw('MAX(id) as id, voucher_no, MAX(date) as date, voucher_type, SUM(debit_amount) as amount')
+                ->groupBy('voucher_no', 'voucher_type')
                 ->orderBY('id', 'desc')
-                ->select('*', DB::raw('SUM(debit_amount) as amount'))
-                ->orderBY('voucher_date', 'desc')->where('approve', 1)->groupBy('voucher_no');
+                ->orderBY('date', 'desc')->where('approved', true);
+
             return DataTables::eloquent($model)
                 ->addIndexColumn()
-                ->addColumn('voucher_date', function ($row) {
-                    return date('d-m-Y', strtotime($row->voucher_date));
-                })
                 ->addColumn('debit_head', function ($row) {
-                    return AccountTransaction::with('coa')->where('voucher_no', $row->voucher_no)
+                    return $this->model::with('coa')->where('voucher_no', $row->voucher_no)
                         ->where('voucher_type', $row->voucher_type)
                         ->where('debit_amount', '>', 0)
-                        ->get('coa_setup_id')->pluck('coa.head_name')->toArray();
+                        ->get('coa_id')->pluck('coa.head_name')->toArray();
                 })
                 ->addColumn('credit_head', function ($row) {
-                    return AccountTransaction::with('coa')->where('voucher_no', $row->voucher_no)
+                    return $this->model::with('coa')->where('voucher_no', $row->voucher_no)
                         ->where('voucher_type', $row->voucher_type)
                         ->where('credit_amount', '>', 0)
-                        ->get('coa_setup_id')->pluck('coa.head_name')->toArray();
+                        ->get('coa_id')->pluck('coa.head_name')->toArray();
                 })
                 ->addColumn('actions', function ($row) {
-                    return '<div class="justify-content-end d-flex gap-1">
-                            <a class="btn btn-outline-info btn-xs text-nowrap px-2 tt" href="' . Route('admin.automation-reject.show', $row->id) . '" data-bs-toggle="tooltip" data-bs-placement="top" title="View"><i class="fas fa-eye"></i> View</a>
-                            <button type="button" class="btn btn-outline-danger btn-xs text-nowrap approve-btn px-2 tt" data-url="' . Route('admin.automation-reject.edit', $row->id) . '" data-bs-toggle="tooltip" data-bs-placement="top" title="Approve"><i class="fa fa-thumbs-down"></i> Refuse</button></div>';
+                    $data = [
+                        'id' => $row->id,
+                    ];
+
+                    $addition_btns = [
+                        [
+                            'parameter' => true,
+                            'target' => '_self',
+                            'title' => 'View Automation',
+                            'route' => "admin.{$this->path}.show",
+                            'icon' => '<i class="fas fa-eye"></i> View',
+                            'class' => 'btn btn-outline-info btn-xs text-nowrap px-2 tt',
+                        ],
+                        [
+                            'parameter' => true,
+                            'target' => '_self',
+                            'title' => 'Refuse Automation',
+                            'route' => "admin.{$this->path}.edit",
+                            'icon' => '<i class="fa fa-thumbs-down"></i> Refuse',
+                            'class' => 'btn btn-outline-danger btn-xs text-nowrap refuse-btn px-2 tt',
+                        ]
+                    ];
+
+                    return ActionButtons::actions($data, $addition_btns);
                 })
-                ->rawColumns(['actions'])
+                ->rawColumns(['checkbox', 'actions'])
                 ->make(true);
         }
-        $title = 'Refuse Automation';
-        $disable_filter = true;
-        return view('admin.refuse_automation.index', compact('title', 'disable_filter'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+        $title = $this->title;
+        return view("admin.{$this->path}.index", compact('title'));
     }
 
     /**
@@ -74,10 +87,10 @@ class AutomationRejectController extends Controller
     public function show(string $id)
     {
         $title = "View Automation";
-        $transaction = AccountTransaction::findOrFail($id);
-        $transactions = AccountTransaction::where('voucher_no', $transaction->voucher_no)
-            ->where('voucher_type', $transaction->voucher_type)->get();
-        return view('admin.refuse_automation.view')->with(compact('title', 'transaction', 'transactions'));
+        $data = $this->model::findOrFail($id);
+        $transactions = $this->model::where('voucher_no', $data->voucher_no)
+            ->where('voucher_type', $data->voucher_type)->get();
+        return view("admin.{$this->path}.view")->with(compact('title', 'data', 'transactions'));
     }
 
     /**
@@ -86,40 +99,24 @@ class AutomationRejectController extends Controller
     public function edit(Request $request, string $id)
     {
         if ($request->ajax()) {
-            DB::transaction(function () use ($id) {
-                $data = AccountTransaction::findOrFail($id);
-                $transactions = AccountTransaction::where('voucher_no', $data->voucher_no)
-                    ->where('voucher_type', $data->voucher_type)->get();
-                foreach ($transactions as $item) {
-                    $query = AccountTransactionAuto::find($item->account_transaction_auto_id);
-                    $query->update([
-                        'posted' => 0,
-                        'approve' => 0,
-                        'approve_by' => NULL,
-                    ]);
-                }
-                AccountTransaction::where('voucher_no', $data->voucher_no)
-                    ->where('voucher_type', $data->voucher_type)
-                    ->forceDelete();
-            });
-
-            return response()->json(['status' => 'success']);
+            try {
+                DB::transaction(function () use ($id) {
+                    $data = $this->model::findOrFail($id);
+                    AccountTransactionAuto::where('voucher_no', $data->voucher_no)
+                        ->where('voucher_type', $data->voucher_type)
+                        ->update([
+                            'posted' => false,
+                            'approved' => false,
+                            'approved_by' => null,
+                        ]);
+                    $this->model::where('voucher_no', $data->voucher_no)
+                        ->where('voucher_type', $data->voucher_type)
+                        ->forceDelete();
+                });
+                return response()->json(['status' => 'success']);
+            } catch (\Exception $e) {
+                return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+            }
         }
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

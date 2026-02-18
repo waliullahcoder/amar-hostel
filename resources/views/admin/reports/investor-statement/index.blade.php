@@ -12,9 +12,6 @@
                 <select name="investor_id" id="investor_id" class="form-select select" data-placeholder="Select Investor"
                     required>
                     <option value=""></option>
-                    @php
-                        $investors = \App\Models\Investor::orderBy('id', 'desc')->get();
-                    @endphp
                     @foreach ($investors as $item)
                         <option value="{{ $item->id }}" {{ request('investor_id') == $item->id ? 'selected' : '' }}>
                             {{ $item->name }}

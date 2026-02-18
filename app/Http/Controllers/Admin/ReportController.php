@@ -3,26 +3,23 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Coa;
-use App\Models\Store;
 use App\Models\Invest;
-use App\Models\Room;
-use App\Models\Payment;
 use App\Models\Investor;
 use Carbon\CarbonPeriod;
 use App\Models\TrialBalance;
-use App\Models\ProductionList;
-use App\Models\SalesList;
-use App\Models\SalesReturnList;
-use App\Models\ProfitDistribution;
 use Illuminate\Http\Request;
+use App\Models\InvestorPayment;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\InvestSattlement;
+use App\Models\MonthlyProfitList;
 use Illuminate\Support\Facades\DB;
 use App\Models\AccountTransaction;
 use App\DataTables\CoaListDataTable;
 use App\Http\Controllers\Controller;
-use App\Models\ProfitDistributionList;
 use App\DataTables\voucherListDataTable;
+use App\Models\Expense;
+use App\Models\ReferralWallet;
+use App\Models\ServiceInvoice;
 
 class ReportController extends Controller
 {
@@ -417,164 +414,107 @@ class ReportController extends Controller
         return $totalIncome - $totalExpanse;
     }
 
-    public function stockStatus(Request $request)
-{
-    if ($request->ajax()) {
+    public function dailyTransaction(Request $request)
+    {
+        $statements = [];
 
-        $term = $request->get('q');
+        $date_range = explode('to', $request->date_range);
+        $start_date = $request->date_range ? date('Y-m-d', strtotime(trim($date_range[0]))) : date('Y-m-01');
+        $end_date = $request->date_range ? date('Y-m-d', strtotime(trim($date_range[1]))) : date('Y-m-t');
 
-        $results = Room::where('name', 'LIKE', "%$term%")
-            ->select('id', 'name', 'code')
-            ->get();
-
-        return response()->json($results);
-    }
-
-    $title = 'Stock Status';
-    $data = [];
-
-    $date_range = explode('to', $request->date_range);
-
-    $start_date = !is_null($request->date_range)
-        ? date('Y-m-d', strtotime($date_range[0]))
-        : date('Y-m-01');
-
-    $end_date = !is_null($request->date_range)
-        ? date('Y-m-d', strtotime($date_range[1]))
-        : date('Y-m-t');
-
-    $store_ids = $request->has('store_id')
-        ? (array)$request->store_id
-        : Store::where('status', true)->pluck('id')->toArray();
-
-    $product_ids = $request->has('product_id')
-        ? (array)$request->product_id
-        : Room::pluck('id')->toArray();
-
-
-    if ($request->has('filter')) {
-
-        $rooms = Room::whereIn('id', $product_ids)->get();
-
-        // ===== PRODUCTION (IN) =====
-        $productions = ProductionList::whereIn('product_id', $product_ids)
-            ->whereIn('store_id', $store_ids)
-            ->whereHas('production', function ($q) use ($start_date, $end_date) {
-                $q->whereBetween('date', [$start_date, $end_date]);
-            })->get();
-
-        // ===== SALES (OUT) =====
-        $sales = SalesList::whereIn('product_id', $product_ids)
-            ->whereIn('store_id', $store_ids)
-            ->whereHas('sales', function ($q) use ($start_date, $end_date) {
-                $q->whereBetween('date', [$start_date, $end_date]);
-            })->get();
-
-        // ===== SALES RETURN (IN) =====
-        $sales_returns = SalesReturnList::whereIn('product_id', $product_ids)
-            ->whereIn('store_id', $store_ids)
-            ->whereHas('return', function ($q) use ($start_date, $end_date) {
-                $q->whereBetween('date', [$start_date, $end_date]);
-            })->get();
-
-
-        // ===== OPENING CALCULATION (BEFORE START DATE) =====
-        $opening_productions = ProductionList::whereIn('product_id', $product_ids)
-            ->whereIn('store_id', $store_ids)
-            ->whereHas('production', function ($q) use ($start_date) {
-                $q->where('date', '<', $start_date);
-            })->get();
-
-        $opening_sales = SalesList::whereIn('product_id', $product_ids)
-            ->whereIn('store_id', $store_ids)
-            ->whereHas('sales', function ($q) use ($start_date) {
-                $q->where('date', '<', $start_date);
-            })->get();
-
-        $opening_sales_returns = SalesReturnList::whereIn('product_id', $product_ids)
-            ->whereIn('store_id', $store_ids)
-            ->whereHas('return', function ($q) use ($start_date) {
-                $q->where('date', '<', $start_date);
-            })->get();
-
-
-        foreach ($rooms as $room) {
-
-            $room_id = $room->id;
-
-            $opening =
-                $opening_productions->where('product_id', $room_id)->sum('qty')
-                - $opening_sales->where('product_id', $room_id)->sum('qty')
-                + $opening_sales_returns->where('product_id', $room_id)->sum('qty');
-
-            $production = $productions->where('product_id', $room_id)->sum('qty');
-
-            $sale = $sales->where('product_id', $room_id)->sum('qty');
-
-            $sales_return = $sales_returns->where('product_id', $room_id)->sum('qty');
-
-            $stock = $opening + $production - $sale + $sales_return;
-
-            $data[] = [
-                'product' => $room->name,
-                'opening' => $opening,
-                'production' => $production,
-                'sales' => $sale,
-                'sales_return' => $sales_return,
-                'stock' => $stock,
-            ];
+        $dateRange = CarbonPeriod::create($start_date, $end_date);
+        foreach ($dateRange as $date) {
+            $d = $date->format('Y-m-d');
+            $invoices = ServiceInvoice::with('items')->where('date', $d)->get();
+            foreach ($invoices as $item) {
+                $sparePartExpense = $item->items()->where('type', 'Spare Part')->sum('subtotal');
+                $serviceIncome = $item->grand_total - $sparePartExpense;
+                $serviceExpense = $item->items()->withSum('mechanics', 'charge')->get()->sum('mechanics_sum_charge');
+                $row = [
+                    'date' => $date->format('d-m-Y'),
+                    'narration' => 'Daily Invoice Income Expense against invoice no - ' . $item->invoice_no,
+                    'invoice_amount' => $item->grand_total,
+                    'spare_part_expense' => $sparePartExpense,
+                    'service_income' => $serviceIncome,
+                    'service_expense' => $serviceExpense,
+                    'service_profit' => $serviceIncome - $serviceExpense,
+                    'operational_expense' => 0
+                ];
+                array_push($statements, $row);
+            }
+            $expenses = Expense::with('items')->where('date', $d)->get();
+            foreach ($expenses as $item) {
+                $row = [
+                    'date' => $date->format('d-m-Y'),
+                    'narration' => 'Daily Common Expense by transaction no - ' . $item->transaction_no,
+                    'invoice_amount' => 0,
+                    'spare_part_expense' => 0,
+                    'service_income' => 0,
+                    'service_expense' => 0,
+                    'service_profit' => 0,
+                    'operational_expense' => $item->amount
+                ];
+                array_push($statements, $row);
+            }
         }
+
+        $title = 'Daily Transaction';
+
+        // ✅ Use HEREDOC syntax to store HTML safely
+        $filter_form = <<<HTML
+            <form action="{$request->url()}" method="GET">
+                <div class="d-flex">
+                    <input type="hidden" name="print" value="">
+                    <input type="hidden" name="filter" value="1">
+                    <input
+                        type="text"
+                        class="form-control date-range input-sm me-2"
+                        name="date_range"
+                        id="date_range"
+                        placeholder="Select Date Range"
+                        data-time-picker="true"
+                        data-format="DD-MM-Y"
+                        data-separator=" to "
+                        autocomplete="off"
+                        value="{$this->formatDateRange($start_date,$end_date)}"
+                        style="max-width: 170px;"
+                        required
+                    >
+                    <button type="submit" class="btn btn-sm btn-primary flex-shrink-0">Search</button>
+                </div>
+            </form>
+        HTML;
+
+        return view('admin.reports.daily-transaction.index', compact('title', 'filter_form', 'start_date', 'end_date', 'statements'));
     }
 
-
-    if (!is_null($request->print)) {
-
-        $report_title = 'Stock Status Report <br>
-            <span class="text-sm">' .
-            date('d-m-Y', strtotime($start_date)) .
-            ' To ' .
-            date('d-m-Y', strtotime($end_date)) .
-            '</span>';
-
-        $pdf = Pdf::loadView(
-            'admin.reports.stock-status.print',
-            compact('report_title', 'data')
-        );
-
-        return $pdf->stream('stock_status_' . date('d_m_Y_h_i_s') . '.pdf');
+    // Helper method for cleaner formatting
+    private function formatDateRange($start_date, $end_date)
+    {
+        return date('d-m-Y', strtotime($start_date)) . ' to ' . date('d-m-Y', strtotime($end_date));
     }
-
-    $stores = Store::where('status', true)
-        ->orderBy('name', 'asc')
-        ->get();
-
-    return view(
-        'admin.reports.stock-status.index',
-        compact('title', 'stores', 'start_date', 'end_date', 'data')
-    );
-}
-
 
     public function investorStatement(Request $request)
     {
         $previous_balance = 0;
         $statements = [];
+        $investor_id = $request->investor_id ?? null;
         $date_range = explode('to', $request->date_range);
         $start_date = !is_null($request->date_range) ? date('Y-m-d', strtotime($date_range[0])) : date('Y-m-01');
         $end_date = !is_null($request->date_range) ? date('Y-m-d', strtotime($date_range[1])) : date('Y-m-t');
 
-        if ($request->has('filter')) {
-            $dateRange = CarbonPeriod::create($start_date, $end_date);
-            $investAmount = Invest::where('investor_id', $request->investor_id)->where('date', '<', $start_date)->where('sattled', false)->sum('amount');
-            $profitAmount = ProfitDistributionList::where('investor_id', $request->investor_id)->whereHas('profitDistribution', function ($query) use ($start_date) {
+        if ($request->has('filter') && $investor_id) {
+            $investAmount = Invest::where('investor_id', $investor_id)->where('date', '<', $start_date)->where('sattled', false)->sum('amount');
+            $profitAmount = MonthlyProfitList::where('investor_id', $investor_id)->whereHas('monthlyProfit', function ($query) use ($start_date) {
                 $query->where('date', '<', $start_date);
-            })->sum('amount');
-            $paymentAmount = Payment::where('investor_id', $request->investor_id)->where('date', '<', $start_date)->whereIn('payment_type', ['Payment', 'Advance'])->sum('amount');
+            })->sum('profit_amount');
+            $paymentAmount = InvestorPayment::where('investor_id', $investor_id)->where('date', '<', $start_date)->sum('amount');
             $previous_balance = $investAmount + $profitAmount - $paymentAmount;
             $balance = $previous_balance;
+            $dateRange = CarbonPeriod::create($start_date, $end_date);
             foreach ($dateRange as $date) {
                 $d = $date->format('Y-m-d');
-                $invests = Invest::where('investor_id', $request->investor_id)->where('date', $d)->get();
+                $invests = Invest::where('investor_id', $investor_id)->where('date', $d)->get();
                 foreach ($invests as $item) {
                     $balance += $item->amount;
                     $row = [
@@ -587,23 +527,23 @@ class ReportController extends Controller
                     array_push($statements, $row);
                 }
 
-                $profits = ProfitDistributionList::whereHas('profitDistribution', function ($query) use ($d) {
+                $profits = MonthlyProfitList::whereHas('monthlyProfit', function ($query) use ($d) {
                     $query->where('date', $d);
-                })->where('investor_id', $request->investor_id)->get();
+                })->where('investor_id', $investor_id)->get();
                 foreach ($profits as $item) {
-                    $balance += $item->amount;
+                    $balance += $item->profit_amount;
                     $row = [
                         'date' => $date->format('d-m-Y'),
-                        'remarks' => 'Profit against serial no - ' . $item->profitDistribution->serial_no ?? '',
-                        'amount_in' => $item->amount,
+                        'remarks' => 'Profit against serial no - ' . ($item->monthlyProfit->serial_no ?? ''),
+                        'amount_in' => $item->profit_amount,
                         'amount_out' => 0.00,
                         'balance' => $balance,
                     ];
                     array_push($statements, $row);
                 }
 
-                $payments = Payment::where('date', $d)->where('investor_id', $request->investor_id)->whereIn('payment_type', ['Payment', 'Advance'])->get();
-                foreach ($payments as $item) {
+                $paymentsList = InvestorPayment::where('date', $d)->where('investor_id', $investor_id)->get();
+                foreach ($paymentsList as $item) {
                     $balance -= $item->amount;
                     $row = [
                         'date' => $date->format('d-m-Y'),
@@ -615,14 +555,14 @@ class ReportController extends Controller
                     array_push($statements, $row);
                 }
 
-                $sattlements = InvestSattlement::where('date', $d)->where('investor_id', $request->investor_id)->get();
-                foreach ($sattlements as $item) {
-                    $balance -= $item->payment;
+                $sattlementsList = InvestSattlement::where('date', $d)->where('investor_id', $investor_id)->get();
+                foreach ($sattlementsList as $item) {
+                    $balance -= $item->amount;
                     $row = [
                         'date' => $date->format('d-m-Y'),
                         'remarks' => 'Invest Sattlement against Sattlement no - ' . $item->sattlement_no,
                         'amount_in' => 0.00,
-                        'amount_out' => $item->payment,
+                        'amount_out' => $item->amount,
                         'balance' => $balance,
                     ];
                     array_push($statements, $row);
@@ -630,14 +570,43 @@ class ReportController extends Controller
             }
         }
 
-        if (!is_null($request->print)) {
-            $investor = Investor::find($request->investor_id);
-            $report_title = 'Investor Statement of - ' . $investor->name;
-            $pdf = Pdf::loadView('admin.reports.investor-statement.print', compact('report_title', 'previous_balance', 'statements'));
-            return $pdf->stream('investor_statement_' . date('d_m_Y_H_i_s') . '.pdf');
+        if (!is_null($request->print) && $investor_id) {
+            $investor = Investor::find($investor_id);
+            $report_title = 'Investor Statement <br> <span class="text-sm">' . date('d-m-Y', strtotime($start_date)) . ' To ' . date('d-m-Y', strtotime($end_date)) . '</span>';
+            $pdf = Pdf::loadView('admin.reports.investor-statement.print', compact('report_title', 'investor', 'statements', 'previous_balance', 'start_date', 'end_date'));
+            $pdf->setPaper('A4', 'landscape');
+            return $pdf->stream('investor_statement_' . date('d_m_Y_h_i_s') . '.pdf');
         }
 
         $title = 'Investor Statement';
-        return view('admin.reports.investor-statement.index', compact('title', 'start_date', 'end_date', 'previous_balance', 'statements'));
+        $investors = Investor::orderBy('name', 'asc')->get();
+        return view('admin.reports.investor-statement.index', compact('title', 'start_date', 'end_date', 'investors', 'statements', 'previous_balance'));
+    }
+
+    public function discountWallet(Request $request)
+    {
+        $previous_balance = 0;
+        $statements = collect();
+        $investor_id = $request->investor_id ?? null;
+        $date_range = explode('to', $request->date_range);
+        $start_date = !is_null($request->date_range) ? date('Y-m-d', strtotime($date_range[0])) : date('Y-m-01');
+        $end_date = !is_null($request->date_range) ? date('Y-m-d', strtotime($date_range[1])) : date('Y-m-t');
+
+        if ($request->has('filter') && $investor_id) {
+            $previous_balance = ReferralWallet::where('investor_id', $investor_id)->where('date', '<', $start_date)->sum('amount');
+            $statements = ReferralWallet::where('investor_id', $investor_id)->whereBetween('date', [$start_date, $end_date])->get();
+        }
+
+        if (!is_null($request->print) && $investor_id) {
+            $investor = Investor::find($investor_id);
+            $report_title = 'Discount Wallet <br> <span class="text-sm">' . date('d-m-Y', strtotime($start_date)) . ' To ' . date('d-m-Y', strtotime($end_date)) . '</span>';
+            $pdf = Pdf::loadView('admin.reports.discount-wallet.print', compact('report_title', 'investor', 'statements', 'previous_balance', 'start_date', 'end_date'));
+            $pdf->setPaper('A4', 'landscape');
+            return $pdf->stream('discount_wallet' . date('d_m_Y_h_i_s') . '.pdf');
+        }
+
+        $title = 'Discount Wallet';
+        $investors = Investor::orderBy('name', 'asc')->get();
+        return view('admin.reports.discount-wallet.index', compact('title', 'start_date', 'end_date', 'investors', 'statements', 'previous_balance'));
     }
 }

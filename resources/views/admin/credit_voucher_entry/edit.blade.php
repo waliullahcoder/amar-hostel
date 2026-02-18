@@ -65,8 +65,8 @@
                                 <td class="py-1 px-3">
                                     <input type="hidden" name="coa_id[]" class="coa_id" value="{{ $item->coa_setup_id }}">
                                     <input type="hidden" name="head_code[{{ $item->coa_setup_id }}]" class="head_code"
-                                        value="{{ @$item->coa->head_code }}">
-                                    <b class="head_name">{{ @$item->coa->head_name }} - {{ @$item->coa->head_code }}</b>
+                                        value="{{ @$item->head_code }}">
+                                    <b class="head_name">{{ @$item->head_name }} - {{ @$item->head_code }}</b>
                                 </td>
                                 <td class="py-1">
                                     <input type="number" class="credit text-end"

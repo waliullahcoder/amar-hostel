@@ -37,6 +37,11 @@ use App\Http\Controllers\Admin\{
     SalesReturnController,
     InvestorPaymentController,
     ExpenseController,
+    ExpenseItemController,
+    CoaController,
+    DebitVoucherController,
+    CreditVoucherController,
+    JournalVoucherController
     
 
 };
@@ -122,16 +127,29 @@ Route::group(['middleware' => ['admin']], function () {
     Route::resource('/coa-setup', CoaSetupController::class);
 
     // Accounts Transaction
-    Route::resource('/debit-voucher-entry', DebitVoucherEntryController::class);
-    Route::get('/debit-voucher-entry/{id}/print', [DebitVoucherEntryController::class, 'print'])->name('debit-voucher-entry.print');
-    Route::resource('/credit-voucher-entry', CreditVoucherEntryController::class);
-    Route::get('/credit-voucher-entry/{id}/print', [creditVoucherEntryController::class, 'print'])->name('credit-voucher-entry.print');
-    Route::resource('/journal-voucher-entry', JournalVoucherEntryController::class);
-    Route::get('/journal-voucher-entry/{id}/print', [journalVoucherEntryController::class, 'print'])->name('journal-voucher-entry.print');
+    // Chart of Account
+    Route::resource('/coa', CoaController::class);
+
+    // Debit Voucher
+    Route::resource('/debit-voucher', DebitVoucherController::class);
+    Route::get('/debit-voucher/{id}/print', [DebitVoucherController::class, 'print'])->name('debit-voucher.print');
+
+    // Credit Voucher
+    Route::resource('/credit-voucher', CreditVoucherController::class);
+    Route::get('/credit-voucher/{id}/print', [CreditVoucherController::class, 'print'])->name('credit-voucher.print');
+
+    // Journal Voucher
+    Route::resource('/journal-voucher', JournalVoucherController::class);
+    Route::get('/journal-voucher/{id}/print', [JournalVoucherController::class, 'print'])->name('journal-voucher.print');
+
+    // Voucher Approve
     Route::resource('/voucher-approve', VoucherApproveController::class);
-    Route::resource('/voucher-reject', VoucherRejectController::class);
+    // Voucher Refuse
+    Route::resource('/voucher-refuse', VoucherRejectController::class);
+    // Automation Approve
     Route::resource('/automation-approve', AutomationApproveController::class);
-    Route::resource('/automation-reject', AutomationRejectController::class);
+    // Automation Refuse
+    Route::resource('/automation-refuse', AutomationRejectController::class);
 
     // Investor
     Route::resource('/investor', InvestorController::class);
@@ -169,6 +187,7 @@ Route::group(['middleware' => ['admin']], function () {
 
     // Invest Sattlement
     Route::resource('/invest-sattlement', InvestSattlementController::class);
+    // Reports
     Route::get('/coa-list', [ReportController::class, 'coaList'])->name('coa-list.index');
     Route::get('/voucher-list', [ReportController::class, 'voucherList'])->name('voucher-list.index');
     Route::get('/cash-book', [ReportController::class, 'cashBook'])->name('cash-book.index');
@@ -180,7 +199,11 @@ Route::group(['middleware' => ['admin']], function () {
     Route::get('/trial-balance', [ReportController::class, 'trialBalance'])->name('trial-balance.index');
     Route::get('/balance-sheet', [ReportController::class, 'balanceSheet'])->name('balance-sheet.index');
     Route::get('/head-details', [ReportController::class, 'headDetails'])->name('head-details.index');
+
+    Route::get('/daily-transaction', [ReportController::class, 'dailyTransaction'])->name('daily-transaction.index');
     Route::get('/investor-statement', [ReportController::class, 'investorStatement'])->name('investor-statement.index');
+    Route::get('/discount-wallet', [ReportController::class, 'discountWallet'])->name('discount-wallet.index');
+
 
     //===================Accounting and Investors end======================
 

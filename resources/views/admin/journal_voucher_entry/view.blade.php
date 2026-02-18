@@ -54,7 +54,7 @@
                     @foreach ($journalEntries as $item)
                         <tr>
                             <th class="text-center">{{ $loop->iteration }}</th>
-                            <th>{{ $item->coa->head_name }} - {{ $item->coa->head_code }}</th>
+                            <th>{{ $item->head_name }} - {{ $item->head_code }}</th>
                             <td>{{ number_format($item->debit_amount, 2, '.', ',') }}</td>
                             <td>{{ number_format($item->credit_amount, 2, '.', ',') }}</td>
                         </tr>
