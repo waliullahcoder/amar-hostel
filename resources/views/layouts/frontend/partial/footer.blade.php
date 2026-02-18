@@ -3,8 +3,8 @@
                 <div class="row">
                     <div class="col-lg-3  col-md-6 col-sm-6">
                         <div class="single-footer-widget">
-                            <h6 class="footer_title">{{ $services['about']->name }}</h6>
-                            <p>{{ $services['about']->description }}</p>
+                            <h6 class="footer_title">{{ $global_services['about']->name }}</h6>
+                            <p>{{ $global_services['about']->description }}</p>
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6 col-sm-6">
@@ -13,14 +13,14 @@
                             <div class="row">
                                 <div class="col-4">
                                     <ul class="list_style">
-                                        @foreach ($services['footer_col1'] as $item)
+                                        @foreach ($global_services['footer_col1'] as $item)
                                         <li><a href="{{ route('serviceDetails', $item->id) }}">{{ $item->name }}</a></li>
                                         @endforeach
                                     </ul>
                                 </div>
                                 <div class="col-4">
                                     <ul class="list_style">
-                                       @foreach ($services['footer_col2'] as $item)
+                                       @foreach ($global_services['footer_col2'] as $item)
                                         <li><a href="{{ route('serviceDetails', $item->id) }}">{{ $item->name }}</a></li>
                                         @endforeach
                                     </ul>
@@ -42,7 +42,7 @@
                         <div class="single-footer-widget instafeed">
                             <h6 class="footer_title">InstaFeed</h6>
                             <ul class="list_style instafeed d-flex flex-wrap">
-                                 @foreach ($services['gallery'] as $item)
+                                 @foreach ($global_services['gallery'] as $item)
                                 <li><img src="{{ asset('storage/'.$item->image) }}" alt="" loading="lazy" decoding="async" style="width: 50px; height: 50px; object-fit: cover;"></li>
                                 @endforeach
                             </ul>

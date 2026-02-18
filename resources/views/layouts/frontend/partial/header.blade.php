@@ -40,7 +40,7 @@
                                 Services <span class="ms-1">▼</span>
                             </a>
                             <ul class="dropdown-menu">
-                                @foreach ($services['menu'] as $service)
+                                @foreach ($global_services['menu'] as $service)
                                 <li class="nav-item"><a class="nav-link" href="{{ route('serviceDetails', $service->id) }}">{{ $service->name }}</a></li>
                                 @endforeach
                             </ul>
