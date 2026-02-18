@@ -20,6 +20,11 @@ use App\DataTables\voucherListDataTable;
 use App\Models\Expense;
 use App\Models\ReferralWallet;
 use App\Models\ServiceInvoice;
+use App\Models\Room;
+use App\Models\Store;
+use App\Models\ProductionList;
+use App\Models\SalesList;
+use App\Models\SalesReturnList;
 
 class ReportController extends Controller
 {
@@ -51,6 +56,133 @@ class ReportController extends Controller
         $title = 'Chart of Accounts';
         return $dataTable->render('admin.reports.coa-list.index', compact('title'));
     }
+
+    public function stockStatus(Request $request)
+{
+    if ($request->ajax()) {
+        $term = $request->get('q');
+
+        $results = Room::where('name', 'LIKE', "%$term%")
+            ->select('id', 'name', 'code')
+            ->get();
+
+        return response()->json($results);
+    }
+
+    $title = 'Stock Status';
+    $data = [];
+
+    $date_range = explode('to', $request->date_range);
+
+    $start_date = !is_null($request->date_range)
+        ? date('Y-m-d', strtotime($date_range[0]))
+        : date('Y-m-01');
+
+    $end_date = !is_null($request->date_range)
+        ? date('Y-m-d', strtotime($date_range[1]))
+        : date('Y-m-t');
+
+    $store_ids = $request->has('store_id')
+        ? (array)$request->store_id
+        : Store::where('status', true)->pluck('id')->toArray();
+
+    $product_ids = $request->has('product_id')
+        ? (array)$request->product_id
+        : Room::pluck('id')->toArray();
+
+    if ($request->has('filter')) {
+
+        $products = Room::whereIn('id', $product_ids)->get();
+
+        // Production (IN)
+        $productions = ProductionList::whereIn('product_id', $product_ids)
+            ->whereIn('store_id', $store_ids)
+            ->whereHas('production', function ($q) use ($start_date, $end_date) {
+                $q->whereBetween('date', [$start_date, $end_date]);
+            })->get();
+
+        // Sales (OUT)
+        $sales = SalesList::whereIn('product_id', $product_ids)
+            ->whereIn('store_id', $store_ids)
+            ->whereHas('sales', function ($q) use ($start_date, $end_date) {
+                $q->whereBetween('date', [$start_date, $end_date]);
+            })->get();
+
+        // Sales Return (IN)
+        $sales_returns = SalesReturnList::whereIn('product_id', $product_ids)
+            ->whereIn('store_id', $store_ids)
+            ->whereHas('return', function ($q) use ($start_date, $end_date) {
+                $q->whereBetween('date', [$start_date, $end_date]);
+            })->get();
+
+        // Opening (Before start_date)
+        $opening_productions = ProductionList::whereIn('product_id', $product_ids)
+            ->whereIn('store_id', $store_ids)
+            ->whereHas('production', function ($q) use ($start_date) {
+                $q->where('date', '<', $start_date);
+            })->get();
+
+        $opening_sales = SalesList::whereIn('product_id', $product_ids)
+            ->whereIn('store_id', $store_ids)
+            ->whereHas('sales', function ($q) use ($start_date) {
+                $q->where('date', '<', $start_date);
+            })->get();
+
+        $opening_sales_returns = SalesReturnList::whereIn('product_id', $product_ids)
+            ->whereIn('store_id', $store_ids)
+            ->whereHas('return', function ($q) use ($start_date) {
+                $q->where('date', '<', $start_date);
+            })->get();
+
+        foreach ($products as $product) {
+
+            $opening =
+                $opening_productions->where('product_id', $product->id)->sum('qty')
+                - $opening_sales->where('product_id', $product->id)->sum('qty')
+                + $opening_sales_returns->where('product_id', $product->id)->sum('qty');
+
+            $production = $productions->where('product_id', $product->id)->sum('qty');
+            $sale = $sales->where('product_id', $product->id)->sum('qty');
+            $sale_return = $sales_returns->where('product_id', $product->id)->sum('qty');
+
+            $data[] = [
+                'product' => $product->name,
+                'opening' => $opening,
+                'production' => $production,
+                'sales' => $sale,
+                'sales_return' => $sale_return,
+                'stock' => $opening + $production - $sale + $sale_return
+            ];
+        }
+    }
+
+    if (!is_null($request->print)) {
+
+        $report_title = 'Stock Status Report <br>
+            <span class="text-sm">' .
+            date('d-m-Y', strtotime($start_date)) .
+            ' To ' .
+            date('d-m-Y', strtotime($end_date)) .
+            '</span>';
+
+        $pdf = Pdf::loadView(
+            'admin.reports.stock-status.print',
+            compact('report_title', 'data')
+        );
+
+        return $pdf->stream('stock_status_' . date('d_m_Y_h_i_s') . '.pdf');
+    }
+
+    $stores = Store::where('status', true)
+        ->orderBy('name', 'asc')
+        ->get();
+
+    return view(
+        'admin.reports.stock-status.index',
+        compact('title', 'stores', 'start_date', 'end_date', 'data')
+    );
+}
+
 
     public function voucherList(Request $request, voucherListDataTable $dataTable)
     {
