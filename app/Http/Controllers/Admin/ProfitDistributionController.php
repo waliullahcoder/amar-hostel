@@ -150,79 +150,77 @@ class ProfitDistributionController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-{
-    dd($request->all());
-    $request->validate([
-        'year' => 'required',
-        'month' => 'required',
-        'date' => 'required',
-        'product_id' => 'required',
-        'invest_id' => 'required|array'
-    ]);
-
-    DB::beginTransaction();
-
-    try {
-
-        $product = Room::findOrFail($request->product_id);
-
-        $distribution = $this->model::create([
-            'serial_no' => $this->serialNo(),
-            'year' => $request->year,
-            'month' => $request->month,
-            'date' => date('Y-m-d', strtotime($request->date)),
-            'product_id' => $request->product_id,
-            'invest_qty' => $request->invest_qty,
-            'invest_amount' => $request->invest_amount,
-            'profit_amount' => $request->profit_amount,
-            'production_qty' => $request->production_qty,
-            'sales_qty' => $request->sales_qty,
-            'sales_amount' => $request->sales_amount,
-            'created_by' => auth()->id(),
+    {
+        $request->validate([
+            'year' => 'required',
+            'month' => 'required',
+            'date' => 'required',
+            'product_id' => 'required',
+            'invest_id' => 'required|array'
         ]);
 
-        $perShareProfit = 0;
-        if ($product->required_share > 0) {
-            $perShareProfit = round($request->profit_amount / $product->required_share);
-        }
+        DB::beginTransaction();
 
-        foreach ($request->invest_id as $invest_id) {
+        try {
 
-            $invest = Invest::findOrFail($invest_id);
+            $product = Room::findOrFail($request->product_id);
 
-            ProfitDistributionList::create([
-                'profit_distribution_id' => $distribution->id,
-                'invest_id' => $invest_id,
-                'investor_id' => $invest->investor_id,
-                'product_id' => $invest->product_id,
-                'profit_per_sale' => $product->profit,
+            $distribution = $this->model::create([
+                'serial_no' => $this->serialNo(),
+                'year' => $request->year,
+                'month' => $request->month,
+                'date' => date('Y-m-d', strtotime($request->date)),
+                'product_id' => $request->product_id,
+                'invest_qty' => $request->invest_qty,
+                'invest_amount' => $request->invest_amount,
+                'profit_amount' => $request->profit_amount,
+                'production_qty' => $request->production_qty,
                 'sales_qty' => $request->sales_qty,
-                'invest_qty' => $invest->qty,
-                'invest_amount' => $invest->amount,
-                'amount' => $perShareProfit * $invest->qty
+                'sales_amount' => $request->sales_amount,
+                'created_by' => auth()->id(),
             ]);
+
+            $perShareProfit = 0;
+            if ($product->required_share > 0) {
+                $perShareProfit = round($request->profit_amount / $product->required_share);
+            }
+
+            foreach ($request->invest_id as $invest_id) {
+
+                $invest = Invest::findOrFail($invest_id);
+
+                ProfitDistributionList::create([
+                    'profit_distribution_id' => $distribution->id,
+                    'invest_id' => $invest_id,
+                    'investor_id' => $invest->investor_id,
+                    'product_id' => $invest->product_id,
+                    'profit_per_sale' => $product->profit,
+                    'sales_qty' => $request->sales_qty,
+                    'invest_qty' => $invest->qty,
+                    'invest_amount' => $invest->amount,
+                    'amount' => $perShareProfit * $invest->qty
+                ]);
+            }
+
+            // Mark settled
+            Invest::whereIn('id', $request->invest_id)
+                ->update(['sattled' => true]);
+
+            SalesList::where('product_id', $request->product_id)
+                ->where('distributed', false)
+                ->update(['distributed' => true]);
+
+            DB::commit();
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->withErrors($e->getMessage());
         }
 
-        // Mark settled
-        Invest::whereIn('id', $request->invest_id)
-            ->update(['sattled' => true]);
-
-        SalesList::where('product_id', $request->product_id)
-            ->where('distributed', false)
-            ->update(['distributed' => true]);
-
-        DB::commit();
-
-    } catch (\Exception $e) {
-        dd($e->getMessage());
-        DB::rollback();
-        return back()->withErrors($e->getMessage());
+        return redirect()
+            ->route("admin.{$this->path}.index")
+            ->withSuccessMessage('Profit Distributed Successfully!');
     }
-
-    return redirect()
-        ->route("admin.{$this->path}.index")
-        ->withSuccessMessage('Profit Distributed Successfully!');
-}
 
 
     /**
