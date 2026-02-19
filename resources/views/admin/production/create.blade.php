@@ -2,22 +2,16 @@
 
 @section('content')
     <div class="row g-3">
-
-        {{-- Production No --}}
-        <div class="col-md-4 col-sm-6">
+<div class="col-md-4 col-sm-6">
             <label for="production" class="form-label"><b>Production No. <span class="text-danger">*</span></b></label>
             <input type="text" class="form-control" id="production" name="production" value="{{ $production_no }}" readonly
                 placeholder="Production No." required>
         </div>
-
-        {{-- Date --}}
         <div class="col-md-4 col-sm-6">
             <label for="date" class="form-label"><b>Date <span class="text-danger">*</span></b></label>
             <input type="text" class="form-control date_picker" id="date" name="date"
                 value="{{ date('d-m-Y', strtotime(old('date', date('d-m-Y')))) }}" placeholder="Date" required>
         </div>
-
-        {{-- Store --}}
         <div class="col-md-4 col-sm-6">
             <label for="store_id" class="form-label"><b>Store</b></label>
             <select id="store_id" name="store_id" class="select form-select" data-placeholder="Select Store">
@@ -26,8 +20,6 @@
                 @endforeach
             </select>
         </div>
-
-        {{-- Rooms --}}
         <div class="col-md-4 col-sm-6">
             <label for="product_id" class="form-label"><b>Rooms</b></label>
             <select id="product_id" class="select form-select" data-placeholder="Select Room">
@@ -43,19 +35,16 @@
             <small id="room_info" class="text-muted"></small>
         </div>
 
-        {{-- Quantity --}}
         <div class="col-md-4 col-6">
             <label for="quantity" class="form-label"><b>Quantity</b></label>
             <input type="number" class="form-control" id="quantity" step="1" value="1" placeholder="Quantity">
         </div>
 
-        {{-- Add Item Button --}}
         <div class="col-md-4 col-6">
             <label class="form-label text-white"><b>Add Item</b></label>
             <button type="button" class="btn btn-xs btn-primary w-100 py-2" id="add_item">Add Product</button>
         </div>
 
-        {{-- Items Table --}}
         <div class="col-12">
             <div class="table-responsive">
                 <table class="table table-striped align-middle mb-0">
@@ -92,7 +81,7 @@
 <script type="text/javascript">
 $(document).ready(function() {
 
-    // Show capacity & available on room select
+    // Show capacity & available
     $('#product_id').on('change', function() {
         var selected = $(this).find(':selected');
         var capacity = selected.data('capacity') || 0;
@@ -104,7 +93,6 @@ $(document).ready(function() {
         }
 
         $('#room_info').text(`Capacity: ${capacity}, Available: ${available}`);
-        $('#quantity').attr('max', Math.min(capacity, available));
         $('#quantity').val(1);
     });
 
@@ -113,7 +101,6 @@ $(document).ready(function() {
         var product_id = $('#product_id option:selected').val();
         var product = $('#product_id option:selected').text();
         var qty = +$('#quantity').val();
-        var capacity = $('#product_id option:selected').data('capacity') || 0;
         var available = $('#product_id option:selected').data('available') || 0;
         var sl = $('#tbody tr').length + 1;
 
@@ -127,22 +114,31 @@ $(document).ready(function() {
             return false;
         }
 
-        // Check capacity
-        if(qty > capacity) {
-            Swal.fire({toast:true,position:'top-right',text:`Quantity exceeds room capacity (${capacity})!`,icon:"error",timer:2000,showConfirmButton:false});
-            return false;
-        }
-
-        // Check available
-        if(qty > available) {
-            Swal.fire({toast:true,position:'top-right',text:`Only ${available} available!`,icon:"error",timer:2000,showConfirmButton:false});
-            return false;
-        }
-
         // same room already added
         if ($('#product_' + product_id).length) {
-            Swal.fire({toast:true,position:'top-right',text:"Room already added!",icon:"error",timer:1500,showConfirmButton:false});
-            return false;
+            // check how much already added
+            var existingQty = +$('#qty_' + product_id).val();
+            var totalAvailable = available - existingQty;
+
+            if(totalAvailable <= 0){
+                Swal.fire({toast:true,position:'top-right',text:`No more available for this room!`,icon:"error",timer:2000,showConfirmButton:false});
+                return false;
+            }
+
+            if(qty > totalAvailable){
+                qty = totalAvailable;
+                Swal.fire({toast:true,position:'top-right',text:`Only ${qty} remaining, adding that.`,icon:"info",timer:2000,showConfirmButton:false});
+            }
+
+            $('#qty_' + product_id).val(existingQty + qty);
+            calculate();
+            return true;
+        }
+
+        // New row, check available
+        if(qty > available){
+            qty = available;
+            Swal.fire({toast:true,position:'top-right',text:`Only ${qty} available, adding that.`,icon:"info",timer:2000,showConfirmButton:false});
         }
 
         var tr = `
@@ -158,7 +154,7 @@ $(document).ready(function() {
                            name="qty[${product_id}]" 
                            value="${qty}" 
                            required
-                           max="${Math.min(capacity, available)}">
+                           max="${available}">
                 </td>
                 <td class="text-center">
                     <input type="hidden" name="product_id[]" value="${product_id}">
