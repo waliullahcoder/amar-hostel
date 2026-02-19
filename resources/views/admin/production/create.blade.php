@@ -81,7 +81,7 @@
 <script type="text/javascript">
 $(document).ready(function() {
 
-    // Show capacity & available
+    // Show capacity & remaining on room select
     $('#product_id').on('change', function() {
         var selected = $(this).find(':selected');
         var capacity = selected.data('capacity') || 0;
@@ -92,55 +92,54 @@ $(document).ready(function() {
             return;
         }
 
-        $('#room_info').text(`Capacity: ${capacity}, Available: ${available}`);
-        $('#quantity').val(1);
+        // Remaining = Capacity - Available
+        var remaining = capacity - available;
+        remaining = remaining < 0 ? 0 : remaining;
+
+        $('#room_info').text(`Capacity: ${capacity}, Available: ${available}, Remaining: ${remaining}`);
+        $('#quantity').val(remaining > 0 ? 1 : 0);
     });
 
-    // Add item
+    // Add item button
     $(document).on('click', '#add_item', function() {
         var product_id = $('#product_id option:selected').val();
         var product = $('#product_id option:selected').text();
-        var qty = +$('#quantity').val();
+        var capacity = $('#product_id option:selected').data('capacity') || 0;
         var available = $('#product_id option:selected').data('available') || 0;
-        var sl = $('#tbody tr').length + 1;
+        var qty = +$('#quantity').val();
 
         if (product_id == '') {
             Swal.fire({toast:true,position:'top-right',text:"Please select a room!",icon:"error",timer:1500,showConfirmButton:false});
             return false;
         }
 
-        if (qty <= 0) {
-            Swal.fire({toast:true,position:'top-right',text:"Quantity must be greater than 0!",icon:"error",timer:1500,showConfirmButton:false});
+        // Remaining = Capacity - Available
+        var remaining = capacity - available;
+
+        if (remaining <= 0) {
+            Swal.fire({toast:true,position:'top-right',text:`Cannot add more for this room!`,icon:"error",timer:2000,showConfirmButton:false});
             return false;
         }
 
-        // same room already added
+        if (qty > remaining) {
+            qty = remaining;
+            Swal.fire({toast:true,position:'top-right',text:`Only ${qty} can be added for this room.`,icon:"info",timer:2000,showConfirmButton:false});
+        }
+
         if ($('#product_' + product_id).length) {
-            // check how much already added
+            // Update existing row
             var existingQty = +$('#qty_' + product_id).val();
-            var totalAvailable = available - existingQty;
-
-            if(totalAvailable <= 0){
-                Swal.fire({toast:true,position:'top-right',text:`No more available for this room!`,icon:"error",timer:2000,showConfirmButton:false});
-                return false;
+            if(existingQty + qty > remaining){
+                qty = remaining - existingQty;
+                Swal.fire({toast:true,position:'top-right',text:`Can only add ${qty} more for this room.`,icon:"info",timer:2000,showConfirmButton:false});
             }
-
-            if(qty > totalAvailable){
-                qty = totalAvailable;
-                Swal.fire({toast:true,position:'top-right',text:`Only ${qty} remaining, adding that.`,icon:"info",timer:2000,showConfirmButton:false});
-            }
-
             $('#qty_' + product_id).val(existingQty + qty);
             calculate();
             return true;
         }
 
-        // New row, check available
-        if(qty > available){
-            qty = available;
-            Swal.fire({toast:true,position:'top-right',text:`Only ${qty} available, adding that.`,icon:"info",timer:2000,showConfirmButton:false});
-        }
-
+        // New row
+        var sl = $('#tbody tr').length + 1;
         var tr = `
             <tr id="product_${product_id}">
                 <td class="text-center">${sl}</td>
@@ -154,7 +153,7 @@ $(document).ready(function() {
                            name="qty[${product_id}]" 
                            value="${qty}" 
                            required
-                           max="${available}">
+                           max="${remaining}">
                 </td>
                 <td class="text-center">
                     <input type="hidden" name="product_id[]" value="${product_id}">
@@ -163,18 +162,29 @@ $(document).ready(function() {
                     </button>
                 </td>
             </tr>`;
-
         $('#tbody').append(tr);
         calculate();
     });
 
-    // Quantity change check
+    // Quantity change validation
     $(document).on('keyup change wheel', '.qty', function() {
-        var max = +$(this).attr('max') || 0;
-        if(+$(this).val() > max){
-            $(this).val(max);
-            Swal.fire({toast:true,position:'top-right',text:`Max allowed quantity is ${max}`,icon:"error",timer:2000,showConfirmButton:false});
+        var product_id = $(this).attr('id').replace('qty_', '');
+        var selected = $('#product_id option:selected[value="'+product_id+'"]');
+        var capacity = selected.data('capacity') || 0;
+        var available = selected.data('available') || 0;
+
+        var remaining = capacity - available;
+        remaining = remaining < 0 ? 0 : remaining;
+
+        if(+$(this).val() > remaining){
+            $(this).val(remaining);
+            Swal.fire({toast:true,position:'top-right',text:`Max allowed for this room is ${remaining}`,icon:"error",timer:2000,showConfirmButton:false});
         }
+
+        if(+$(this).val() < 1){
+            $(this).val(1);
+        }
+
         calculate();
     });
 
@@ -194,7 +204,7 @@ $(document).ready(function() {
         $('#totalQty').val(totalQty);
     }
 
-    // Re-serial number
+    // Re-serial numbers
     function reSerial() {
         $('#tbody tr').each(function(index) {
             $(this).find('td:first').text(index + 1);
@@ -203,4 +213,7 @@ $(document).ready(function() {
 
 });
 </script>
+
+
+
 @endpush

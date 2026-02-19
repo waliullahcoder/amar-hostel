@@ -146,12 +146,13 @@ class ReportController extends Controller
             $sale_return = $sales_returns->where('product_id', $product->id)->sum('qty');
 
             $data[] = [
+                'room_id' => $product->id,
                 'product' => $product->name,
-                'opening' => $opening,
+                'opening' => $product->capacity,
                 'production' => $production,
                 'sales' => $sale,
                 'sales_return' => $sale_return,
-                'stock' => $opening + $production - $sale + $sale_return
+                'stock' => $product->available
             ];
         }
     }

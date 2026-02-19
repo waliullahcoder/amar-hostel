@@ -44,11 +44,11 @@
         <thead class="text-nowrap">
             <tr>
                 <th class="text-center" width="30">SL#</th>
+                <th>RoomID</th>
                 <th>Room</th>
                 <th class="text-center" width="50">Opening</th>
-                <th class="text-center" width="50">Roomion</th>
+                <th class="text-center" width="50">Production</th>
                 <th class="text-center" width="50">Sales</th>
-                <th class="text-center" width="50">Sales Return</th>
                 <th class="text-center" width="50">Stock</th>
             </tr>
         </thead>
@@ -57,12 +57,12 @@
             @foreach ($data as $row)
                 <tr>
                     <td class="text-center">{{ $key++ }}</td>
-                    <td>{{ $row['product'] }} @if(!empty($row['edition'])) <span class="text-muted">({{ $row['edition'] }})</span> @endif</td>
-                    <td class="text-center">{{ number_format($row['opening'], 2, '.', ',') }}</td>
-                    <td class="text-center">{{ number_format($row['production'], 2, '.', ',') }}</td>
-                    <td class="text-center">{{ number_format($row['sales'], 2, '.', ',') }}</td>
-                    <td class="text-center">{{ number_format($row['sales_return'], 2, '.', ',') }}</td>
-                    <td class="text-center">{{ number_format($row['stock'], 2, '.', ',') }}</td>
+                    <td class="text-center">ROOMID{{ $row['room_id'] }}</td>
+                    <td>{{ $row['product'] }}</td>
+                    <td class="text-center">{{ number_format($row['opening']) }}</td>
+                    <td class="text-center">{{ number_format($row['production']) }}</td>
+                    <td class="text-center">{{ number_format($row['sales']) }}</td>
+                    <td class="text-center">{{ number_format($row['stock']) }}</td>
                 </tr>
             @endforeach
         </tbody>

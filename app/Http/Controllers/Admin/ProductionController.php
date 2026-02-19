@@ -109,13 +109,13 @@ class ProductionController extends Controller
 
                     $qty = $request->qty[$product_id] ?? 0;
 
-                    // ❌ Capacity check
+                    // ❌ Logic-1: capacity check
                     if ($qty > $room->capacity) {
                         throw new \Exception("{$room->name} capacity exceeded! Max Capacity: {$room->capacity}");
                     }
 
-                    // ❌ Available check
-                    if ($qty > $room->available) {
+                    // ❌ Logic-2: available check (available = capacity - already booked)
+                    if ($qty > ($room->capacity-$room->available)) {
                         throw new \Exception("{$room->name} available only {$room->available}");
                     }
                 }
@@ -143,7 +143,7 @@ class ProductionController extends Controller
                     ]);
 
                     // Reduce available quantity of the room
-                    \App\Models\Room::where('id', $product_id)->decrement('available', $qty);
+                    \App\Models\Room::where('id', $product_id)->increment('available', $qty);
                 }
 
             });

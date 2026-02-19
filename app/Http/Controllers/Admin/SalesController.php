@@ -237,7 +237,8 @@ class SalesController extends Controller
                 $client = Client::find($request->client_id);
                 if ($client->coa) {
                     $income_head = CoaSetup::where('head_type', 'I')->where('head_name', 'Product Sales')->first();
-                    $headCode = [$client->coa->head_code, $income_head->head_code];
+                    $headCode = [$client->coa->head_code, $income_head->head_code??null];
+                  
                     $debit_amount = [$request->net_amount, 0.00];
                     $credit_amount = [0.00, $request->net_amount];
 
@@ -248,7 +249,7 @@ class SalesController extends Controller
                             'voucher_no' => $data->invoice,
                             'voucher_type' => "Client Sales",
                             'date' => date('Y-m-d', strtotime($request->date)),
-                            'coa_id' => $coa->id,
+                            'coa_id' => $coa->id??0,
                             'coa_head_code' => $headCode[$i],
                             'narration' => 'Client Sales Against Invoice No - ' . $data->invoice,
                             'debit_amount' => $debit_amount[$i],
