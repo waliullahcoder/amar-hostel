@@ -73,6 +73,10 @@
                             data-price="{{ $room->price }}"
                             data-capacity="{{ $room->capacity }}"
                             data-available="{{ $room->available }}"
+                            data-profit="{{ $room->profit }}"
+                            data-required_share="{{ $room->required_share }}"
+                            data-show_dashboard="{{ $room->show_dashboard }}"
+                            data-serial="{{ $room->serial }}"
                             data-description="{{ $room->description }}"
                             data-category="{{ $room->category_id }}"
                             data-image="{{ $room->image }}"
@@ -198,6 +202,18 @@
                                     <label class="fw-bold">Available</label>
                                     <input type="number" name="available" id="available" class="form-control">
                                 </div>
+                                <div class="col-md-4">
+                                    <label class="fw-bold">Profit</label>
+                                    <input type="number" name="profit" id="profit" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="fw-bold">Required Share</label>
+                                    <input type="number" name="required_share" id="required_share" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="fw-bold">Show on Dashboard</label>
+                                    <input type="checkbox" name="show_dashboard" id="show_dashboard" class="form-check-input">
+                                </div>
                             </div>
                         </div>
 
@@ -255,6 +271,10 @@
                 <p><strong>Name:</strong> <span id="v_name"></span></p>
                 <p><strong>Price:</strong> <span id="v_price"></span></p>
                 <p><strong>Capacity:</strong> <span id="v_capacity"></span></p>
+                <p><strong>Profit:</strong> <span id="v_profit"></span></p>
+                <p><strong>Required Share:</strong> <span id="v_required_share"></span></p>
+                <p><strong>Show on Dashboard:</strong> <span id="v_show_dashboard"></span></p>
+                <p><strong>Serial:</strong> <span id="v_serial"></span></p>
                 <p><strong>Available:</strong> <span id="v_available"></span></p>
                 <p><strong>Description:</strong> <span id="v_description"></span></p>
             </div>
@@ -286,6 +306,10 @@ document.querySelectorAll('.editRoom').forEach(btn=>{
         room_name.value = btn.dataset.name;
         room_price.value = btn.dataset.price;
         room_capacity.value = btn.dataset.capacity;
+        room_profit.value = btn.dataset.profit;
+        required_share.value = btn.dataset.required_share;
+        show_dashboard.checked = btn.dataset.show_dashboard == '1' ? true : false;
+        serial.value = btn.dataset.serial;
         room_description.value = btn.dataset.description;
         room_category_id.value = btn.dataset.category;
         meta_title.value = btn.dataset.meta_title ?? '';
@@ -310,6 +334,10 @@ function viewRoom(r){
     v_price.innerText = '৳ '+Number(r.price).toLocaleString();
     v_capacity.innerText = r.capacity;
     v_available.innerText = r.available;
+    v_profit.innerText = r.profit;
+    v_required_share.innerText = r.required_share;
+    v_show_dashboard.innerText = r.show_dashboard == 1 ? 'Yes' : 'No';
+    v_serial.innerText = r.serial;
     v_description.innerText = r.description ?? 'N/A';
 
     new bootstrap.Modal(viewRoomModal).show();

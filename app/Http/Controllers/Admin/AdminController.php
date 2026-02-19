@@ -204,6 +204,10 @@ class AdminController extends Controller
             'capacity'         => 'required|integer',
             'description'      => 'nullable|string',
             'available'        => 'nullable',
+            'profit'           => 'required|numeric',
+            'required_share'   => 'required|integer',
+            'show_dashboard'   => 'nullable',
+            'serial'           => 'required|integer',
 
             // room image
             'image'            => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
@@ -271,6 +275,10 @@ class AdminController extends Controller
             'capacity'         => 'required|integer',
             'description'      => 'nullable|string',
             'available'        => 'nullable',
+            'profit'           => 'required|numeric',
+            'required_share'   => 'required|integer',
+            'show_dashboard'   => 'nullable',
+            'serial'           => 'required|integer',
 
             // Room image
             'image'            => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',

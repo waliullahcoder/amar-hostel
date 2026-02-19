@@ -21,6 +21,8 @@ class Room extends Model
     'description',
     'price',
     'capacity',
+    'profit',
+    'available',
     'image',
     'image2',
     'image3',
