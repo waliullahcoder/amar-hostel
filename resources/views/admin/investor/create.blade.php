@@ -1,6 +1,15 @@
 @extends('layouts.admin.create_app')
 
 @section('content')
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
     <div class="row g-3">
         <div class="col-lg-4 col-sm-6">
             <label for="name" class="form-label"><b>Investor Name <span class="text-danger">*</span></b></label>

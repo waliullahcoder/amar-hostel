@@ -79,7 +79,14 @@
                             @endphp
                             <li class="list-group-item {{ $bg }} text-center">
                                 <i class="fas fa-bed"></i>
-                                <b>{{ $item['product']->name ?? '' }}</b>
+                                <b>{{ $item['product']->name ?? '' }} </b>
+                            </li>
+                            <li class="list-group-item d-flex bg-light" title="Room Capacity Qty">
+                                <span class="d-inline-block" style="min-width: 135px;">Room Price/Seat</span> =&gt;
+                                &nbsp;&nbsp;&nbsp;
+                                <div class="flex-grow-1 text-end">
+                                    {{ $item['price_per_seat'] ?? 0 }}
+                                </div>
                             </li>
                             <li class="list-group-item d-flex bg-light" title="Room Capacity Qty">
                                 <span class="d-inline-block" style="min-width: 135px;">Room Capacity Qty</span> =&gt;

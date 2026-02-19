@@ -57,7 +57,6 @@ class InvestorController extends Controller
             'image' => 'image',
             'phone' => 'required|unique:users,phone',
         ]);
-
         if (!is_null($request->email)) {
             $request->validate([
                 'email' => 'email|unique:users,email',
@@ -75,7 +74,6 @@ class InvestorController extends Controller
                 'password' => Hash::make($request->phone),
                 'created_by' => Auth::user()->id,
             ]);
-
             $file = $request->document;
             if (isset($file)) {
                 $fileName = $file->getClientOriginalName();
@@ -90,7 +88,8 @@ class InvestorController extends Controller
                 $document = 'investor-document/' . $fileFullName;
             }
 
-            $parent = CoaSetup::findOrFail(140);
+            $parent = CoaSetup::findOrFail(1);
+       
             $prefix = $parent->head_code;
             $maxCode = CoaSetup::where('parent_id', $parent->id)->max('head_code');
             if ($maxCode) {
@@ -111,7 +110,7 @@ class InvestorController extends Controller
                 'created_by'  => Auth::id(),
             ]);
 
-            $parent = CoaSetup::findOrFail(185);
+            $parent = CoaSetup::findOrFail(1);
             $prefix = $parent->head_code;
             $maxCode = CoaSetup::where('parent_id', $parent->id)->max('head_code');
             if ($maxCode) {
@@ -195,7 +194,6 @@ class InvestorController extends Controller
             'image' => 'image',
             'phone' => 'required|unique:users,phone,' . $data->user_id,
         ]);
-
         if (!is_null($request->email)) {
             $request->validate([
                 'email' => 'email|unique:users,email,' . $data->user_id,
@@ -310,8 +308,7 @@ class InvestorController extends Controller
                 'updated_by' => Auth::user()->id,
             ]);
         });
-
-        return redirect()->route("admin.{$this->path}.index")->withSuccessMessage('Updated Successfully!');
+        return redirect()->route("admin.{$this->path}.index")->with('success','Updated Successfully!');
     }
 
     /**

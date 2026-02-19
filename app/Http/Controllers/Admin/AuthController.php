@@ -12,6 +12,8 @@ use App\Models\ProfitDistribution;
 use App\Models\ProductionList;
 use App\Models\Booking;
 use App\Models\Room;
+use App\Models\Sales;
+use App\Models\SalesList;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
@@ -76,11 +78,9 @@ class AuthController extends Controller
         
         $data = [];
         foreach ($rooms as $item) {
-            // $sales = SalesList::whereHas('sales')->where('product_id', $item->id)->select('*', DB::raw('SUM(qty - return_qty) as sumQty, SUM(net_amount - return_amount) as sumAmount'))->get();
-            // $productionQty = ProductionList::whereHas('production')->where('product_id', $item->id)->sum('qty');
-            $sales = Booking::where('room_id', $item->id)->get();
-            $salesQty = round($sales->sum('guests') * 0.9);
-            $salesAmount = round(($sales->sum('total_price')) * 0.9);
+            $sales = SalesList::where('product_id', $item->id)->get();
+            $salesQty = round($sales->sum('qty'));
+            $salesAmount = round(($sales->sum('net_amount')));
             $totalProfit = $salesQty * $item->profit;
             $totalShare = Invest::where('product_id', $item->id)->sum('qty');
             $sattledQty = Invest::where('product_id', $item->id)->where('sattled', true)->sum('qty');
@@ -88,13 +88,14 @@ class AuthController extends Controller
             $distribution = ProfitDistribution::where('product_id', $item->id)->first();
             if($distribution){
                 $productionQty  = $distribution->production_qty??0;
-                $salesQty       = $distribution->sales_qty??0;
+                $salesQty       = $salesQty??0;
                 $salesAmount    = $distribution->sales_amount??0;
                 $totalProfit    = $distribution->profit_amount??0;
             }
 
             $data[] = [
                 'product'           => $item??[],
+                'price_per_seat'    => $item->price??0,
                 'production_qty'    => $item->capacity??0,
                 'sales_qty'         => $salesQty??0,
                 'sales_amount'      => $salesAmount??0,
