@@ -87,47 +87,77 @@ class ProductionController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'date' => 'required',
-            'store_id' => 'required',
-            'product_id' => 'required|array',
-            'qty' => 'required|array'
-        ]);
+{
+    $request->validate([
+        'date' => 'required',
+        'store_id' => 'required',
+        'product_id' => 'required|array',
+        'qty' => 'required|array'
+    ]);
 
-        try {
+    try {
 
-            DB::transaction(function () use ($request) {
+        DB::transaction(function () use ($request) {
 
-                $production = $this->model::create([
-                    'store_id' => $request->store_id,
-                    'production_no' => $this->productionNo(),
-                    'date' => date('Y-m-d', strtotime($request->date)),
-                    'total_qty' => $request->total_qty ?? 0,
-                    'remarks' => $request->remarks,
-                    'created_by' => Auth::id(),
-                ]);
+            // 🔎 First Validate All Rooms Before Insert
+            foreach ($request->product_id as $product_id) {
 
-                foreach ($request->product_id as $product_id) {
+                $room = \App\Models\Room::find($product_id);
 
-                    ProductionList::create([
-                        'production_id' => $production->id,
-                        'store_id' => $request->store_id,
-                        'product_id' => $product_id,
-                        'qty' => $request->qty[$product_id] ?? 0,
-                    ]);
+                if (!$room) {
+                    throw new \Exception("Room not found!");
                 }
 
-            });
+                $qty = $request->qty[$product_id] ?? 0;
 
-        } catch (\Exception $e) {
-            dd($e->getMessage());
-            return back()->withErrors($e->getMessage());
-        }
+                // ❌ Capacity check
+                if ($qty > $room->capacity) {
+                    throw new \Exception("{$room->name} capacity exceed! Max Capacity: {$room->capacity}");
+                }
 
-        return redirect()->route("admin.{$this->path}.index")
-            ->withSuccessMessage('Created Successfully!');
+                // ❌ Available check
+                if ($qty > $room->available) {
+                    throw new \Exception("{$room->name} available only {$room->available}");
+                }
+            }
+
+            // ✅ Create Production
+            $production = $this->model::create([
+                'store_id' => $request->store_id,
+                'production_no' => $this->productionNo(),
+                'date' => date('Y-m-d', strtotime($request->date)),
+                'total_qty' => $request->total_qty ?? 0,
+                'remarks' => $request->remarks,
+                'created_by' => Auth::id(),
+            ]);
+
+            // ✅ Insert List
+            foreach ($request->product_id as $product_id) {
+
+                $qty = $request->qty[$product_id];
+
+                ProductionList::create([
+                    'production_id' => $production->id,
+                    'store_id' => $request->store_id,
+                    'product_id' => $product_id,
+                    'qty' => $qty,
+                ]);
+
+                // 🔻 Reduce Available
+                \App\Models\Room::where('id', $product_id)
+                    ->decrement('available', $qty);
+            }
+
+        });
+
+    } catch (\Exception $e) {
+        return back()->withErrors($e->getMessage())->withInput();
     }
+
+    return redirect()->route("admin.{$this->path}.index")
+        ->withSuccessMessage('Created Successfully!');
+}
+
 
 
     /**
