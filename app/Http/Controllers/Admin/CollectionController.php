@@ -227,6 +227,7 @@ class CollectionController extends Controller
                 }
             });
         } catch (\Exception $e) {
+            dd($e);
             return back()->withErrors($e->getMessage());
         }
 

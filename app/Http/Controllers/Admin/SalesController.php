@@ -231,6 +231,8 @@ class SalesController extends Controller
                         'discount' => $discount,
                         'net_amount' => $request->amount[$product_id] - $discount,
                     ]);
+                      // Reduce available quantity of the room
+                    \App\Models\Room::where('id', $product_id)->decrement('available',  $request->qty[$product_id]);
                 }
 
                 // ================= Account Transaction =================
@@ -489,6 +491,8 @@ class SalesController extends Controller
                         'discount'   => $discount,
                         'net_amount' => $amount - $discount,
                     ]);
+
+                    
                 }
                 // ----------- END SALES LIST -----------
 
