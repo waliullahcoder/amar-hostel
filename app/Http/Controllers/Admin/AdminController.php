@@ -184,7 +184,7 @@ class AdminController extends Controller
     // ================= ROOMS =================
     public function rooms()
     {
-        $rooms = Room::all();
+        $rooms = Room::orderBy('id', 'desc')->get();
         $categories = Category::all();
         return view('admin.rooms.index', compact('rooms','categories'));
     }

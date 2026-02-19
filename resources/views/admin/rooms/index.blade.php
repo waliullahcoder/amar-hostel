@@ -211,6 +211,10 @@
                                     <input type="number" name="required_share" id="required_share" class="form-control">
                                 </div>
                                 <div class="col-md-4">
+                                    <label class="fw-bold">Serial</label>
+                                    <input type="number" name="serial" id="serial" class="form-control">
+                                </div>
+                                <div class="col-md-4">
                                     <label class="fw-bold">Show on Dashboard</label>
                                     <input type="checkbox" name="show_dashboard" id="show_dashboard" class="form-check-input">
                                 </div>
@@ -293,41 +297,55 @@ function resetRoomForm(){
     roomForm.reset();
     roomForm.action = "{{ route('admin.rooms.store') }}";
     form_method.value = "POST";
+
     ['image','image2','image3','image4'].forEach(i=>{
         document.getElementById('preview_'+i).innerHTML = '';
     });
+
+    // Clear checkbox manually
+    show_dashboard.checked = false;
 }
 
 document.querySelectorAll('.editRoom').forEach(btn=>{
     btn.onclick = ()=>{
+
+        // Update form action to PUT
         roomForm.action = `/admin/rooms/${btn.dataset.id}`;
         form_method.value = "PUT";
 
-        room_name.value = btn.dataset.name;
-        room_price.value = btn.dataset.price;
-        room_capacity.value = btn.dataset.capacity;
-        room_profit.value = btn.dataset.profit;
-        required_share.value = btn.dataset.required_share;
+        // General
+        room_name.value = btn.dataset.name ?? '';
+        room_description.value = btn.dataset.description ?? '';
+        room_category_id.value = btn.dataset.category ?? '';
+
+        // Price Tab
+        room_price.value = btn.dataset.price ?? '';
+        room_capacity.value = btn.dataset.capacity ?? '';
+        available.value = btn.dataset.available ?? '';
+        profit.value = btn.dataset.profit ?? '';
+        required_share.value = btn.dataset.required_share ?? '';
+        serial.value = btn.dataset.serial ?? '';
+
+        // Checkbox
         show_dashboard.checked = btn.dataset.show_dashboard == '1' ? true : false;
-        serial.value = btn.dataset.serial;
-        room_description.value = btn.dataset.description;
-        room_category_id.value = btn.dataset.category;
+
+        // SEO Tab
         meta_title.value = btn.dataset.meta_title ?? '';
         meta_keywords.value = btn.dataset.meta_keywords ?? '';
         meta_description.value = btn.dataset.meta_description ?? '';
-        available.value = btn.dataset.available ?? '';
 
+        // Images preview
         ['image','image2','image3','image4'].forEach(i=>{
             document.getElementById('preview_'+i).innerHTML =
-                btn.dataset[i] ? `<img src="/storage/${btn.dataset[i]}" class="img-fluid rounded" width="20">` : '';
+                btn.dataset[i] ? `<img src="/storage/${btn.dataset[i]}" class="img-fluid rounded" width="50">` : '';
         });
     }
 });
 
+// View modal stays the same
 function viewRoom(r){
     ['image','image2','image3','image4'].forEach((i,idx)=>{
-        document.getElementById('v_img'+(idx+1)).src =
-            r[i] ? '/storage/'+r[i] : '/no-image.png';
+        document.getElementById('v_img'+(idx+1)).src = r[i] ? '/storage/'+r[i] : '/no-image.png';
     });
 
     v_name.innerText = r.name;
