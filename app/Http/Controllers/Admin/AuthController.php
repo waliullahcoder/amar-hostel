@@ -95,7 +95,7 @@ class AuthController extends Controller
 
             $data[] = [
                 'product'           => $item??[],
-                'production_qty'    => $productionQty??0,
+                'production_qty'    => $item->capacity??0,
                 'sales_qty'         => $salesQty??0,
                 'sales_amount'      => $salesAmount??0,
                 'investor_profit'   => $totalProfit??0,
