@@ -81,8 +81,8 @@
                                 <i class="fas fa-bed"></i>
                                 <b>{{ $item['product']->name ?? '' }}</b>
                             </li>
-                            <li class="list-group-item d-flex bg-light" title="Room Published Qty">
-                                <span class="d-inline-block" style="min-width: 135px;">Room Published Qty</span> =&gt;
+                            <li class="list-group-item d-flex bg-light" title="Room Capacity Qty">
+                                <span class="d-inline-block" style="min-width: 135px;">Room Capacity Qty</span> =&gt;
                                 &nbsp;&nbsp;&nbsp;
                                 <div class="flex-grow-1 text-end">
                                     {{ $item['production_qty'] ?? 0 }}

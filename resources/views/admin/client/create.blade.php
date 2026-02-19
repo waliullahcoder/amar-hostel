@@ -1,6 +1,11 @@
 @extends('layouts.admin.create_app')
 
 @section('content')
+@if(session('error'))
+<div class="alert alert-danger">
+    {{ session('error') }}
+</div>
+@endif
     <div class="row g-3">
         <div class="col-sm-6">
             <label for="code" class="form-label"><b>Code</b></label>

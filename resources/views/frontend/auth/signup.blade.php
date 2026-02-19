@@ -71,6 +71,19 @@
                                 @enderror
                             </div>
 
+                             <!-- Phone -->
+                            <div class="form-group mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="phone"
+                                       name="phone"
+                                       value="{{ old('phone') }}"
+                                       class="form-control rounded-pill py-2 px-3 @error('phone') is-invalid @enderror"
+                                       required>
+                                @error('phone')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
                             <!-- Password -->
                             <div class="form-group mb-3">
                                 <label class="form-label">Password</label>

@@ -7,6 +7,7 @@ use App\HelperClass;
 use App\Models\Area;
 use App\Models\Client;
 use App\Models\Region;
+use App\Models\User;
 use App\Models\Territory;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -73,7 +74,7 @@ class ClientController extends Controller
 
         try {
             DB::transaction(function () use ($request) {
-                $parent = CoaSetup::findOrFail(7);
+                $parent = CoaSetup::findOrFail(4);
                 $prefix = $parent->head_code;
                 $maxCode = CoaSetup::withTrashed()->where('parent_id', $parent->id)->max('head_code');
                 if ($maxCode) {
@@ -94,23 +95,45 @@ class ClientController extends Controller
                     'created_by'  => Auth::id(),
                 ]);
 
-                $this->model::create([
-                    'region_id' => $request->region_id,
-                    'area_id' => $request->area_id,
-                    'territory_id' => $request->territory_id,
-                    'coa_id' => $account->id,
-                    'code' => $request->code,
-                    'name' => $request->name,
-                    'contact_person' => $request->contact_person,
-                    'phone' => $request->phone,
-                    'email' => $request->email,
-                    'address' => $request->address,
-                    'bin_no' => $request->bin_no,
-                    'credit_limit' => $request->credit_limit,
-                    'created_by' => Auth::id(),
-                ]);
+               if (!is_null($request->phone) || !is_null($request->email)) {
+
+                $user = User::where('phone', $request->phone)
+                            ->orWhere('email', $request->email)
+                            ->first();
+
+                if (!$user) {
+                    $user = User::create([
+                        'name'       => $request->name,
+                        'email'      => $request->email,
+                        'phone'      => $request->phone,
+                        'user_name'  => $request->phone,
+                        'password'   => Hash::make($request->phone),
+                        'created_by' => Auth::id(),
+                    ]);
+                }
+
+                $user_id = $user->id; 
+            }
+            $this->model::create([
+                'user_id'        => $user_id, 
+                'region_id'      => $request->region_id,
+                'area_id'        => $request->area_id,
+                'territory_id'   => $request->territory_id,
+                'coa_id'         => $account->id,
+                'code'           => $request->code,
+                'name'           => $request->name,
+                'contact_person' => $request->contact_person,
+                'phone'          => $request->phone,
+                'email'          => $request->email,
+                'address'        => $request->address,
+                'bin_no'         => $request->bin_no,
+                'credit_limit'   => $request->credit_limit,
+                'created_by'     => Auth::id(),
+            ]);
+
             });
         } catch (\Exception $e) {
+            dd($e->getMessage());
             return back()->withErrors($e->getMessage());
         }
         return redirect()->route("admin.{$this->path}.index")->withSuccessMessage('Created Successfully!');

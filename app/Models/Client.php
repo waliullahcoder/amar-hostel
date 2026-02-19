@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Client extends Model
 {
     use SoftDeletes;
-    protected $fillable = ['coa_id', 'region_id', 'area_id', 'territory_id', 'code', 'name', 'contact_person', 'phone', 'email', 'address', 'credit_limit', 'bin_no', 'status', 'created_by', 'updated_by', 'deleted_by'];
+    protected $fillable = ['user_id','coa_id', 'region_id', 'area_id', 'territory_id', 'code', 'name', 'contact_person', 'phone', 'email', 'address', 'credit_limit', 'bin_no', 'status', 'created_by', 'updated_by', 'deleted_by'];
 
     public function region()
     {
