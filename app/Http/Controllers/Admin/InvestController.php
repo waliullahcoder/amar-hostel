@@ -132,9 +132,7 @@ class InvestController extends Controller
         $title = $this->create_title;
         $invest_no = $this->investNo();
         $investors = Investor::where('status', true)->orderBy('name', 'asc')->get();
-        $cashHeads = CoaSetup::with('parent')->whereHas('parent', function ($query) {
-            $query->whereIn('head_name', ['Cash In Hand', 'Cash at Bank']);
-        })->get();
+        $cashHeads = CoaSetup::whereIn('head_name', ['Cash In Hand', 'Cash at Bank'])->get();
         $products = Room::where('status', true)->orderBy('id', 'desc')->get();
         return view("admin.{$this->path}.create", compact('title', 'invest_no', 'investors', 'cashHeads', 'products'));
     }

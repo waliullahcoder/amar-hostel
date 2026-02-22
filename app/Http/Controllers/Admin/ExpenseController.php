@@ -72,13 +72,11 @@ class ExpenseController extends Controller
     {
         $title = $this->create_title;
 
-        $cashHeads = CoaSetup::whereHas('parent', function ($query) {
-            $query->whereIn('head_name', ['Cash In Hand', 'Cash at Bank']);
-        })->where('transaction', 1)->orderBy('head_name', 'asc')->get();
+        $cashHeads = CoaSetup::whereIn('head_name', ['Cash In Hand', 'Cash at Bank'])->get();
 
         $debitHeads = CoaSetup::where(function ($query) {
-            $query->whereIn('head_type', ['E']);
-        })->where('head_code', 'like', '403%')->where('transaction', 1)->orderBy('head_name', 'asc')->get();
+            $query->whereIn('head_type', ['E', 'R', 'A', 'I','C']);
+        })->orderBy('head_name', 'asc')->get();
 
         $transaction_no = $this->transactionNo();
         return view("admin.{$this->path}.create", compact('title', 'cashHeads', 'debitHeads', 'transaction_no'));

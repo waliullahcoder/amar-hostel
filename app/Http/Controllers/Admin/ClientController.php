@@ -64,63 +64,54 @@ class ClientController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-        $request->validate([
-            'region_id' => 'required',
-            'area_id' => 'required',
-            'territory_id' => 'required',
-            'name' => 'required',
-            'code' => 'nullable|unique:clients,code'
-        ]);
+{
+    $request->validate([
+        'region_id'     => 'required',
+        'area_id'       => 'required',
+        'territory_id'  => 'required',
+        'name'          => 'required',
+        'code'          => 'nullable|unique:clients,code'
+    ]);
 
-        try {
-            DB::transaction(function () use ($request) {
-                $parent = CoaSetup::findOrFail(4);
-                $prefix = $parent->head_code;
-                $maxCode = CoaSetup::withTrashed()->where('parent_id', $parent->id)->max('head_code');
-                if ($maxCode) {
-                    $next = str_pad((int) substr($maxCode, strlen($prefix)) + 1, 2, '0', STR_PAD_LEFT);
-                    $headCode = $prefix . $next;
-                } else {
-                    $headCode = $prefix . '01';
-                }
-                $account = CoaSetup::create([
-                    'parent_id'   => $parent->id,
-                    'head_code'   => $headCode,
-                    'head_name'   => $request->name,
-                    'transaction' => true,
-                    'general'     => false,
-                    'head_type'   => $parent->head_type,
-                    'status'      => true,
-                    'updateable'     => false,
-                    'created_by'  => Auth::id(),
-                ]);
+    try {
+        DB::transaction(function () use ($request) {
 
-               if (!is_null($request->phone) || !is_null($request->email)) {
+            $user = null;
 
-                $user = User::where('phone', $request->phone)
-                            ->orWhere('email', $request->email)
-                            ->first();
+            if ($request->phone || $request->email || $request->name) {
+
+                $user = User::query()
+                    ->when($request->phone, function ($q) use ($request) {
+                        $q->where('phone', $request->phone);
+                    })
+                    ->when($request->email, function ($q) use ($request) {
+                        $q->orWhere('email', $request->email);
+                    })
+                    ->when($request->name, function ($q) use ($request) {
+                        $q->orWhere('name', $request->name);
+                    })
+                    ->first();
 
                 if (!$user) {
                     $user = User::create([
                         'name'       => $request->name,
                         'email'      => $request->email,
                         'phone'      => $request->phone,
-                        'user_name'  => $request->phone,
-                        'password'   => Hash::make($request->phone),
+                        'user_name'  => $request->phone ?? $request->email ?? $request->name,
+                        'password'   => Hash::make($request->phone ?? '123456'),
                         'created_by' => Auth::id(),
                     ]);
                 }
 
-                $user_id = $user->id; 
+                $user_id = $user->id;
             }
-            $this->model::create([
-                'user_id'        => $user_id, 
+
+            // ================= CLIENT CREATE FIRST =================
+            $client = $this->model::create([
+                'user_id'        => $user_id,
                 'region_id'      => $request->region_id,
                 'area_id'        => $request->area_id,
                 'territory_id'   => $request->territory_id,
-                'coa_id'         => $account->id,
                 'code'           => $request->code,
                 'name'           => $request->name,
                 'contact_person' => $request->contact_person,
@@ -131,14 +122,35 @@ class ClientController extends Controller
                 'credit_limit'   => $request->credit_limit,
                 'created_by'     => Auth::id(),
             ]);
+            // ================= COA CREATE USING CLIENT ID =================
+            $parent = CoaSetup::findOrFail(4);
 
-            });
-        } catch (\Exception $e) {
-            dd($e->getMessage());
-            return back()->withErrors($e->getMessage());
-        }
-        return redirect()->route("admin.{$this->path}.index")->withSuccessMessage('Created Successfully!');
+            $account = CoaSetup::create([
+                'parent_id'   => $parent->id,
+                'head_code'   => $client->id, // 🔥 Client ID as Head Code
+                'head_name'   => $client->name,
+                'transaction' => true,
+                'general'     => false,
+                'head_type'   => 'C',
+                'status'      => true,
+                'updateable'  => false,
+                'created_by'  => Auth::id(),
+            ]);
+
+            // ================= UPDATE CLIENT WITH COA ID =================
+            $client->update([
+                'coa_id' => $account->id
+            ]);
+
+        });
+
+    } catch (\Exception $e) {
+        return back()->withErrors($e->getMessage());
     }
+
+    return redirect()->route("admin.{$this->path}.index")
+                     ->withSuccessMessage('Created Successfully!');
+}
 
     /**
      * Display the specified resource.
@@ -184,53 +196,53 @@ class ClientController extends Controller
         ]);
 
         try {
-            DB::transaction(function () use ($request, $id) {
+              DB::transaction(function () use ($request, $id) {
+
                 $data = $this->model::findOrFail($id);
 
+                // ================= COA UPDATE OR CREATE =================
                 $account = CoaSetup::find($data->coa_id);
+
                 if ($account) {
+
+                    // শুধু name update
                     $account->update([
-                        'head_name' => $request->name,
-                        'updateable'     => false,
-                        'updated_by' => Auth::id()
+                        'head_name'  => $request->name,
+                        'updated_by' => Auth::id(),
                     ]);
+
                 } else {
-                    $parent = CoaSetup::findOrFail(7);
-                    $prefix = $parent->head_code;
-                    $maxCode = CoaSetup::withTrashed()->where('parent_id', $parent->id)->max('head_code');
-                    if ($maxCode) {
-                        $next = str_pad((int) substr($maxCode, strlen($prefix)) + 1, 2, '0', STR_PAD_LEFT);
-                        $headCode = $prefix . $next;
-                    } else {
-                        $headCode = $prefix . '01';
-                    }
+
+                    $parent = CoaSetup::findOrFail(4);
+
                     $account = CoaSetup::create([
                         'parent_id'   => $parent->id,
-                        'head_code'   => $headCode,
+                        'head_code'   => $data->id, // 🔥 Client ID as Head Code
                         'head_name'   => $request->name,
                         'transaction' => true,
                         'general'     => false,
                         'head_type'   => $parent->head_type,
                         'status'      => true,
-                        'updateable'     => false,
+                        'updateable'  => false,
                         'created_by'  => Auth::id(),
                     ]);
                 }
 
+                // ================= CLIENT UPDATE =================
                 $data->update([
-                    'region_id' => $request->region_id,
-                    'area_id' => $request->area_id,
-                    'territory_id' => $request->territory_id,
-                    'coa_id' => $account->id,
-                    'code' => $request->code,
-                    'name' => $request->name,
+                    'region_id'      => $request->region_id,
+                    'area_id'        => $request->area_id,
+                    'territory_id'   => $request->territory_id,
+                    'coa_id'         => $account->id,
+                    'code'           => $request->code,
+                    'name'           => $request->name,
                     'contact_person' => $request->contact_person,
-                    'phone' => $request->phone,
-                    'email' => $request->email,
-                    'address' => $request->address,
-                    'bin_no' => $request->bin_no,
-                    'credit_limit' => $request->credit_limit,
-                    'updated_by' => Auth::id(),
+                    'phone'          => $request->phone,
+                    'email'          => $request->email,
+                    'address'        => $request->address,
+                    'bin_no'         => $request->bin_no,
+                    'credit_limit'   => $request->credit_limit,
+                    'updated_by'     => Auth::id(),
                 ]);
             });
         } catch (\Exception $e) {

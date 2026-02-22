@@ -8,7 +8,7 @@
                 <option value=""></option>
                 @foreach ($investors as $item)
                     <option value="{{ $item->id }}" {{ old('investor_id') == $item->id ? 'selected' : '' }}>
-                        {{ $item->name }}
+                         {{ $item->name }}
                     </option>
                 @endforeach
             </select>
@@ -35,7 +35,7 @@
                 <option value=""></option>
                 @foreach ($products as $item)
                     <option value="{{ $item->id }}" {{ old('product_id') == $item->id ? 'selected' : '' }}>
-                        {{ $item->name }}</option>
+                        ROOMID{{ $item->id }} {{ $item->name }}</option>
                 @endforeach
             </select>
         </div>

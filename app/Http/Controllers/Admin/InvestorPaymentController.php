@@ -92,9 +92,7 @@ class InvestorPaymentController extends Controller
         $title = $this->create_title;
         $payment_no = $this->paymentNo();
         $investors = Investor::where('status', true)->orderBy('name', 'asc')->get();
-        $cash_heads = CoaSetup::whereHas('parent', function ($query) {
-            $query->whereIn('head_name', ['Cash In Hand', 'Cash at Bank']);
-        })->get();
+        $cash_heads = CoaSetup::whereIn('head_name', ['Cash In Hand', 'Cash at Bank'])->get();
         return view("admin.{$this->path}.create", compact('title', 'payment_no', 'investors', 'cash_heads'));
     }
 
@@ -112,9 +110,6 @@ class InvestorPaymentController extends Controller
         if (in_array($request->payment_type, ['Payment', 'Advance'])) {
             $request->validate(['coa_id' => 'required']);
         }
-        // if (in_array($request->payment_type, ['Payment', 'Adjust'])) {
-        //     $request->validate(['distribution_list_id' => 'required']);
-        // }
         try {
             DB::transaction(function () use ($request) {
                 $data = $this->model::create([

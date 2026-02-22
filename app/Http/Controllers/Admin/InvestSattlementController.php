@@ -84,9 +84,7 @@ class InvestSattlementController extends Controller
 
         $title = $this->create_title;
         $investors = Investor::where('status', true)->orderBy('name', 'asc')->get();
-        $cashHeads = CoaSetup::whereHas('parent', function ($query) {
-            $query->whereIn('head_name', ['Cash In Hand', 'Cash at Bank']);
-        })->get();
+        $cashHeads = CoaSetup::whereIn('head_name', ['Cash In Hand', 'Cash at Bank'])->get();
         $sattlement_no = $this->sattlementNo();
         return view("admin.{$this->path}.create", compact('title', 'investors', 'cashHeads', 'sattlement_no'));
     }

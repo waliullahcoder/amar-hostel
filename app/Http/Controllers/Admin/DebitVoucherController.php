@@ -119,13 +119,11 @@ class DebitVoucherController extends Controller
     {
         $title = $this->create_title;
 
-        $creditCoas = CoaSetup::whereHas('parent', function ($query) {
-            $query->whereIn('head_name', ['Cash In Hand', 'Cash at Bank']);
-        })->where('transaction', '1')->orderBy('head_name', 'asc')->get();
+        $creditCoas = CoaSetup::whereIn('head_name', ['Cash In Hand', 'Cash at Bank'])->get();
 
         $coas = CoaSetup::where(function ($query) {
-            $query->whereIn('head_type', ['L', 'E']);
-        })->where('transaction', '1')->orderBy('head_name', 'asc')->get();
+            $query->whereIn('head_type', ['L', 'E','C','R','A','I']);
+        })->orderBy('head_name', 'asc')->get();
 
         $voucher_no = $this->voucherNo();
         return view("admin.{$this->path}.create", compact('title', 'creditCoas', 'coas', 'voucher_no'));

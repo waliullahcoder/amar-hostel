@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Booking;
 use App\Models\User;
 use App\Models\Testimonial;
+use App\Models\CoaSetup;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -226,6 +227,20 @@ class AdminController extends Controller
             return back()->with('error','Room already exists!')->withInput();
         }
 
+             $parent = CoaSetup::findOrFail(4);
+                $prefix = $parent->head_code;
+                $account = CoaSetup::create([
+                    'parent_id'   => $parent->head_code,
+                    'head_code'   => $room->id,
+                    'head_name'   => $request->name,
+                    'transaction' => true,
+                    'general'     => false,
+                    'head_type'   => 'R',
+                    'status'      => true,
+                    'updateable'     => false,
+                    'created_by'  => Auth::id(),
+                ]);
+
         /* ---------- SLUG ---------- */
         $data['slug'] = Str::slug($request->name);
 
@@ -292,6 +307,31 @@ class AdminController extends Controller
             'meta_keywords'    => 'nullable|string',
             'meta_image'       => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
+
+        $coasetup = CoaSetup::where(function ($query) use ($request, $room) {
+        $query->where('head_name', $request->name)
+              ->orWhere('head_name', $room->name);
+            })
+            ->where('head_type', 'R')
+            ->first();
+
+        if (!$coasetup) {
+
+            $parent = CoaSetup::findOrFail(4);
+
+            $account = CoaSetup::create([
+                'parent_id'   => $parent->id,          // id use করা ভালো
+                'head_code'   => $room->id,   // চাইলে নতুন code generate করতে পারো
+                'head_name'   => $request->name,
+                'transaction' => true,
+                'general'     => false,
+                'head_type'   => 'R',
+                'status'      => true,
+                'updateable'  => false,
+                'created_by'  => Auth::id(),
+            ]);
+        }
+        
 
     
         /* ---------- SLUG ---------- */
