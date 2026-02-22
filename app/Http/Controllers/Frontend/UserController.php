@@ -7,6 +7,8 @@ use App\Models\HomeSection;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\Client;
+use App\Models\CoaSetup;
 use App\Models\Booking;
 use App\Models\Room;
 use App\Http\Controllers\Controller;
@@ -91,6 +93,10 @@ class UserController extends Controller
                 'password' => 'required|min:6|confirmed', // 👈 confirm handled here
             ]);
 
+             try {
+        DB::transaction(function () use ($request) {
+
+        
             $user = User::create([
                 'name'        => $request->name,
                 'phone'        => $request->phone,
@@ -100,6 +106,48 @@ class UserController extends Controller
                 'role_status' => 0,
             ]);
             Auth::login($user);
+
+            // ================= CLIENT CREATE FIRST =================
+            $client = Client::create([
+                'user_id'        => $user->id,
+                'region_id'      => 1,
+                'area_id'        => 1,
+                'territory_id'   => 1,
+                'code'           => 'code'.$request->name,
+                'name'           => $request->name,
+                'contact_person' => $request->name,
+                'phone'          => $request->phone,
+                'email'          => $request->email,
+                'address'        => $request->phone,
+                'bin_no'         => null,
+                'credit_limit'   => 0,
+                'created_by'     => Auth::id(),
+            ]);
+            // ================= COA CREATE USING CLIENT ID =================
+            $parent = CoaSetup::findOrFail(4);
+
+            $account = CoaSetup::create([
+                'parent_id'   => $parent->id,
+                'head_code'   => $client->id, // 🔥 Client ID as Head Code
+                'head_name'   => $client->name,
+                'transaction' => true,
+                'general'     => false,
+                'head_type'   => 'C',
+                'status'      => true,
+                'updateable'  => false,
+                'created_by'  => Auth::id(),
+            ]);
+
+            // ================= UPDATE CLIENT WITH COA ID =================
+            $client->update([
+                'coa_id' => $account->id
+            ]);
+
+        });
+
+    } catch (\Exception $e) {
+        return back()->withErrors($e->getMessage());
+    }
 
             return redirect()
                 ->route('frontend.user.dashboard')

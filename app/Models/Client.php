@@ -44,4 +44,8 @@ class Client extends Model
     {
         return $this->hasMany(AccountTransactionAuto::class, 'coa_id', 'coa_id');
     }
+    public function user()
+    {
+        return $this->hasMany(User::class, 'user_id');
+    }
 }

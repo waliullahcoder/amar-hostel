@@ -98,13 +98,13 @@
                             <td>
                                 <a href="{{ Route('admin.head-details.index') }}?coa_id={{ $expense->coa_id }}&start_date={{ $start_date }}&end_date={{ $end_date }}&income_statement=1"
                                     target="_blank">
-                                    {{ $expense->coa->head_code }}
+                                    {{ $expense->coa->head_code??'N/A' }}
                                 </a>
                             </td>
                             <td>
                                 <a href="{{ Route('admin.head-details.index') }}?coa_id={{ $expense->coa_id }}&start_date={{ $start_date }}&end_date={{ $end_date }}&income_statement=1"
                                     target="_blank">
-                                    {{ $expense->coa->head_name }}
+                                    {{ $expense->coa->head_name??'N/A' }}
                                 </a>
                             </td>
                             <td class="text-end">
