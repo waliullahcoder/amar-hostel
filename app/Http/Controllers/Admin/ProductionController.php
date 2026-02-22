@@ -6,6 +6,7 @@ use App\HelperClass;
 use App\Models\Store;
 use App\Models\Room;
 use App\Models\Production;
+use App\Models\CoaSetup;
 use Illuminate\Http\Request;
 use App\Models\ProductionList;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -102,6 +103,29 @@ class ProductionController extends Controller
                 foreach ($request->product_id as $product_id) {
 
                     $room = \App\Models\Room::find($product_id);
+
+                    $coasetup = CoaSetup::where(function ($query) use ($request, $room) {
+                        $query->where('head_name', $room->name);
+                            })
+                        ->where('head_type', 'R')
+                        ->first();
+
+                         if (!$coasetup) {
+
+                            $parent = CoaSetup::findOrFail(4);
+
+                            $account = CoaSetup::create([
+                                'parent_id'   => $parent->id,          // id use করা ভালো
+                                'head_code'   => $room->id,   // চাইলে নতুন code generate করতে পারো
+                                'head_name'   => $room->name,
+                                'transaction' => true,
+                                'general'     => false,
+                                'head_type'   => 'R',
+                                'status'      => true,
+                                'updateable'  => false,
+                                'created_by'  => Auth::id(),
+                            ]);
+                        }
 
                     if (!$room) {
                         throw new \Exception("Room not found!");

@@ -159,10 +159,7 @@ class SalesController extends Controller
         $clients = Client::where('status', true)->orderBy('name', 'asc')->get();
         $stores = Store::where('status', true)->orderBy('name', 'asc')->get();
         $salesOfficers = SalesOfficer::where('status', true)->orderBy('name', 'asc')->get();
-        $cash_heads = CoaSetup::whereHas('parent', function ($query) {
-            $query->where('head_name', 'Cash In Hand')
-                ->orWhere('head_name', 'Cash at Bank');
-        })->get();
+        $cash_heads = CoaSetup::whereIn('head_name', ['Cash In Hand', 'Cash at Bank'])->get();
         $products = Room::where('status', true)->orderBy('name', 'asc')->get();
 
         return view("admin.{$this->path}.create", compact(
@@ -193,13 +190,14 @@ class SalesController extends Controller
 
         try {
             DB::transaction(function () use ($request) {
+             $coa = CoaSetup::where('head_name', 'Income')->where('head_type', 'I')->first();
 
                 // ================= Create Sales =================
                 $data = $this->model::create([
                     'client_id' => $request->client_id,
                     'store_id' => $request->store_id,
                     'sales_officer_id' => $request->sales_officer_id,
-                    'coa_id' => $request->sale_type == 'Cash' ? $request->coa_id : null,
+                    'coa_id' => $coa->id??0,
                     'sale_type' => $request->sale_type,
                     'invoice' => $this->invoiceNo(),
                     'date' => date('Y-m-d', strtotime($request->date)),
@@ -238,9 +236,8 @@ class SalesController extends Controller
                 // ================= Account Transaction =================
                 $client = Client::find($request->client_id);
                 if ($client->coa) {
-                    $income_head = CoaSetup::where('head_type', 'I')->where('head_name', 'Product Sales')->first();
+                    $income_head = CoaSetup::where('head_type', 'I')->where('head_name', 'Income')->first();
                     $headCode = [$client->coa->head_code, $income_head->head_code??null];
-                  
                     $debit_amount = [$request->net_amount, 0.00];
                     $credit_amount = [0.00, $request->net_amount];
 
@@ -251,7 +248,7 @@ class SalesController extends Controller
                             'voucher_no' => $data->invoice,
                             'voucher_type' => "Client Sales",
                             'date' => date('Y-m-d', strtotime($request->date)),
-                            'coa_id' => $coa->id??0,
+                            'coa_id' => $client->coa_id,
                             'coa_head_code' => $headCode[$i],
                             'narration' => 'Client Sales Against Invoice No - ' . $data->invoice,
                             'debit_amount' => $debit_amount[$i],

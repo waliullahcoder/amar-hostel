@@ -228,7 +228,6 @@ class AdminController extends Controller
         }
 
              $parent = CoaSetup::findOrFail(4);
-                $prefix = $parent->head_code;
                 $account = CoaSetup::create([
                     'parent_id'   => $parent->head_code,
                     'head_code'   => $room->id,
