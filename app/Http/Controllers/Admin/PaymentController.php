@@ -205,7 +205,7 @@ class PaymentController extends Controller
 
             $investor = Investor::findOrFail($data->investor_id);
             if ($investor->coa) {
-                $cash_head = CoaSetup::findOrFail($request->coa_setup_id);
+                $cash_head = CoaSetup::findOrFail($request->coa_id);
                 $headCode = collect([
                     '0' => $investor->profit_account->head_code,
                     '1' => $cash_head->head_code,
@@ -229,7 +229,7 @@ class PaymentController extends Controller
                         'voucher_no' => $data->payment_no,
                         'voucher_type' => "Profit Payment",
                         'voucher_date' => date('Y-m-d', strtotime($data->date)),
-                        'coa_setup_id' => $coa->id,
+                        'coa_id' => $coa->id,
                         'coa_head_code' => $headCode[$i],
                         'narration' => 'Investor Payment Against PAYMENT NO - ' . $data->payment_no,
                         'debit_amount' => $debit_amount[$i],
@@ -378,7 +378,7 @@ class PaymentController extends Controller
             AccountTransactionAuto::where('voucher_no', $data->payment_no)->where('voucher_type', 'Profit Payment')->forceDelete();
             $investor = Investor::findOrFail($data->investor_id);
             if ($investor->coa) {
-                $cash_head = CoaSetup::findOrFail($request->coa_setup_id);
+                $cash_head = CoaSetup::findOrFail($request->coa_id);
                 $headCode = collect([
                     '0' => $investor->profit_account->head_code,
                     '1' => $cash_head->head_code,
@@ -402,7 +402,7 @@ class PaymentController extends Controller
                         'voucher_no' => $data->payment_no,
                         'voucher_type' => "Profit Payment",
                         'voucher_date' => date('Y-m-d', strtotime($data->date)),
-                        'coa_setup_id' => $coa->id,
+                        'coa_id' => $coa->id,
                         'coa_head_code' => $headCode[$i],
                         'narration' => 'Investor Payment Against PAYMENT NO - ' . $data->payment_no,
                         'debit_amount' => $debit_amount[$i],

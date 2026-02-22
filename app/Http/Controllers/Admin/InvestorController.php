@@ -146,7 +146,7 @@ class InvestorController extends Controller
                 'account_name' => $request->account_name,
                 'account_no' => $request->account_no,
                 'user_id' => $user->id,
-                'coa_setup_id' => $account->id,
+                'coa_id' => $account->id,
                 'profit_head' => $profit_account->id,
                 'image' => isset($request->image) ? HelperClass::saveImage($request->image, 500, 'media/investors/') : NULL,
                 'document' => @$document,
@@ -226,7 +226,7 @@ class InvestorController extends Controller
                 }
             }
 
-            $account = CoaSetup::find($data->coa_setup_id);
+            $account = CoaSetup::find($data->coa_id);
             if ($account) {
                 $account->update([
                     'head_name' => $request->name,
@@ -301,7 +301,7 @@ class InvestorController extends Controller
                 'branch' => $request->branch,
                 'account_name' => $request->account_name,
                 'account_no' => $request->account_no,
-                'coa_setup_id' => $account->id,
+                'coa_id' => $account->id,
                 'profit_head' => $profit_account->id,
                 'image' => isset($request->image) ? HelperClass::saveImage($request->image, 500, 'media/investors/', $data->image) : $data->image,
                 'document' => @$document ?? $data->document,
@@ -321,7 +321,7 @@ class InvestorController extends Controller
             try {
                 DB::transaction(function () use ($id) {
                     $data = $this->model::onlyTrashed()->findOrFail($id);
-                    $coa = CoaSetup::onlyTrashed()->find($data->coa_setup_id);
+                    $coa = CoaSetup::onlyTrashed()->find($data->coa_id);
                     if ($coa) {
                         $coa->restore();
                     }
@@ -350,7 +350,7 @@ class InvestorController extends Controller
                     if (file_exists($data->document)) {
                         unlink($data->document);
                     }
-                    $coa = CoaSetup::onlyTrashed()->find($data->coa_setup_id);
+                    $coa = CoaSetup::onlyTrashed()->find($data->coa_id);
                     if ($coa) {
                         $coa->forceDelete();
                     }
@@ -376,7 +376,7 @@ class InvestorController extends Controller
         try {
             DB::transaction(function () use ($id) {
                 $data = $this->model::findOrFail($id);
-                $coa = CoaSetup::find($data->coa_setup_id);
+                $coa = CoaSetup::find($data->coa_id);
                 if ($coa) {
                     $coa->update(['deleted_by' => Auth::id()]);
                     $coa->delete();

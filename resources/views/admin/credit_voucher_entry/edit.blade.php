@@ -7,7 +7,7 @@
             <select name="debit_head" id="debit_head" class="chosen-select" data-placeholder="select Account Name" required>
                 <option value="">Select Account Name</option>
                 @foreach ($debitCoas as $item)
-                    <option value="{{ $item->id }}" {{ $data->coa_setup_id == $item->id ? 'selected' : '' }}>
+                    <option value="{{ $item->id }}" {{ $data->coa_id == $item->id ? 'selected' : '' }}>
                         {{ $item->head_name }} - {{ $item->head_code }}
                     </option>
                 @endforeach
@@ -63,14 +63,14 @@
                             <tr>
                                 <th class="py-1 text-center serial">{{ $loop->iteration }}</th>
                                 <td class="py-1 px-3">
-                                    <input type="hidden" name="coa_id[]" class="coa_id" value="{{ $item->coa_setup_id }}">
-                                    <input type="hidden" name="head_code[{{ $item->coa_setup_id }}]" class="head_code"
+                                    <input type="hidden" name="coa_id[]" class="coa_id" value="{{ $item->coa_id }}">
+                                    <input type="hidden" name="head_code[{{ $item->coa_id }}]" class="head_code"
                                         value="{{ @$item->head_code }}">
                                     <b class="head_name">{{ @$item->head_name }} - {{ @$item->head_code }}</b>
                                 </td>
                                 <td class="py-1">
                                     <input type="number" class="credit text-end"
-                                        name="credit_amount[{{ $item->coa_setup_id }}]" oninput="findTotal()"
+                                        name="credit_amount[{{ $item->coa_id }}]" oninput="findTotal()"
                                         value="{{ $item->credit_amount }}">
                                 </td>
                                 <td class="py-1 text-center">

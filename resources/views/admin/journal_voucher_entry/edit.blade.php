@@ -52,21 +52,21 @@
                             <tr>
                                 <th class="py-1 text-center serial">{{ $loop->iteration }}</th>
                                 <td class="py-1">
-                                    <input type="hidden" name="coa_id[]" class="coa_id" value="{{ $item->coa_setup_id }}">
-                                    <input type="hidden" name="head_code[{{ $item->coa_setup_id }}]" class="head_code"
+                                    <input type="hidden" name="coa_id[]" class="coa_id" value="{{ $item->coa_id }}">
+                                    <input type="hidden" name="head_code[{{ $item->coa_id }}]" class="head_code"
                                         value="{{ $item->head_code }}">
                                     <input type="text" class="head_name w-100"
-                                        name="head_name[{{ $item->coa_setup_id }}]" readonly
+                                        name="head_name[{{ $item->coa_id }}]" readonly
                                         value="{{ $item->head_name }} - {{ $item->head_code }}">
                                 </td>
                                 <td class="py-1">
                                     <input type="number" class="debit text-end"
-                                        name="debit_amount[{{ $item->coa_setup_id }}]" oninput="findTotal()"
+                                        name="debit_amount[{{ $item->coa_id }}]" oninput="findTotal()"
                                         value="{{ $item->debit_amount }}">
                                 </td>
                                 <td class="py-1">
                                     <input type="number" class="credit text-end"
-                                        name="credit_amount[{{ $item->coa_setup_id }}]" oninput="findTotal()"
+                                        name="credit_amount[{{ $item->coa_id }}]" oninput="findTotal()"
                                         value="{{ $item->credit_amount }}">
                                 </td>
                                 <td class="py-1 text-center">

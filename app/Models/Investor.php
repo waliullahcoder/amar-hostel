@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Investor extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $fillable = ['user_id', 'name', 'image', 'email', 'phone', 'address', 'nid', 'document', 'bkash', 'rocket', 'nagad', 'bank', 'branch', 'account_name', 'account_no', 'coa_setup_id', 'profit_head', 'status', 'created_by', 'updated_by', 'deleted_by'];
+    protected $fillable = ['user_id', 'name', 'image', 'email', 'phone', 'address', 'nid', 'document', 'bkash', 'rocket', 'nagad', 'bank', 'branch', 'account_name', 'account_no', 'coa_id', 'profit_head', 'status', 'created_by', 'updated_by', 'deleted_by'];
 
     protected static function booted()
     {
@@ -18,7 +18,7 @@ class Investor extends Model
 
     public function coa()
     {
-        return $this->belongsTo(CoaSetup::class, 'coa_setup_id');
+        return $this->belongsTo(CoaSetup::class, 'coa_id');
     }
 
     public function profit_account()

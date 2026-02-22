@@ -70,12 +70,12 @@
         </div>
         <div class="col-sm-6">
             <label for="payment_no" class="form-label"><b>Cash Head <span class="text-danger">*</span></b></label>
-            <select name="coa_setup_id" id="coa_setup_id" class="form-select select" data-placeholder="Select Cash Head"
+            <select name="coa_id" id="coa_id" class="form-select select" data-placeholder="Select Cash Head"
                 required>
                 <option value=""></option>
                 @foreach ($cash_heads as $item)
                     <option value="{{ $item->id }}"
-                        {{ $selected_cash_head->coa_setup_id == $item->id ? 'selected' : '' }}>{{ $item->head_name }} -
+                        {{ $selected_cash_head->coa_id == $item->id ? 'selected' : '' }}>{{ $item->head_name }} -
                         {{ $item->head_code }}
                     </option>
                 @endforeach

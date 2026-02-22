@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('investors', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('coa_setup_id')->nullable();
+            $table->foreignId('coa_id')->nullable();
             $table->foreignId('profit_head')->nullable();
             $table->string('name');
             $table->string('image')->nullable();

@@ -46,13 +46,13 @@ class JournalVoucherEntryController extends Controller
                     return AccountTransactionAuto::with('coa')->where('voucher_no', $row->voucher_no)
                         ->where('voucher_type', 'JV')
                         ->where('debit_amount', '>', 0)
-                        ->get('coa_setup_id')->pluck('coa.head_name')->toArray();
+                        ->get('coa_id')->pluck('coa.head_name')->toArray();
                 })
                 ->addColumn('credit_head', function ($row) {
                     return AccountTransactionAuto::with('coa')->where('voucher_no', $row->voucher_no)
                         ->where('voucher_type', 'JV')
                         ->where('credit_amount', '>', 0)
-                        ->get('coa_setup_id')->pluck('coa.head_name')->toArray();
+                        ->get('coa_id')->pluck('coa.head_name')->toArray();
                 })
                 ->addColumn('approve', function ($row) {
                     return $row->approve == 1 ? 'Approved' : 'Pending';
@@ -140,7 +140,7 @@ class JournalVoucherEntryController extends Controller
                     'voucher_no' => $voucher_no,
                     'voucher_type' => "JV",
                     'voucher_date' => date('Y-m-d', strtotime($request->voucher_date)),
-                    'coa_setup_id' => $coa_id,
+                    'coa_id' => $coa_id,
                     'coa_head_code' => $request->head_code[$coa_id],
                     'narration' => $request->narration,
                     'debit_amount' => $request->debit_amount[$coa_id],
@@ -198,7 +198,7 @@ class JournalVoucherEntryController extends Controller
             ->get();
         $title = "Update Journal Voucher";
         $link = Route('admin.journal-voucher-entry.update', $id);
-        $coas = CoaSetup::whereNotIn('id', $journalEntries->pluck('coa_setup_id')->toArray())->where('transaction', '1')->orderBy('head_name', 'asc')->get();
+        $coas = CoaSetup::whereNotIn('id', $journalEntries->pluck('coa_id')->toArray())->where('transaction', '1')->orderBy('head_name', 'asc')->get();
         return view('admin.journal_voucher_entry.edit', compact('title', 'link', 'data', 'journalEntries', 'coas'));
     }
 
@@ -242,7 +242,7 @@ class JournalVoucherEntryController extends Controller
                     'voucher_no' => $voucher_no,
                     'voucher_type' => "JV",
                     'voucher_date' => date('Y-m-d', strtotime($request->voucher_date)),
-                    'coa_setup_id' => $coa_id,
+                    'coa_id' => $coa_id,
                     'coa_head_code' => $request->head_code[$coa_id],
                     'narration' => $request->narration,
                     'debit_amount' => $request->debit_amount[$coa_id],

@@ -10,7 +10,7 @@ class TrialBalance extends Model
 
     public function coa_setup()
     {
-        return $this->belongsTo(CoaSetup::class, 'coa_setup_id');
+        return $this->belongsTo(CoaSetup::class, 'coa_id');
     }
 
     public function parent_head()

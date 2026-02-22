@@ -213,7 +213,6 @@ class ReportController extends Controller
             $data = $query->select('*', DB::raw('SUM(debit_amount) as amount'))->orderBY('id', 'desc')
                 ->orderBY('date', 'desc')
                 ->groupBy('voucher_no')->get();
-
             $report_title = 'Voucher List';
             $pdf = Pdf::loadView('admin.reports.voucher-list.print', compact('report_title', 'data'));
             $pdf->setPaper('A4', 'landscape');

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('voucher_no');
             $table->string('voucher_type', 20);
             $table->date('voucher_date');
-            $table->foreignId('coa_setup_id');
+            $table->foreignId('coa_id');
             $table->bigInteger('coa_head_code');
             $table->text('narration');
             $table->decimal('debit_amount', 16, 2)->default(0.00);

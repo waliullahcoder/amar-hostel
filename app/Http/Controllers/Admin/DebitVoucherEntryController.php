@@ -47,7 +47,7 @@ class DebitVoucherEntryController extends Controller
                     return AccountTransactionAuto::with('coa')->where('voucher_no', $row->voucher_no)
                         ->where('voucher_type', 'DV')
                         ->where('credit_amount', 0.00)
-                        ->get('coa_setup_id')->pluck('coa.head_name')->toArray();
+                        ->get('coa_id')->pluck('coa.head_name')->toArray();
                 })
                 ->addColumn('credit_head', function ($row) {
                     return @$row->coa->head_name;
@@ -149,7 +149,7 @@ class DebitVoucherEntryController extends Controller
                 'voucher_no' => $voucher_no,
                 'voucher_type' => "DV",
                 'voucher_date' => date('Y-m-d', strtotime($request->voucher_date)),
-                'coa_setup_id' => $request->credit_head,
+                'coa_id' => $request->credit_head,
                 'coa_head_code' => $head->head_code,
                 'narration' => $request->narration,
                 'credit_amount' => $total_debit,
@@ -166,7 +166,7 @@ class DebitVoucherEntryController extends Controller
                     'voucher_no' => $voucher_no,
                     'voucher_type' => "DV",
                     'voucher_date' => date('Y-m-d', strtotime($request->voucher_date)),
-                    'coa_setup_id' => $coa_id,
+                    'coa_id' => $coa_id,
                     'coa_head_code' => $request->head_code[$coa_id],
                     'narration' => $request->narration,
                     'debit_amount' => $request->debit_amount[$coa_id],
@@ -232,7 +232,7 @@ class DebitVoucherEntryController extends Controller
             $query->where('head_code', 'like', $generalLedgerHeadCash . '%')->orWhere('head_code', 'like', $generalLedgerHeadBank . '%');
         })->where('transaction', '1')->orderBy('head_name', 'asc')->get();
 
-        $coas = CoaSetup::whereNotIn('id', $debitEntries->pluck('coa_setup_id')->toArray())->where(function ($query) {
+        $coas = CoaSetup::whereNotIn('id', $debitEntries->pluck('coa_id')->toArray())->where(function ($query) {
             $query->where('head_type', 'L')->orWhere('head_type', 'E');
         })->where('transaction', '1')->orderBy('head_name', 'asc')->get();
 
@@ -274,7 +274,7 @@ class DebitVoucherEntryController extends Controller
 
             $data->update([
                 'voucher_date' => date('Y-m-d', strtotime($request->voucher_date)),
-                'coa_setup_id' => $request->credit_head,
+                'coa_id' => $request->credit_head,
                 'coa_head_code' => $head->head_code,
                 'narration' => $request->narration,
                 'credit_amount' => $total_debit,
@@ -295,7 +295,7 @@ class DebitVoucherEntryController extends Controller
                     'voucher_no' => $data->voucher_no,
                     'voucher_type' => "DV",
                     'voucher_date' => date('Y-m-d', strtotime($request->voucher_date)),
-                    'coa_setup_id' => $coa_id,
+                    'coa_id' => $coa_id,
                     'coa_head_code' => $request->head_code[$coa_id],
                     'narration' => $request->narration,
                     'debit_amount' => $request->debit_amount[$coa_id],

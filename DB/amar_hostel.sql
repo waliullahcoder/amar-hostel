@@ -2787,7 +2787,7 @@ DROP TABLE IF EXISTS `investors`;
 CREATE TABLE IF NOT EXISTS `investors` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
-  `coa_setup_id` bigint unsigned DEFAULT NULL,
+  `coa_id` bigint unsigned DEFAULT NULL,
   `profit_head` bigint(20) unsigned zerofill DEFAULT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `image` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -2817,7 +2817,7 @@ CREATE TABLE IF NOT EXISTS `investors` (
 
 -- Dumping data for table amar_hostel.investors: ~0 rows (approximately)
 DELETE FROM `investors`;
-INSERT INTO `investors` (`id`, `user_id`, `coa_setup_id`, `profit_head`, `name`, `image`, `email`, `phone`, `address`, `nid`, `document`, `bkash`, `rocket`, `nagad`, `bank`, `branch`, `account_name`, `account_no`, `status`, `created_by`, `updated_by`, `deleted_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
+INSERT INTO `investors` (`id`, `user_id`, `coa_id`, `profit_head`, `name`, `image`, `email`, `phone`, `address`, `nid`, `document`, `bkash`, `rocket`, `nagad`, `bank`, `branch`, `account_name`, `account_no`, `status`, `created_by`, `updated_by`, `deleted_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
 	(1, 6, 241, 00000000000000000242, 'Investor 1', NULL, NULL, '01997316189', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL, NULL, '2026-02-09 22:23:41', '2026-02-09 22:23:41'),
 	(2, 7, 245, 00000000000000000246, 'Wali', NULL, 'w@gmail.com', '01921588567', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL, NULL, NULL, '2026-02-15 04:26:31', '2026-02-15 04:26:31');
 
@@ -2922,7 +2922,7 @@ CREATE TABLE IF NOT EXISTS `invests` (
   `approved` tinyint NOT NULL DEFAULT '0',
   `status` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Pending',
   `sattled` tinyint NOT NULL DEFAULT '0',
-  `coa_setup_id` bigint unsigned DEFAULT NULL,
+  `coa_id` bigint unsigned DEFAULT NULL,
   `created_by` bigint unsigned DEFAULT NULL,
   `updated_by` bigint unsigned DEFAULT NULL,
   `deleted_by` bigint unsigned DEFAULT NULL,
@@ -2936,7 +2936,7 @@ CREATE TABLE IF NOT EXISTS `invests` (
 
 -- Dumping data for table amar_hostel.invests: ~2 rows (approximately)
 DELETE FROM `invests`;
-INSERT INTO `invests` (`id`, `company_id`, `investor_id`, `invest_no`, `product_id`, `coa_id`, `date`, `qty`, `amount`, `deposit_type`, `bkash`, `rocket`, `nagad`, `bank_account`, `remarks`, `calculate`, `approved`, `status`, `sattled`, `coa_setup_id`, `created_by`, `updated_by`, `deleted_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
+INSERT INTO `invests` (`id`, `company_id`, `investor_id`, `invest_no`, `product_id`, `coa_id`, `date`, `qty`, `amount`, `deposit_type`, `bkash`, `rocket`, `nagad`, `bank_account`, `remarks`, `calculate`, `approved`, `status`, `sattled`, `coa_id`, `created_by`, `updated_by`, `deleted_by`, `deleted_at`, `created_at`, `updated_at`) VALUES
 	(1, 0, 1, 'FDI2602000001', 1, NULL, '2026-02-10', 14, 140000, '', NULL, NULL, NULL, NULL, NULL, 1, 1, 'Approved', 1, 163, 1, NULL, NULL, NULL, '2026-02-09 22:42:48', '2026-02-17 05:04:48'),
 	(10, 0, 2, 'I2602001', 11, 14, '2026-02-16', 15, 150000, '', NULL, NULL, NULL, NULL, NULL, 1, 1, 'Pending', 1, NULL, 1, NULL, NULL, NULL, '2026-02-15 23:59:20', '2026-02-17 04:47:48'),
 	(11, 0, 2, 'I2602002', 11, 13, '2026-02-17', 33, 330000, '', NULL, NULL, NULL, NULL, NULL, 1, 1, 'Pending', 1, NULL, 1, NULL, NULL, NULL, '2026-02-17 05:05:32', '2026-02-17 23:58:28');
