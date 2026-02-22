@@ -391,7 +391,9 @@ class ReportController extends Controller
             $incomes = AccountTransaction::with('coa')
                 ->where('date', '>=', $start_date)
                 ->where('date', '<=', $end_date)
-                ->whereHas('coa', fn($q) => $q->where('head_type', 'I'))
+                // ->whereHas('coa', function ($q) {
+                //     $q->whereIn('head_type', ['I','A', 'R','C']);
+                // })
                 ->groupBy('coa_id')
                 ->select('coa_head_code', 'coa_id', DB::raw('SUM(debit_amount) as debit_amount'), DB::raw('SUM(credit_amount) as credit_amount'))
                 ->get();
@@ -399,8 +401,10 @@ class ReportController extends Controller
             $expenses = AccountTransaction::with('coa')->select('*', DB::raw('SUM(debit_amount - credit_amount) as amount'))
                 ->where('date', '>=', $start_date)
                 ->where('date', '<=', $end_date)
-                ->whereHas('coa', fn($q) => $q->where('head_type', 'E')->where('transaction', 1))
-                ->groupBy('coa_id')
+                // ->whereHas('coa', function ($q) {
+                //         $q->whereIn('head_type', ['E', 'R','C']);
+                //     })
+                ->where('voucher_type', 'Expense')
                 ->get();
         }
 
