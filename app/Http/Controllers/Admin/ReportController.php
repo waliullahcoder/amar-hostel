@@ -392,7 +392,7 @@ class ReportController extends Controller
                 ->where('date', '>=', $start_date)
                 ->where('date', '<=', $end_date)
                 ->whereHas('coa', function ($q) {
-                    $q->whereIn('head_type', ['I', 'R','C']);
+                    $q->whereIn('head_type', ['I']);
                 })
                 ->groupBy('coa_id')
                 ->select('coa_head_code', 'coa_id', DB::raw('SUM(debit_amount) as debit_amount'), DB::raw('SUM(credit_amount) as credit_amount'))
@@ -402,7 +402,7 @@ class ReportController extends Controller
                 ->where('date', '>=', $start_date)
                 ->where('date', '<=', $end_date)
                 ->whereHas('coa', function ($q) {
-                        $q->whereIn('head_type', ['E', 'R','A','C']);
+                        $q->whereIn('head_type', ['E']);
                     })
                 ->groupBy('coa_id')
                 ->get();

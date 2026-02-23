@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 class Expense extends Model
 {
     use SoftDeletes;
-    protected $fillable = ['coa_id', 'transaction_no', 'date', 'amount', 'remarks', 'document', 'created_by', 'updated_by', 'deleted_by'];
+    protected $fillable = ['coa_id','transaction_no', 'date', 'amount', 'remarks', 'document', 'created_by', 'updated_by', 'deleted_by'];
     protected $appends = ['formattedDate'];
 
     public function coa()

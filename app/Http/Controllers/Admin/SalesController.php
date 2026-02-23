@@ -159,7 +159,9 @@ class SalesController extends Controller
         $clients = Client::where('status', true)->orderBy('name', 'asc')->get();
         $stores = Store::where('status', true)->orderBy('name', 'asc')->get();
         $salesOfficers = SalesOfficer::where('status', true)->orderBy('name', 'asc')->get();
-        $cash_heads = CoaSetup::whereIn('head_name', ['Cash In Hand', 'Cash at Bank'])->get();
+        $cash_heads = CoaSetup::whereHas('parent', function($q){
+                $q->where('head_type','I');
+            })->get();
         $products = Room::where('status', true)->orderBy('name', 'asc')->get();
 
         return view("admin.{$this->path}.create", compact(
@@ -392,8 +394,7 @@ class SalesController extends Controller
             'stores'        => Store::where('status', true)->orderBy('name','asc')->get(),
             'salesOfficers' => SalesOfficer::where('status', true)->orderBy('name','asc')->get(),
             'cash_heads'    => CoaSetup::whereHas('parent', function($q){
-                $q->where('head_name','Cash In Hand')
-                  ->orWhere('head_name','Cash at Bank');
+                $q->where('head_type','I');
             })->get(),
             'products'      => Room::where('status', true)->orderBy('name','asc')->get(),
             'credit_limit'  => $credit_limit,

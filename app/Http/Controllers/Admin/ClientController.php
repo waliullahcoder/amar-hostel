@@ -98,7 +98,7 @@ class ClientController extends Controller
                         'email'      => $request->email,
                         'phone'      => $request->phone,
                         'user_name'  => $request->phone ?? $request->email ?? $request->name,
-                        'password'   => Hash::make($request->phone ?? '123456'),
+                        'password'   => Hash::make($request->phone ?? '12345678'),
                         'created_by' => Auth::id(),
                     ]);
                 }
@@ -131,7 +131,7 @@ class ClientController extends Controller
                 'head_name'   => $client->name,
                 'transaction' => true,
                 'general'     => false,
-                'head_type'   => 'C',
+                'head_type'   => 'E',
                 'status'      => true,
                 'updateable'  => false,
                 'created_by'  => Auth::id(),

@@ -107,7 +107,7 @@ class ProductionController extends Controller
                     $coasetup = CoaSetup::where(function ($query) use ($request, $room) {
                         $query->where('head_name', $room->name);
                             })
-                        ->where('head_type', 'R')
+                        ->where('head_type', 'A')
                         ->first();
 
                          if (!$coasetup) {
@@ -120,7 +120,7 @@ class ProductionController extends Controller
                                 'head_name'   => $room->name,
                                 'transaction' => true,
                                 'general'     => false,
-                                'head_type'   => 'R',
+                                'head_type'   => 'A',
                                 'status'      => true,
                                 'updateable'  => false,
                                 'created_by'  => Auth::id(),

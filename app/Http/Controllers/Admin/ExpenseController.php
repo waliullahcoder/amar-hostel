@@ -75,7 +75,7 @@ class ExpenseController extends Controller
         $cashHeads = CoaSetup::whereIn('head_name', ['Cash In Hand', 'Cash at Bank'])->get();
 
         $debitHeads = CoaSetup::where(function ($query) {
-            $query->whereIn('head_type', ['E', 'R', 'A', 'I','C']);
+            $query->whereIn('head_type', ['E']);
         })->orderBy('head_name', 'asc')->get();
 
         $transaction_no = $this->transactionNo();
@@ -125,9 +125,12 @@ class ExpenseController extends Controller
                         continue;
                     }
 
+                       $headCode = $request->head_code[$coa_id] ?? null;
                     ExpenseItem::create([
                         'expense_id'    => $data->id,
                         'coa_id'        => $coa_id,
+                        'client_id'  => $headCode?? null,
+                        'room_id'    => $headCode?? null,
                         'amount'        => $request->debit_amount[$coa_id]
                     ]);
 

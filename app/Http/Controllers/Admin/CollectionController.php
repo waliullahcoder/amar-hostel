@@ -9,6 +9,7 @@ use App\HelperClass;
 use App\Models\Sales;
 use App\Models\Client;
 use App\Models\Collection;
+use App\Models\ExpenseItem;
 use Illuminate\Http\Request;
 use App\Models\CollectionList;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -29,7 +30,7 @@ class CollectionController extends Controller
     public function __construct()
     {
         $this->path = 'collection';
-        $this->title = 'Dealer Collections';
+        $this->title = 'Client Collections';
         $this->create_title = 'Add Collection';
         $this->edit_title = 'Update Collection';
         $this->model = Collection::class;
@@ -116,8 +117,18 @@ class CollectionController extends Controller
         }
 
         if ($request->ajax() && $request->client_id) {
-            $sales = Sales::where('client_id', $request->client_id)->whereColumn('net_amount', '>', DB::raw('paid+return_amount'))->get();
-            $sales_amount = Sales::where('client_id', $request->client_id)->sum('net_amount');
+            
+             $expense = ExpenseItem::where('client_id', $request->client_id)->sum('amount')??0;
+            // $sales = Sales::where('client_id', $request->client_id)->whereColumn('net_amount', '>', DB::raw('paid+return_amount'))->get();
+            
+$sales = Sales::where('client_id', $request->client_id)
+    ->whereRaw('(net_amount + ?) > (paid + return_amount)', [$expense])
+    ->selectRaw('sales.*, (net_amount + ?) as net_amount', [$expense])
+    ->get();
+      //  dd( $sales );
+            $sales_amount = Sales::where('client_id', $request->client_id)->sum('net_amount')+$expense;
+        
+         
             $total_paid = $this->model::where('client_id', $request->client_id)->whereIn('collection_type', ['Payment', 'Adjust'])->sum('amount');
             $due = round($sales_amount - $total_paid, 2);
 
@@ -136,7 +147,7 @@ class CollectionController extends Controller
         $payment_no = $this->paymentNo();
         $clients = Client::where('status', true)->orderBy('name', 'asc')->get();
         $cash_heads = CoaSetup::whereHas('parent', function ($query) {
-            $query->where('head_name', 'Cash In Hand');
+            $query->where('head_type', 'I');
         })->get();
         return view("admin.{$this->path}.create", compact('title', 'payment_no', 'clients', 'cash_heads'));
     }

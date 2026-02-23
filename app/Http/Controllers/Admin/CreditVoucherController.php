@@ -122,7 +122,7 @@ class CreditVoucherController extends Controller
         $debitCoas = CoaSetup::whereIn('head_name', ['Cash In Hand', 'Cash at Bank'])->get();
 
         $coas = CoaSetup::where(function ($query) {
-            $query->whereIn('head_type', ['E', 'R', 'A', 'I','C','L']);
+            $query->whereIn('head_type', ['E', 'A', 'I','L']);
         })->orderBy('head_name', 'asc')->get();
 
         $voucher_no = $this->voucherNo();

@@ -234,7 +234,7 @@ class AdminController extends Controller
                     'head_name'   => $request->name,
                     'transaction' => true,
                     'general'     => false,
-                    'head_type'   => 'R',
+                    'head_type'   => 'E',
                     'status'      => true,
                     'updateable'     => false,
                     'created_by'  => Auth::id(),
@@ -311,7 +311,7 @@ class AdminController extends Controller
         $query->where('head_name', $request->name)
               ->orWhere('head_name', $room->name);
             })
-            ->where('head_type', 'R')
+            ->where('head_type', 'E')
             ->first();
 
         if (!$coasetup) {
@@ -324,7 +324,7 @@ class AdminController extends Controller
                 'head_name'   => $request->name,
                 'transaction' => true,
                 'general'     => false,
-                'head_type'   => 'R',
+                'head_type'   => 'E',
                 'status'      => true,
                 'updateable'  => false,
                 'created_by'  => Auth::id(),

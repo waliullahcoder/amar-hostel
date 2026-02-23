@@ -132,7 +132,7 @@ class UserController extends Controller
                 'head_name'   => $client->name,
                 'transaction' => true,
                 'general'     => false,
-                'head_type'   => 'C',
+                'head_type'   => 'E',
                 'status'      => true,
                 'updateable'  => false,
                 'created_by'  => Auth::id(),
