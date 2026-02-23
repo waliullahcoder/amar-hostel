@@ -206,16 +206,30 @@ class UserController extends Controller
         {
             $query = Booking::where('user_id', auth()->id());
             // 🔍 Search by order number or status
+            
             if ($request->filled('search')) {
-                $query->where(function ($q) use ($request) {
-                    $q->where('room_id', 'like', '%' . $request->search . '%')
-                    ->orWhere('status', 'like', '%' . $request->search . '%');
+                $search = str_replace('ORDNO', '', $request->search);
+              //  dd($search, $request->search);
+                $query->where(function ($q) use ($search) {
+                    $q->where('id', 'like', '%' . $search . '%')
+                    ->orWhere('status', 'like', '%' . $search . '%');
                 });
             }
 
             $bookings = $query->latest()->paginate(100)->withQueryString();
 
             return view('frontend.order.orderList', compact('bookings'));
+        }
+
+        public function walletHistory(Request $request)
+        {
+            if (auth()->user()->role_status != 0) {
+            abort(403);
+            }
+            $client = Client::where('user_id', Auth::id())->first();
+            $sales = SalesList::where('client_id', $client->id)->get();
+            $expenses = ExpenseItem::where('client_id', $client->id)->get();
+            return view('frontend.user.walletHistory', compact('sales','expenses'));
         }
 
        public function show(Booking $order)

@@ -54,6 +54,9 @@ Route::middleware(['auth'])->group(function () {
         ->name('orders.show');
     Route::get('/my-orders/{order}/invoice', [UserController::class, 'invoice'])
         ->name('orders.invoice');
+
+    Route::get('/user/wallet/history', [UserController::class, 'walletHistory'])
+        ->name('frontend.user.wallet');
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 });
 

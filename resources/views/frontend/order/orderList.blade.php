@@ -55,26 +55,26 @@
                                             {{ $order->payment_method }}
                                         </td>
                                         <td>
-                                              <span class="badge 
+                                              <span class="badge
                                                 @switch($order->status)
-                                                    @case('pending') bg-warning text-dark @break
-                                                    @case('processing') bg-primary @break
-                                                    @case('confirmed') bg-success @break
-                                                    @case('shipped') bg-info text-dark @break
-                                                    @case('delivered') bg-success text-dark @break
-                                                    @case('cancelled') bg-danger @break
-                                                    @default bg-secondary
+                                                    @case('pending') badge-pending @break
+                                                    @case('processing') badge-processing @break
+                                                    @case('confirmed') badge-confirmed @break
+                                                    @case('shipped') badge-shipped @break
+                                                    @case('delivered') badge-delivered @break
+                                                    @case('cancelled') badge-cancelled @break
+                                                    @default badge-default
                                                 @endswitch
                                             ">
                                                 {{ ucfirst($order->status) }}
                                             </span>
-                                        </td>
+                                                                                    </td>
                                         <td>
                                             {{ $order->created_at->format('d M Y') }}
                                         </td>
                                          <td class="text-center">
                                         <div class="btn-group btn-group-sm">
-                                            <a href="{{ route('orders.show',$order->id) }}" class="btn btn-outline-primary">👁</a>
+                                            <a href="{{ route('orders.show',$order->id) }}" target="_blank" class="btn btn-outline-primary">👁</a>
                                             <a href="{{ route('orders.invoice',$order->id) }}" class="btn btn-outline-success" target="_blank">📄</a>
                                             
                                         </div>

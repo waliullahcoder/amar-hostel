@@ -70,6 +70,29 @@
                 display: none !important;
             }
         }
+        @media print {
+
+    body {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    table {
+        border-collapse: collapse !important;
+    }
+
+    table, th, td {
+        border: 1px solid #000 !important;
+    }
+
+    th {
+        background: #f5f5f5 !important;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+}
     </style>
 </head>
 <body>

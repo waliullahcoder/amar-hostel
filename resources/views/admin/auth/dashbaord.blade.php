@@ -82,7 +82,7 @@
                                 <b>{{ $item['product']->name ?? '' }} </b>
                             </li>
                             <li class="list-group-item d-flex bg-light" title="Room Capacity Qty">
-                                <span class="d-inline-block" style="min-width: 135px;">Room Price/Seat</span> =&gt;
+                                <span class="d-inline-block" style="min-width: 135px;">Room Price</span> =&gt;
                                 &nbsp;&nbsp;&nbsp;
                                 <div class="flex-grow-1 text-end">
                                     {{ $item['price_per_seat'] ?? 0 }}

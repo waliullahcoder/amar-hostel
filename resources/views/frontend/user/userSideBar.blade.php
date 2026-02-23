@@ -27,7 +27,7 @@
 
 
                <li class="list-group-item px-3 py-2">
-                    <a href="" class="d-flex align-items-center gap-2 text-dark text-decoration-none">
+                    <a href="{{ route('frontend.user.wallet') }}" class="d-flex align-items-center gap-2 text-dark text-decoration-none">
                         <i class="fa fa-credit-card"></i>
                         <span>Wallet History</span>
                     </a>
