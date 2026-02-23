@@ -44,8 +44,8 @@
                             <div class="card border-0 shadow-sm rounded-4 text-center h-100" 
                                 style="padding: 30px 20px; margin: 20px;">
                                 <div class="card-body">
-                                    <h5 class="mb-3 fw-semibold text-primary">Bookings</h5>
-                                    <h3 class="fw-bold">{{ $orders_count ?? 0 }}</h3>
+                                    <h5 class="mb-3 fw-semibold text-primary">Self Booked Seats</h5>
+                                    <h3 class="fw-bold">{{ number_format($orders_count) ?? 0 }}</h3>
                                 </div>
                             </div>
                         </a>
@@ -57,8 +57,8 @@
                             <div class="card border-0 shadow-sm rounded-4 text-center h-100" 
                                 style="padding: 30px 20px; margin: 20px;">
                                 <div class="card-body">
-                                    <h5 class="mb-3 fw-semibold text-success">Rooms</h5>
-                                    <h3 class="fw-bold">0</h3>
+                                    <h5 class="mb-3 fw-semibold text-success">Booked Seats</h5>
+                                    <h3 class="fw-bold">{{ number_format($sales_count) ?? 0 }}</h3>
                                 </div>
                             </div>
                         </a>
@@ -69,11 +69,41 @@
                         <div class="card border-0 shadow-sm rounded-4 text-center h-100" 
                             style="padding: 30px 20px; margin: 20px;">
                             <div class="card-body">
-                                <h5 class="mb-3 fw-semibold text-warning">Wallet</h5>
-                                <h3 class="fw-bold">৳{{ auth()->user()->wallet ?? 0 }}</h3>
+                                <h5 class="mb-3 fw-semibold text-warning">Purchase</h5>
+                                <h3 class="fw-bold">৳{{ $sales_amount ?? 0 }}</h3>
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm rounded-4 text-center h-100" 
+                            style="padding: 30px 20px; margin: 20px;">
+                            <div class="card-body">
+                                <h5 class="mb-3 fw-semibold text-warning">Expense</h5>
+                                <h3 class="fw-bold">৳{{ $expense_amount ?? 0 }}</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                     <div class="col-md-4">
+                        <div class="card border-0 shadow-sm rounded-4 text-center h-100" 
+                            style="padding: 30px 20px; margin: 20px;">
+                            <div class="card-body">
+                                <h5 class="mb-3 fw-semibold text-warning">Paid</h5>
+                                <h3 class="fw-bold">৳{{ $collection_amount ?? 0 }}</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm rounded-4 text-center h-100" 
+                            style="padding: 30px 20px; margin: 20px;">
+                            <div class="card-body">
+                                <h5 class="mb-3 fw-semibold text-warning">Due</h5>
+                                <h3 class="fw-bold">৳{{ $sales_amount+$expense_amount-$collection_amount ?? 0 }}</h3>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
 

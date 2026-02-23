@@ -11,6 +11,11 @@ use App\Models\Client;
 use App\Models\CoaSetup;
 use App\Models\Booking;
 use App\Models\Room;
+use App\Models\Collection;
+use App\Models\CollectionList;
+use App\Models\Sales;
+use App\Models\SalesList;
+use App\Models\ExpenseItem;
 use App\Http\Controllers\Controller;
 use App\Services\FrontEndService;
 use Illuminate\Support\Facades\DB;
@@ -160,7 +165,34 @@ class UserController extends Controller
         if (auth()->user()->role_status != 0) {
             abort(403);
         }
-        return view('frontend.user.dashboard');
+        $client = Client::where('user_id', Auth::id())->first();
+
+        $orders = Booking::where('user_id', Auth::id())->get();
+        $orders_count = Booking::where('user_id', Auth::id())->count();
+
+        $sales = Sales::where('client_id', $client->id)->get();
+        $sales_count = SalesList::where('client_id', $client->id)->sum('qty');
+        $sales_amount = SalesList::where('client_id', $client->id)->sum('net_amount');
+
+        $expenses = ExpenseItem::where('client_id', $client->id)->get();
+        $expense_amount = ExpenseItem::where('client_id', $client->id)->sum('amount');
+
+        $collections = Collection::where('client_id', $client->id)->get();
+        $collection_amount = Collection::where('client_id', $client->id)->sum('amount');
+
+        return view('frontend.user.dashboard', compact(
+            'orders',
+            'sales',
+            'sales_count',
+            'sales_amount',
+            'expenses',
+            'expense_amount',
+            'collections',
+            'orders_count',
+            'client',
+            'collections',
+            'collection_amount'
+            ));
     }
 
     public function updateEditProfile()
