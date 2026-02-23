@@ -16,6 +16,7 @@ use App\Models\CollectionList;
 use App\Models\Sales;
 use App\Models\SalesList;
 use App\Models\ExpenseItem;
+use App\HelperClass;
 use App\Http\Controllers\Controller;
 use App\Services\FrontEndService;
 use Illuminate\Support\Facades\DB;
@@ -197,9 +198,45 @@ class UserController extends Controller
 
     public function updateEditProfile()
     {
-        $menus = $this->frontEndService->getMenu();
-        return view('frontend.user.profile_edit', compact('menus'));
+        //$menus = $this->frontEndService->getMenu();
+        return view('frontend.user.profile_edit');
     }
+
+    public function bookingList(Request $request)
+        {
+            $query = Booking::where('user_id', auth()->id());
+            // 🔍 Search by order number or status
+            if ($request->filled('search')) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('room_id', 'like', '%' . $request->search . '%')
+                    ->orWhere('status', 'like', '%' . $request->search . '%');
+                });
+            }
+
+            $bookings = $query->latest()->paginate(100)->withQueryString();
+
+            return view('frontend.order.orderList', compact('bookings'));
+        }
+
+       public function show(Booking $order)
+        {
+            abort_if($order->user_id !== auth()->id(), 403);
+
+            $order->load('room');
+
+            return view('frontend.order.show', compact('order'));
+        }
+
+        public function invoice(Booking $order)
+        {
+            abort_if($order->user_id !== auth()->id(), 403);
+
+            $order->load('room');
+
+            return view('frontend.order.invoice', compact('order'));
+        }
+
+
 
 
         public function updateProfile(Request $request)

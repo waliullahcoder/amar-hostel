@@ -5,21 +5,21 @@
             <ul class="list-group list-group-flush profile-menu">
 
                 <li class="list-group-item px-3 py-2 rounded-top">
-                    <a href="" class="d-flex align-items-center gap-2 text-dark text-decoration-none">
+                    <a href="{{ route('frontend.user.dashboard') }}" class="d-flex align-items-center gap-2 text-dark text-decoration-none">
                         <i class="fa fa-tachometer-alt"></i>
                         <span> Dashboard</span>
                     </a>
                 </li>
 
                 <li class="list-group-item px-3 py-2">
-                    <a href="" class="d-flex align-items-center gap-2 text-dark text-decoration-none">
+                    <a href="{{ route('user.profile.edit') }}" class="d-flex align-items-center gap-2 text-dark text-decoration-none">
                         <i class="fa fa-user-edit"></i> 
                         <span> Profile Update</span>
                     </a>
                 </li>
 
                 <li class="list-group-item px-3 py-2">
-                    <a href="" class="d-flex align-items-center gap-2 text-dark text-decoration-none">
+                    <a href="{{ route('frontend.user.booking') }}" class="d-flex align-items-center gap-2 text-dark text-decoration-none">
                         <i class="fa fa-box"></i>
                         <span> My Booking</span>
                     </a>

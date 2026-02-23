@@ -1,9 +1,9 @@
 @extends('layouts.frontend.app')
 
 @section('content')
-<div class="container py-5">
+@include('frontend.user.headerDash')
+<div class="container py-5 userdash">
     <div class="row">
-
         {{-- SIDEBAR --}}
         @include('frontend.user.userSideBar')
 
@@ -11,7 +11,7 @@
         <div class="col-lg-9">
 
             <div class="card shadow-sm">
-                <div class="card-body">
+                <div class="card-body" style="padding: 30px 20px; margin: 20px;">
 
                     <h4 class="mb-4 text-center">Update Profile</h4>
 

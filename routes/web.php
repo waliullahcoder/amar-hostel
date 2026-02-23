@@ -48,6 +48,12 @@ Route::middleware(['auth'])->group(function () {
     ->name('user.profile.edit');
     Route::post('/user/profile/update', [UserController::class, 'updateProfile'])
     ->name('user.profile.update');
+    Route::get('/user/booking/list', [UserController::class, 'bookingList'])
+        ->name('frontend.user.booking');
+          Route::get('/my-orders/{order}', [UserController::class, 'show'])
+        ->name('orders.show');
+    Route::get('/my-orders/{order}/invoice', [UserController::class, 'invoice'])
+        ->name('orders.invoice');
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 });
 
