@@ -43,4 +43,13 @@ class Room extends Model
     {
         return $this->hasMany(Invest::class, 'product_id');
     }
+    public function reviews()
+    {
+        return $this->hasMany(Review::class)->where('status', 1);
+    }
+
+    public function averageRating()
+    {
+        return $this->reviews()->avg('rating');
+    }
 }

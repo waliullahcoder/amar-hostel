@@ -3,6 +3,7 @@
 use App\Http\Controllers\Frontend\ViewController;
 use App\Http\Controllers\Frontend\UserController;
 use App\Http\Controllers\Frontend\BookingController;
+use App\Http\Controllers\Frontend\ReviewController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
@@ -57,6 +58,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/user/wallet/history', [UserController::class, 'walletHistory'])
         ->name('frontend.user.wallet');
+    Route::post('/room/{room}/review',[ReviewController::class, 'store']
+)->middleware('auth')->name('review.store');
     Route::post('/logout', [UserController::class, 'logout'])->name('logout');
 });
 

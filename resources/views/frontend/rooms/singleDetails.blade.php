@@ -32,6 +32,9 @@
 .tab-btn.active{color:#0d6efd;border-bottom:3px solid #0d6efd}
 .tab-content{display:none}
 .tab-content.active{display:block}
+.text-warning{
+    color:#f78100;
+}
 </style>
 
 <!-- BREADCRUMB -->
@@ -77,6 +80,27 @@
 
             <h5>Availability Seat: {{ $room->available }} / {{ $room->capacity }}</h5>
         <p>{{ $room->description }}</p>
+                                @php
+                                    $avgRating   = round($room->averageRating(), 1); // e.g. 4.5
+                                    $reviewCount = $room->reviews->count();          // total users
+                                @endphp
+
+                                <div class="mb-2 text-warning">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= floor($avgRating))
+                                            ★
+                                        @elseif($i - $avgRating < 1)
+                                            ☆
+                                        @else
+                                            ☆
+                                        @endif
+                                    @endfor
+
+                                    <span class="text-muted">
+                                        ({{ $avgRating > 0 ? $avgRating : '0.0' }} / 5
+                                        · {{ $reviewCount }} {{ $reviewCount == 1 ? 'review' : 'reviews' }})
+                                    </span>
+                                </div>
 
        <a href="{{ route('booking.bookRoom', $room->id) }}"
                                    class="btn theme_btn button_hover position-absolute bottom-0 start-50 translate-middle-x mb-3">
@@ -127,7 +151,7 @@
 
 <div class="tabs-header">
     <button class="tab-btn active" data-tab="info">Information</button>
-    <button class="tab-btn" data-tab="review">Review</button>
+    <button class="tab-btn" data-tab="review">Review ({{ $room->reviews->count() }})</button>
     <button class="tab-btn" data-tab="facility">Facilities</button>
 </div>
 
@@ -137,7 +161,61 @@
     </div>
 
     <div class="tab-content" id="review">
-        <p>⭐ ⭐ ⭐ ⭐ ⭐ Excellent room</p>
+        <h6>Customer Reviews ({{ $room->reviews->count() }})</h6>
+                            @forelse($room->reviews as $review)
+                                <div class="border-bottom pb-2 mb-3">
+                                    <strong>{{ $review->user->name }}</strong>
+
+                                    <div class="text-warning">
+                                        @for($i=1;$i<=5;$i++)
+                                            {{ $i <= $review->rating ? '★' : '☆' }}
+                                        @endfor
+                                    </div>
+
+                                    <p class="mb-0 text-muted">
+                                        {{ $review->review }}
+                                    </p>
+                                </div>
+                            @empty
+                                <p class="text-muted">No reviews yet.</p>
+                            @endforelse
+
+                            {{-- REVIEW FORM --}}
+                            @auth
+                                @if($review_count==0)
+                                <hr>
+                                <h6>Write a Review</h6>
+                                    
+                                <form method="POST" action="{{ route('review.store', $room->id) }}">
+                                    @csrf
+
+                                    <div class="mb-2">
+                                        <label class="form-label">Rating</label>
+                                        <select name="rating" class="form-select" required>
+                                            <option value="">Select Rating</option>
+                                            @for($i=5;$i>=1;$i--)
+                                                <option value="{{ $i }}">{{ $i }} Star</option>
+                                            @endfor
+                                        </select>
+                                    </div>
+
+                                    <div class="">
+                                        <label class="form-label">Review</label>
+                                        <textarea name="review" rows="3"
+                                                class="form-control"
+                                                placeholder="Write your experience..."></textarea>
+                                    </div>
+
+                                    <button class="btn theme_btn button_hover" style="margin-top:10px;">
+                                        Submit Review
+                                    </button>
+                                </form>
+                                @endif
+                            @else
+                                <p class="text-muted mt-3">
+                                    Please <a href="{{ route('login') }}">login</a> to write a review.
+                                </p>
+                            @endauth
     </div>
 
     <div class="tab-content" id="facility">

@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Frontend;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Services\FrontEndService;
+use App\Models\Review;
 use Illuminate\Support\Facades\Auth;
 class ViewController extends Controller
 {
@@ -88,8 +89,9 @@ class ViewController extends Controller
 
     public function singleDetails($id)
     {
-        $room = $this->frontEndService->getRoom($id);
-        return view('frontend.rooms.singleDetails', compact('room'));
+       $room = $this->frontEndService->getRoom($id);
+       $review_count=Review::where('room_id', $room->id)->where('user_id',Auth::id())->count();
+        return view('frontend.rooms.singleDetails', compact('room','review_count'));
     }
     
 }
